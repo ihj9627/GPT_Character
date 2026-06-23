@@ -1,0 +1,31 @@
+{
+  "id": "./mobile.html",
+  "name": "Character Archive Mobile",
+  "short_name": "Archive",
+  "description": "캐릭터 아카이브 감상용 모바일 companion",
+  "lang": "ko",
+  "start_url": "./mobile.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#100b18",
+  "theme_color": "#100b18",
+  "categories": [
+    "books",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

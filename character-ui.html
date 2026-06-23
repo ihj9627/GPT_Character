@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Character UI</title>
+  <link rel="stylesheet" href="character-ui.css?v=home-admin-figure01">
+</head>
+<body>
+  <div class="viewport-stage" id="viewportStage">
+    <div class="screen-frame app-shell" id="screenFrame">
+    <aside class="app-sidebar" id="appSidebar" aria-label="주요 메뉴">
+      <div class="app-brand">
+        <p class="app-brand-kicker">CHARACTER ARCHIVE</p>
+        <h1 class="app-brand-title">Orvia Desk</h1>
+        <p class="app-brand-copy">캐릭터 이미지와 기본 프로필을 모아두는 PC 감상/관리용 아카이브</p>
+      </div>
+
+      <nav class="app-nav" aria-label="화면 이동">
+        <button class="app-nav-button is-active" type="button" data-app-nav="home" id="appNavHome">
+          <span class="app-nav-icon" aria-hidden="true">⌂</span>
+          <span>홈</span>
+        </button>
+        <button class="app-nav-button" type="button" data-app-nav="characters" id="appNavCharacters">
+          <span class="app-nav-icon" aria-hidden="true">◇</span>
+          <span>캐릭터</span>
+        </button>
+        <button class="app-nav-button" type="button" data-app-nav="library" id="appNavLibrary">
+          <span class="app-nav-icon" aria-hidden="true">□</span>
+          <span>서재</span>
+        </button>
+        <button class="app-nav-button" type="button" data-app-nav="generator" id="appNavGenerator">
+          <span class="app-nav-icon" aria-hidden="true">✦</span>
+          <span>랜덤 생성기</span>
+        </button>
+        <button class="app-nav-button" type="button" data-app-nav="adventure" id="appNavAdventure">
+          <span class="app-nav-icon" aria-hidden="true">♜</span>
+          <span>어드벤처</span>
+        </button>
+      </nav>
+
+      <section class="app-mode-panel" aria-label="접속 모드">
+        <div class="app-mode-status">
+          <p class="app-mode-label">현재 모드</p>
+          <strong class="app-mode-value" id="appModeValue">일반모드</strong>
+        </div>
+        <p class="app-mode-copy" id="appModeCopy">공개 자료 보기</p>
+        <div class="app-mode-actions">
+          <button class="app-mode-button" type="button" id="appSafeModeButton">일반모드</button>
+          <button class="app-mode-button app-mode-button-admin" type="button" id="appAdminModeButton">관리자</button>
+        </div>
+      </section>
+    </aside>
+
+    <header class="app-topbar" id="appTopbar">
+      <div class="app-topbar-title">
+        <p class="app-topbar-kicker" id="appTopbarKicker">WORKSPACE STATUS</p>
+        <h2 id="appPageTitle">Archive Home</h2>
+      </div>
+      <p class="app-topbar-summary" id="appPageSummary">캐릭터 · 이미지 · 프롬프트 도구</p>
+      <span class="app-mode-badge" id="appModeBadge">일반모드</span>
+    </header>
+
+  <main class="screen start-screen" id="startScreen">
+    <img class="start-background" id="startBackground" src="assets/ui/start-screen.png" alt="" aria-hidden="true">
+    <section class="home-hero-panel" aria-label="홈 소개">
+      <p class="start-kicker">ORVIA DESK</p>
+      <h1 class="start-title">캐릭터 아카이브</h1>
+      <p class="start-copy">
+        캐릭터 이미지, 프로필, 서재 문서, 랜덤 생성기를 한 곳에서 확인하는 PC용 작업 공간입니다.
+      </p>
+      <p class="home-guide-copy">화면 이동은 좌측 메뉴를 사용하세요.</p>
+    </section>
+
+    <div class="home-side-stack">
+    <section class="home-status-panel" aria-label="아카이브 상태 요약">
+      <div class="home-status-header">
+        <p class="home-status-kicker">ARCHIVE STATUS</p>
+        <h2>아카이브 상태</h2>
+      </div>
+      <dl class="home-status-list">
+        <div class="home-status-row">
+          <dt>캐릭터</dt>
+          <dd><strong id="homeCharacterCount">0</strong><span>명 등록</span></dd>
+        </div>
+        <div class="home-status-row">
+          <dt>서재 문서</dt>
+          <dd><strong id="homeLibraryCount">0</strong><span>편 등록</span></dd>
+        </div>
+        <div class="home-status-row">
+          <dt>현재 모드</dt>
+          <dd><strong id="homeModeStatus">일반모드</strong></dd>
+        </div>
+      </dl>
+    </section>
+
+      <section class="home-admin-panel" id="homeAdminPanel" aria-label="홈 관리자 도구">
+        <div class="home-admin-heading">
+          <p class="home-admin-kicker">ADMIN TOOLS</p>
+          <h2>관리자 영역</h2>
+        </div>
+        <div class="home-admin-actions">
+          <button class="nav-button admin-tools-toggle" type="button" id="openAdminToolsButton" aria-expanded="false" hidden>관리 도구</button>
+          <button class="nav-button asset-check-button hidden" type="button" id="assetCheckButton">이미지 검사</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="admin-tools-panel hidden" id="adminToolsPanel" aria-label="관리자 도구">
+      <div class="admin-tools-heading">
+        <div>
+          <p class="admin-tools-kicker">ADMIN TOOL</p>
+          <h2 class="admin-tools-title">관리 도구</h2>
+          <p class="admin-tools-copy">소설과 캐릭터 데이터를 분석한 뒤, 프로젝트에 덮어쓸 결과 파일을 생성합니다. 이 화면은 파일을 직접 저장하지 않습니다.</p>
+        </div>
+        <span class="admin-tools-badge">관리자 전용</span>
+      </div>
+
+      <div class="admin-tools-tabs" role="tablist" aria-label="관리 도구 종류">
+        <button class="admin-tools-tab is-active" type="button" id="adminStoryToolTab" data-admin-tool-tab="story" role="tab" aria-selected="true" aria-controls="storyImportToolPanel">소설 ZIP 등록</button>
+        <button class="admin-tools-tab" type="button" id="adminCharacterToolTab" data-admin-tool-tab="character" role="tab" aria-selected="false" aria-controls="characterImportToolPanel">캐릭터 엑셀 등록</button>
+      </div>
+
+      <section class="admin-tool-subpanel" id="storyImportToolPanel" data-admin-tool-panel="story" role="tabpanel" aria-labelledby="adminStoryToolTab">
+        <div class="admin-import-controls">
+          <label class="admin-import-file">
+            <span>소설 ZIP 선택</span>
+            <input id="storyImportZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed">
+          </label>
+          <button class="admin-import-button" type="button" id="storyImportPreviewButton">미리보기</button>
+          <button class="admin-import-button admin-import-button-primary" type="button" id="storyImportDownloadButton" disabled>패치 ZIP 다운로드</button>
+        </div>
+
+        <p class="admin-import-guide">
+          권장 파일명은 <code>캐릭터폴더_02.md</code> 형식입니다. 번호가 없으면 현재 등록된 소설 다음 번호를 자동 배정합니다.
+        </p>
+        <p class="admin-import-message" id="storyImportStatus" data-tone="muted">ZIP 파일을 선택해 주세요.</p>
+        <div class="admin-import-summary" id="storyImportSummary" aria-live="polite"></div>
+        <div class="admin-import-results" id="storyImportResults"></div>
+      </section>
+
+      <section class="admin-tool-subpanel hidden" id="characterImportToolPanel" data-admin-tool-panel="character" role="tabpanel" aria-labelledby="adminCharacterToolTab">
+        <div class="admin-import-controls">
+          <label class="admin-import-file">
+            <span>캐릭터 엑셀 선택</span>
+            <input id="characterImportXlsxInput" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          </label>
+          <button class="admin-import-button" type="button" id="characterImportPreviewButton">미리보기</button>
+          <button class="admin-import-button admin-import-button-primary" type="button" id="characterImportDownloadButton" disabled>characters.js 다운로드</button>
+        </div>
+
+        <p class="admin-import-guide">
+          기본정보 템플릿의 <code>folder</code>를 기준으로 신규 추가/기존 수정을 구분합니다. 빈 칸은 기존 값을 유지하고, <code>CLEAR</code>는 해당 값을 비웁니다.
+        </p>
+        <p class="admin-import-message" id="characterImportStatus" data-tone="muted">엑셀 파일을 선택해 주세요.</p>
+        <div class="admin-import-summary" id="characterImportSummary" aria-live="polite"></div>
+        <div class="admin-import-results" id="characterImportResults"></div>
+      </section>
+    </section>
+  </main>
+
+  <main class="screen list-screen hidden" id="listScreen">
+    <header class="list-header">
+      <div class="list-heading">
+        <p class="list-kicker">CHARACTER ARCHIVE</p>
+        <h1 class="list-title">캐릭터 목록</h1>
+        
+      </div>
+    </header>
+
+    <section class="list-tools" aria-label="캐릭터 검색">
+      <label class="search-wrap">
+        <input class="search-input" id="characterSearch" type="search" placeholder="캐릭터 이름 검색" autocomplete="off">
+      </label>
+      <div class="filter-panel" id="filterPanel" aria-label="캐릭터 필터">
+        <button class="filter-open-button" type="button" id="filterOpenButton" aria-controls="filterPopover" aria-expanded="false">필터</button>
+        <div class="filter-popover hidden" id="filterPopover" role="region" aria-label="캐릭터 필터 선택">
+          <div class="filter-popover-header">
+            <strong>FILTER</strong>
+          </div>
+          <div class="filter-popover-body" id="filterPopoverBody"></div>
+          <div class="filter-popover-actions">
+            <button type="button" id="filterApplyButton">확인</button>
+          </div>
+        </div>
+      </div>
+      <button class="favorite-filter-button" type="button" id="favoriteFilterToggle" aria-pressed="false">즐겨찾기</button>
+      <button class="filter-reset-button" type="button" id="filterResetButton">필터 초기화</button>
+      <div class="search-status" id="searchStatus">전체 표시</div>
+      <div class="list-count" id="listCount">0 CHARACTERS</div>
+    </section>
+
+    <section class="list-content">
+      <section class="character-list-wrap" id="characterListWrap">
+        <button class="page-edge page-edge-prev" type="button" id="edgePrevPageButton" aria-label="이전 페이지" data-arrow="‹"></button>
+        <section class="character-grid" id="characterGrid" aria-label="캐릭터 목록"></section>
+        <button class="page-edge page-edge-next" type="button" id="edgeNextPageButton" aria-label="다음 페이지" data-arrow="›"></button>
+      </section>
+    </section>
+    <nav class="page-controls" aria-label="캐릭터 페이지">
+      <div class="page-status" id="pageStatus">1 / 1</div>
+    </nav>
+  </main>
+
+  <main class="screen generator-screen hidden" id="generatorScreen">
+    <header class="generator-header">
+      <div>
+        <p class="list-kicker">IMAGE PROMPT GENERATOR</p>
+        <h1 class="generator-title">랜덤 생성기</h1>
+      </div>
+      <div class="list-actions">
+        <button class="nav-button" type="button" id="closeGeneratorButton">목록으로</button>
+      </div>
+    </header>
+
+    <nav class="generator-main-tabs" role="tablist" aria-label="랜덤 생성기 작업 탭">
+      <button class="generator-main-tab is-active" type="button" id="generatorRandomTabButton" role="tab" aria-selected="true" aria-controls="generatorRandomTabPanel">랜덤 생성용</button>
+      <button class="generator-main-tab" type="button" id="generatorFollowupTabButton" role="tab" aria-selected="false" aria-controls="generatorFollowupTabPanel">후속 이미지</button>
+    </nav>
+
+    <section class="generator-tab-panel generator-random-tab-panel is-active" id="generatorRandomTabPanel" role="tabpanel" aria-labelledby="generatorRandomTabButton">
+      <section class="generator-body" aria-label="랜덤 캐릭터 설정">
+      <aside class="generator-side">
+        <p class="generator-copy">
+          GPT Image 2에서 사용할 캐릭터 이미지 생성용 키워드를 랜덤으로 조합합니다.
+          결과를 이미지 제작과 캐릭터 초안 작성에 활용하는 흐름을 기준으로 정리했습니다.
+        </p>
+        <button class="generate-button" type="button" id="generateCharacterButton">전체 랜덤 생성</button>
+        <button class="copy-generator-button" type="button" id="copyGeneratorButton">질문용 프롬프트 보기</button>
+        <button class="copy-generator-button" type="button" id="copyGeneratorImagePromptButton">생성용 프롬프트 보기</button>
+        <div class="generator-lock-summary" id="generatorLockSummary" aria-live="polite"></div>
+        <button class="clear-lock-button hidden" type="button" id="clearGeneratorLocksButton">고정 전체 해제</button>
+        <section class="generator-history-panel" aria-label="최근 랜덤 생성 결과">
+          <div class="generator-history-heading">
+            <h2>최근 결과</h2>
+            <button class="generator-history-clear" type="button" id="clearGeneratorHistoryButton">비우기</button>
+          </div>
+          <div class="generator-history-list" id="generatorHistoryList" aria-live="polite"></div>
+        </section>
+        <p class="generator-note">
+          고정 버튼을 켜면 해당 항목은 유지하고 나머지만 다시 조합합니다. 질문용 프롬프트는 모달에서 확인한 뒤 복사합니다.
+        </p>
+      </aside>
+
+      <section class="generator-result">
+        <section class="generator-assist-panel" aria-label="AI 연출 세트">
+  <div class="generator-assist-heading">
+    <div>
+      <p class="prompt-preview-kicker">AI DIRECTION SET</p>
+      <h2 class="prompt-preview-title">연출 세트</h2>
+    </div>
+    <div class="generator-assist-heading-actions">
+      <span class="prompt-preview-badge">모달에서 붙여넣기</span>
+      <button class="generator-set-paste-open" type="button" id="openGeneratorSetPasteButton">연출 세트 붙여넣기/수정</button>
+    </div>
+  </div>
+  <div class="generator-set-paste-preview is-empty" id="generatorSetPastePreview" aria-live="polite">
+    <p class="generator-set-paste-preview-empty">아직 적용된 연출 세트가 없습니다. 버튼을 눌러 A안/B안/C안 전체를 그대로 붙여넣어 주세요.</p>
+  </div>
+</section>
+<div class="generator-grid" id="generatorGrid"></div>
+      </section>
+      </section>
+    </section>
+
+    <section class="generator-tab-panel generator-followup-tab-panel hidden" id="generatorFollowupTabPanel" role="tabpanel" aria-labelledby="generatorFollowupTabButton" hidden>
+      <section class="generator-followup-workspace" aria-label="후속 이미지 프롬프트 작업">
+        <div class="generator-followup-heading">
+          <div>
+            <p class="prompt-preview-kicker">FOLLOW-UP IMAGE PROMPTS</p>
+            <h2 class="prompt-preview-title">후속 이미지</h2>
+          </div>
+          <span class="prompt-preview-badge">프롬프트 준비 공간</span>
+        </div>
+        <label class="generator-followup-name-field">
+          <span>캐릭터 이름</span>
+          <input type="text" id="generatorFollowupCharacterNameInput" placeholder="예: 레나(Lena)" autocomplete="off">
+        </label>
+        <section class="generator-followup-sketchbook-panel" aria-label="스케치북 프롬프트 설정">
+          <div class="generator-followup-sketchbook-heading">
+            <div>
+              <p class="prompt-preview-kicker">SKETCHBOOK SETTINGS</p>
+              <h3>스케치북 정보</h3>
+            </div>
+            <p>생성용 프롬프트 복사 기록에서 최근 5개를 불러옵니다.</p>
+          </div>
+          <div class="generator-followup-recent-row">
+            <label class="generator-followup-recent-field">
+              <span>최근 복사본</span>
+              <select id="generatorSketchbookRecentSelect">
+                <option value="">최근 복사본 없음</option>
+              </select>
+            </label>
+            <button class="generator-followup-small-action" type="button" id="loadGeneratorSketchbookRecentButton">불러오기</button>
+          </div>
+          <div class="generator-followup-sketchbook-grid">
+            <label class="generator-followup-name-field">
+              <span>종족</span>
+              <input type="text" id="generatorSketchbookRaceInput" placeholder="예: 엘프" autocomplete="off">
+            </label>
+            <label class="generator-followup-name-field">
+              <span>직업</span>
+              <input type="text" id="generatorSketchbookRoleInput" placeholder="예: 마법사" autocomplete="off">
+            </label>
+            <label class="generator-followup-name-field">
+              <span>성격</span>
+              <input type="text" id="generatorSketchbookPersonalityInput" placeholder="예: 장난스러운 성격" autocomplete="off">
+            </label>
+            <label class="generator-followup-name-field">
+              <span>세계/장르</span>
+              <input type="text" id="generatorSketchbookGenreInput" placeholder="예: 판타지" autocomplete="off">
+            </label>
+          </div>
+        </section>
+        <div class="generator-followup-actions" aria-label="후속 이미지 프롬프트 종류">
+          <button class="generator-followup-action is-ready" type="button" id="copyFollowupSketchSheetPromptButton">낙서시트</button>
+          <button class="generator-followup-action is-ready" type="button" id="copyFollowupTurnaroundPromptButton">삼면도</button>
+          <button class="generator-followup-action is-ready" type="button" id="copyFollowupMagazinePromptButton">잡지</button>
+          <button class="generator-followup-action is-ready" type="button" id="copyFollowupSketchbookPromptButton">스케치북</button>
+          <button class="generator-followup-action is-ready" type="button" id="copyFollowupBodyInfoPromptButton">신체정보</button>
+        </div>
+        <p class="generator-followup-note">추가 후속 프롬프트 선택지</p>
+        <div class="generator-followup-actions" aria-label="추가 후속 이미지 프롬프트 선택지">
+          <button class="generator-followup-action" type="button" id="copyFollowupCookingMagazinePromptButton">요리잡지</button>
+        </div>
+        <div class="generator-followup-placeholder">
+          <p class="generator-followup-copy">후속 이미지용 프롬프트를 모달에서 확인한 뒤 복사합니다.</p>
+          <p class="generator-followup-note">낙서시트, 삼면도, 잡지, 스케치북, 신체정보 프롬프트가 등록되어 있습니다. 스케치북은 이름을 사용하지 않고 종족/직업/성격/세계만 사용합니다.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <section class="generator-set-paste-modal hidden" id="generatorSetPasteModal" role="dialog" aria-modal="true" aria-labelledby="generatorSetPasteModalTitle">
+    <div class="generator-set-paste-dialog">
+      <div class="generator-prompt-modal-heading">
+        <div>
+          <p class="prompt-preview-kicker">SET PASTE</p>
+          <h2 class="prompt-preview-title" id="generatorSetPasteModalTitle">세트 붙여넣기</h2>
+        </div>
+        <button class="generator-prompt-close" type="button" id="closeGeneratorSetPasteButton" aria-label="세트 붙여넣기 닫기">×</button>
+      </div>
+      <p class="generator-prompt-modal-copy">
+        GPT 답변의 A/B/C 세트 중 하나를 통째로 붙여넣으면 장면, 구도, 연출을 자동으로 추출해 적용합니다. 굵게, 목록, 하위 항목이 포함되어도 최대한 그대로 파싱합니다.
+      </p>
+      <textarea class="generator-set-paste-text" id="generatorSetPasteText" placeholder="A안&#10;- **장면:** ...&#10;- **구도:** ...&#10;- **연출:**&#10;  - **능력/무기:** ...&#10;  - **성격/종족:** ..."></textarea>
+      <div class="generator-prompt-modal-actions">
+        <button class="generator-prompt-action secondary" type="button" id="cancelGeneratorSetPasteButton">닫기</button>
+        <button class="generator-prompt-action primary" type="button" id="applyGeneratorSetPasteButton">적용</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="generator-prompt-modal hidden" id="generatorPromptModal" role="dialog" aria-modal="true" aria-labelledby="generatorPromptModalTitle">
+    <div class="generator-prompt-dialog">
+      <div class="generator-prompt-modal-heading">
+        <div>
+          <p class="prompt-preview-kicker" id="generatorPromptModalKicker">QUESTION PROMPT</p>
+          <h2 class="prompt-preview-title" id="generatorPromptModalTitle">질문용 프롬프트 확인</h2>
+        </div>
+        <button class="generator-prompt-close" type="button" id="closeGeneratorQuestionPromptButton" aria-label="질문용 프롬프트 닫기">×</button>
+      </div>
+      <p class="generator-prompt-modal-copy" id="generatorPromptModalCopy">
+        아래 내용을 확인한 뒤 복사 버튼을 눌러 ChatGPT에 붙여넣으세요.
+      </p>
+      <textarea class="generator-prompt-modal-text" id="generatorQuestionPromptText" readonly></textarea>
+      <div class="generator-prompt-modal-actions">
+        <button class="generator-prompt-action secondary" type="button" id="cancelGeneratorQuestionPromptButton">닫기</button>
+        <button class="generator-prompt-action primary" type="button" id="copyGeneratorQuestionPromptButton">복사</button>
+      </div>
+    </div>
+  </section>
+
+
+  <main class="screen adventure-screen hidden" id="adventureScreen">
+    <header class="adventure-header">
+      <div>
+        <p class="list-kicker">NOCT TEXT ADVENTURE</p>
+        <h1 class="adventure-title">노크트 어드벤처</h1>
+      </div>
+      <div class="list-actions">
+        <button class="nav-button" type="button" id="closeAdventureButton">목록으로</button>
+      </div>
+    </header>
+
+    <section class="adventure-body" aria-label="노크트 텍스트 어드벤처">
+      <aside class="adventure-side">
+        <section class="adventure-card adventure-setup-card" aria-label="게임 시작">
+          <p class="adventure-kicker">SCENARIO</p>
+          <h2 id="adventureScenarioTitle">흑관궁의 장례 재판</h2>
+          <p class="adventure-copy" id="adventureScenarioCopy">
+            노크트 세계관의 장례 재판에 휘말려 기록과 선택을 따라가는 30턴 파일럿입니다.
+          </p>
+          <label class="adventure-field-label" for="adventureCharacterSelect">플레이 캐릭터</label>
+          <select class="adventure-character-select" id="adventureCharacterSelect"></select>
+          <div class="adventure-actions">
+            <button class="adventure-primary-button" type="button" id="adventureStartButton">새로 시작</button>
+            <button class="adventure-secondary-button" type="button" id="adventureContinueButton">이어하기</button>
+            <button class="adventure-secondary-button danger" type="button" id="adventureResetButton">저장 삭제</button>
+          </div>
+        </section>
+
+        <section class="adventure-card adventure-character-card" aria-label="선택 캐릭터">
+          <div class="adventure-character-image-wrap">
+            <img class="adventure-character-image" id="adventureCharacterImage" alt="">
+          </div>
+          <div class="adventure-character-info">
+            <h2 id="adventureCharacterName">캐릭터</h2>
+            <dl class="adventure-character-stats" id="adventureCharacterStats"></dl>
+          </div>
+        </section>
+
+        <section class="adventure-card adventure-status-card" aria-label="진행 상태">
+          <div class="adventure-status-grid">
+            <div class="adventure-status-item">
+              <span>체력</span>
+              <strong id="adventureHealthValue">-</strong>
+            </div>
+            <div class="adventure-status-item">
+              <span>정신력</span>
+              <strong id="adventureSanityValue">-</strong>
+            </div>
+            <div class="adventure-status-item">
+              <span>진행</span>
+              <strong id="adventureTurnValue">-</strong>
+            </div>
+            <div class="adventure-status-item">
+              <span>장소</span>
+              <strong id="adventureLocationValue">-</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="adventure-card adventure-inventory-card" aria-label="보유 기록과 아이템">
+          <div class="adventure-subhead">
+            <h2>보유 기록 · 아이템</h2>
+          </div>
+          <div class="adventure-inventory-list" id="adventureInventoryList"></div>
+        </section>
+      </aside>
+
+      <section class="adventure-main">
+        <section class="adventure-event-panel" aria-label="현재 사건">
+          <div class="adventure-event-heading">
+            <p class="adventure-event-kicker" id="adventureEventKicker">READY</p>
+            <h2 id="adventureEventTitle">게임을 시작하세요</h2>
+          </div>
+          <div class="adventure-event-text" id="adventureEventText">
+            캐릭터를 선택한 뒤 새로 시작을 누르면 노크트 파일럿이 시작됩니다.
+          </div>
+          <div class="adventure-result-text hidden" id="adventureResultText" aria-live="polite"></div>
+          <div class="adventure-choice-list" id="adventureChoiceList"></div>
+          <button class="adventure-next-button hidden" type="button" id="adventureNextButton">다음 턴</button>
+        </section>
+
+        <section class="adventure-log-panel" aria-label="최근 진행 로그">
+          <div class="adventure-subhead">
+            <h2>최근 로그</h2>
+          </div>
+          <div class="adventure-log-list" id="adventureLogList"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+
+  <main class="screen library-screen hidden" id="libraryScreen">
+    <header class="library-header">
+      <div>
+        <p class="list-kicker">STORY SHELF</p>
+        <h1 class="library-title">서재</h1>
+      </div>
+      <div class="list-actions">
+        <button class="nav-button" type="button" id="closeLibraryButton">목록으로</button>
+      </div>
+    </header>
+
+    <section class="library-body" aria-label="서재">
+      <aside class="library-tree-panel" aria-label="서재 트리">
+        <label class="library-search-wrap">
+          <input class="library-search-input" id="librarySearch" type="search" placeholder="소설 검색" autocomplete="off">
+        </label>
+        <div class="library-tree" id="libraryTree" role="tree" aria-label="서재 소설 트리"></div>
+      </aside>
+
+      <article class="library-viewer" id="libraryViewer" aria-label="서재 소설">
+        <div class="library-doc-heading">
+          <p class="library-doc-kicker" id="libraryDocKicker">서재</p>
+          <h2 class="library-doc-title" id="libraryDocTitle">소설 선택 대기</h2>
+          <p class="library-doc-summary" id="libraryDocSummary">왼쪽 트리에서 소설을 선택하세요.</p>
+        </div>
+        <div class="library-doc-body" id="libraryDocBody"></div>
+        <section class="library-related-panel" aria-label="관련 정보">
+          <div class="library-related-block">
+            <h3>관련 캐릭터</h3>
+            <div class="library-chip-list" id="libraryRelatedCharacters"></div>
+          </div>
+          <div class="library-related-block">
+            <h3>관련 소설</h3>
+            <div class="library-chip-list" id="libraryRelatedDocuments"></div>
+          </div>
+          <div class="library-related-block">
+            <h3>관련 소설</h3>
+            <div class="library-chip-list" id="libraryRelatedNovels"></div>
+          </div>
+        </section>
+      </article>
+    </section>
+  </main>
+
+
+  <div class="library-password-modal hidden" id="libraryPasswordModal" role="dialog" aria-modal="true" aria-labelledby="libraryPasswordTitle">
+    <div class="library-password-dialog">
+      <p class="library-password-kicker">PRIVATE DOCUMENT</p>
+      <h2 class="library-password-title" id="libraryPasswordTitle">비공개 문서</h2>
+      <p class="library-password-guide">이 문서는 관리자모드에서 비밀번호 확인 후 열람합니다.</p>
+      <label class="library-password-label" for="libraryPasswordInput">비밀번호</label>
+      <input class="library-password-input" id="libraryPasswordInput" type="password" autocomplete="off" inputmode="numeric">
+      <p class="library-password-error" id="libraryPasswordError" aria-live="polite"></p>
+      <div class="library-password-actions">
+        <button class="library-password-cancel" type="button" id="libraryPasswordCancel">취소</button>
+        <button class="library-password-submit" type="button" id="libraryPasswordSubmit">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="library-password-modal hidden" id="adminPasswordModal" role="dialog" aria-modal="true" aria-labelledby="adminPasswordTitle">
+    <div class="library-password-dialog admin-password-dialog">
+      <p class="library-password-kicker">ADMIN ACCESS</p>
+      <h2 class="library-password-title" id="adminPasswordTitle">관리자 모드</h2>
+      <p class="library-password-guide">관리자 자료와 이미지 검사 기능을 열려면 비밀번호를 입력하세요.</p>
+      <label class="library-password-label" for="adminPasswordInput">비밀번호</label>
+      <input class="library-password-input" id="adminPasswordInput" type="password" autocomplete="off" inputmode="numeric">
+      <p class="library-password-error" id="adminPasswordError" aria-live="polite"></p>
+      <div class="library-password-actions">
+        <button class="library-password-cancel" type="button" id="adminPasswordCancel">취소</button>
+        <button class="library-password-submit" type="button" id="adminPasswordSubmit">관리자 모드 열기</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="screen detail-screen hidden" id="detailScreen">
+    <header class="detail-header">
+      <section class="identity">
+        <p class="detail-kicker">CHARACTER FILE</p>
+        <div class="name-row">
+          <div class="detail-name" id="detailName">나기르</div>
+          <div class="detail-en" id="detailEn">Nagir</div>
+        </div>
+      </section>
+
+      <nav class="top-tabs" aria-label="상세 정보 탭">
+        <button class="tab-button active" type="button" data-tab="profile">프로필</button>
+        <button class="tab-button" type="button" data-tab="library">서재</button>
+        <button class="tab-button" type="button" data-tab="status">스테이터스</button>
+        <button class="tab-button" type="button" data-tab="images">이미지</button>
+      </nav>
+
+      <button class="detail-favorite-button" type="button" id="detailFavoriteButton" aria-label="즐겨찾기" title="즐겨찾기"></button>
+      <button class="close-button" type="button" id="backButton" aria-label="목록으로"></button>
+    </header>
+
+    <section class="left-pane">
+      <div class="illustration-slot" id="illustrationSlot" aria-label="일러스트 공간">
+        <img id="slotImage" src="" alt="캐릭터 이미지" hidden>
+      </div>
+    </section>
+
+    <section class="stats-area">
+      <section class="profile-tab-panel">
+        <section class="panel profile-info-panel" aria-label="프로필 기본 정보">
+          <h2 class="panel-title">기본 정보</h2>
+          <div class="profile-info-grid">
+            <div class="info-row"><span class="info-label">성별</span><span class="info-value" data-basic-info="gender"></span></div>
+            <div class="info-row"><span class="info-label">장르</span><span class="info-value" data-basic-info="genre"></span></div>
+            <div class="info-row"><span class="info-label">종족</span><span class="info-value" data-basic-info="race"></span></div>
+            <div class="info-row"><span class="info-label">직업</span><span class="info-value" data-basic-info="job"></span></div>
+            <div class="info-row"><span class="info-label">나이</span><span class="info-value" data-basic-info="age"></span></div>
+            <div class="info-row"><span class="info-label">성격</span><span class="info-value" data-basic-info="personality"></span></div>
+            <div class="info-row"><span class="info-label">능력</span><span class="info-value" data-basic-info="ability"></span></div>
+            <div class="info-row"><span class="info-label">무기</span><span class="info-value" data-basic-info="weapon"></span></div>
+            <div class="info-row"><span class="info-label">신장</span><span class="info-value" data-basic-info="height"></span></div>
+            <div class="info-row"><span class="info-label">체중</span><span class="info-value" data-basic-info="weight"></span></div>
+            <div class="info-row sizes-row"><span class="info-label">쓰리사이즈</span><span class="info-value" data-basic-info="measurements"></span></div>
+          </div>
+        </section>
+
+        <section class="panel profile-summary-panel" aria-label="프로필 요약">
+          <h2 class="panel-title">PROFILE SUMMARY</h2>
+          <div class="profile-summary-grid">
+            <div class="profile-summary-item">
+              <p class="profile-summary-label">한 줄 소개</p>
+              <p class="profile-description" id="profileDescription"></p>
+            </div>
+            <div class="profile-summary-item">
+              <p class="profile-summary-label">대표 대사</p>
+              <blockquote class="profile-quote" id="profileQuote"></blockquote>
+            </div>
+          </div>
+        </section>
+
+</section>
+
+      <section class="detail-settings-tab-panel detail-library-tab-panel" aria-label="서재 연결">
+        <div class="detail-settings-grid detail-library-grid">
+          <header class="detail-library-panel-head">
+            <h2 class="panel-title">관련 자료</h2>
+            <p class="detail-library-summary">이 캐릭터와 연결된 서재 문서를 카드로 모아 봅니다.</p>
+          </header>
+          <div class="detail-library-card-grid" id="detailLibraryCards"></div>
+          <p class="detail-library-note">문서 전문과 긴 설정 확인은 서재 화면에서 진행합니다.</p>
+        </div>
+      </section>
+
+      <section class="panel image-album-panel" aria-label="이미지 앨범">
+        <div class="album-header">
+          <div>
+            <h2 class="panel-title">IMAGE ALBUM</h2>
+            <p class="album-subtitle" id="albumSubtitle">캐릭터 이미지 보관함</p>
+          </div>
+        </div>
+        <div class="album-grid" id="albumGrid"></div>
+      </section>
+
+      <section class="panel h-status">
+        <h2 class="panel-title">H STATUS</h2>
+        <div class="h-status-main">
+          <div class="circle-stat">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="statusStroke" x1="0" y1="0" x2="1" y2="1">
+                  <stop class="status-stop-start" offset="0%" stop-color="#dd4fb3"></stop>
+                  <stop class="status-stop-end" offset="100%" stop-color="#5b2ab8"></stop>
+                </linearGradient>
+              </defs>
+              <circle class="circle-track" cx="60" cy="60" r="50"></circle>
+              <circle class="circle-progress" cx="60" cy="60" r="50"></circle>
+            </svg>
+            <div><strong data-auto="hLevel">--</strong><span>/100</span></div>
+          </div>
+          <div class="blank-list">
+            <div class="blank-row"><span>성적 매력</span><span class="blank-value" data-auto="charm"></span></div>
+            <div class="blank-row"><span>민감도</span><span class="blank-value" data-auto="sensitivity"></span></div>
+            <div class="blank-row"><span>정조 개방</span><span class="blank-value" data-auto="openness"></span></div>
+            <div class="blank-row"><span>쾌락 한계</span><span class="blank-value" data-auto="pleasureLimit"></span></div>
+            <div class="blank-row"><span>방어 내성</span><span class="blank-value" data-auto="defense"></span></div>
+            <div class="blank-row"><span>피로 한계</span><span class="blank-value" data-auto="stamina"></span></div>
+          </div>
+        </div>
+        <div class="pleasure-meter">
+          <span>현재 쾌감</span>
+          <div class="progress-line"><span></span></div>
+          <span class="blank-value" data-auto="currentPleasure"></span>
+        </div>
+      </section>
+
+      <section class="panel action-log">
+        <h2 class="panel-title">행위 기록</h2>
+        <div class="achievement-grid">
+          <div class="blank-list action-log-left">
+            <div class="blank-row"><span>정상위</span><span class="blank-value" data-auto="act0"></span></div>
+            <div class="blank-row"><span>후배위</span><span class="blank-value" data-auto="act1"></span></div>
+            <div class="blank-row"><span>측위</span><span class="blank-value" data-auto="act2"></span></div>
+            <div class="blank-row"><span>자위</span><span class="blank-value" data-auto="act3"></span></div>
+            <div class="blank-row"><span>구강</span><span class="blank-value" data-auto="act4"></span></div>
+            <div class="blank-row"><span>항문</span><span class="blank-value" data-auto="act5"></span></div>
+            <div class="blank-row"><span>기타</span><span class="blank-value" data-auto="act6"></span></div>
+            <div class="blank-row action-total"><span>총 횟수</span><span class="blank-value" data-auto="actTotal"></span></div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-card"><span>절정 도달 총 횟수</span><span class="blank-value" data-auto="climaxTotal"></span></div>
+            <div class="summary-card"><span>연속 절정 최고 기록</span><span class="blank-value" data-auto="climaxChain"></span></div>
+            <div class="summary-card"><span>절정까지 최단 시간</span><span class="blank-value" data-auto="climaxTime"></span></div>
+            <div class="summary-card"><span>임신 가능성</span><span class="blank-value" data-auto="riskPeak"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel record-panel">
+        <h2 class="panel-title">플레이 기록</h2>
+        <div class="blank-list">
+          <div class="blank-row"><span>전투 패배 횟수</span><span class="blank-value" data-auto="play0"></span></div>
+          <div class="blank-row"><span>기절 횟수</span><span class="blank-value" data-auto="play1"></span></div>
+          <div class="blank-row"><span>노출 당한 횟수</span><span class="blank-value" data-auto="play2"></span></div>
+          <div class="blank-row"><span>임신 횟수</span><span class="blank-value" data-auto="play3"></span></div>
+          <div class="blank-row"><span>중출 횟수</span><span class="blank-value" data-auto="play4"></span></div>
+          <div class="blank-row"><span>낙태 횟수</span><span class="blank-value" data-auto="play5"></span></div>
+          <div class="blank-row"><span>속박 당한 횟수</span><span class="blank-value" data-auto="play6"></span></div>
+          <div class="blank-row"><span>조교 완료 횟수</span><span class="blank-value" data-auto="play7"></span></div>
+        </div>
+      </section>
+
+      <section class="panel body-panel">
+        <h2 class="panel-title">신체 상태</h2>
+        <div class="body-status-layout">
+          <div class="body-silhouette" aria-hidden="true">
+            <div class="body-silhouette-mask"></div>
+          </div>
+          <div class="body-lines">
+            <div class="body-row" data-body="chest"><span>가슴</span><div class="bar"><span></span></div><span class="body-percent"><small>민감도</small><b></b></span></div>
+            <div class="body-row" data-body="nipple"><span>유두</span><div class="bar"><span></span></div><span class="body-percent"><small>민감도</small><b></b></span></div>
+            <div class="body-row" data-body="vagina"><span>질</span><div class="bar"><span></span></div><span class="body-percent"><small>민감도</small><b></b></span></div>
+            <div class="body-row" data-body="anus"><span>항문</span><div class="bar"><span></span></div><span class="body-percent"><small>민감도</small><b></b></span></div>
+            <div class="body-row" data-body="womb"><span>자궁</span><div class="bar"><span></span></div><span class="body-percent"><small>민감도</small><b></b></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel parameter-panel">
+        <h2 class="panel-title">H PARAMETER</h2>
+        <div class="parameter-grid">
+          <div class="parameter" data-param="desire"><span class="parameter-name">성욕</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="sensitive"><span class="parameter-name">민감</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="pleasure"><span class="parameter-name">쾌감</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="chastity"><span class="parameter-name">정조</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="allure"><span class="parameter-name">매혹</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="obedience"><span class="parameter-name">복종</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="deviance"><span class="parameter-name">변태성</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+          <div class="parameter" data-param="mental"><span class="parameter-name">정신 저항</span><span class="parameter-value"></span><div class="bar"><span></span></div></div>
+        </div>
+      </section>
+</section>
+  </main>
+  </div>
+  </div>
+
+  <div class="image-modal hidden" id="imageModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-nav modal-prev" type="button" id="modalPrev" aria-label="이전 이미지" hidden>‹</button>
+    <button class="modal-nav modal-next" type="button" id="modalNext" aria-label="다음 이미지" hidden>›</button>
+    <div class="modal-window">
+      <p class="modal-title" id="modalTitle">이미지</p>
+      <p class="modal-meta" id="modalMeta"></p>
+      <button class="modal-close" type="button" id="modalClose" aria-label="닫기"></button>
+      <div class="modal-image-stage" id="modalImageStage">
+        <img class="modal-image" id="modalImage" src="" alt="" hidden>
+        <div class="modal-placeholder" id="modalPlaceholder">준비중...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-modal hidden" id="filterConfirmModal" role="dialog" aria-modal="true" aria-label="필터 변경 확인" aria-describedby="filterConfirmMessage">
+    <div class="confirm-dialog">
+      <p class="confirm-message" id="filterConfirmMessage"></p>
+      <div class="confirm-actions">
+        <button class="confirm-no" type="button" id="filterConfirmNo">아니오</button>
+        <button class="confirm-yes" type="button" id="filterConfirmYes">예</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asset-check-modal hidden" id="assetCheckModal" role="dialog" aria-modal="true" aria-labelledby="assetCheckTitle" aria-describedby="assetCheckBody">
+    <div class="asset-check-dialog">
+      <div class="asset-check-header">
+        <p class="asset-check-title" id="assetCheckTitle">이미지 검사 결과</p>
+        <button class="asset-check-close" type="button" id="assetCheckClose" aria-label="닫기">×</button>
+      </div>
+      <div class="asset-check-body" id="assetCheckBody"></div>
+      <div class="asset-check-actions">
+        <button class="asset-check-ok" type="button" id="assetCheckOk">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="characters.js?v=figure-album01"></script>
+  <script src="generator-data.js?v=age-ranges-final01"></script>
+  <script src="library-data.js?v=20260619-clean-baseline01"></script>
+  <script src="story-taxonomy.js?v=world-intro-collapse01"></script>
+  <script src="story-data.js?v=story-reset01"></script>
+  <script src="adventure-data-noct.js?v=noct-pilot02"></script>
+  <script src="app-core.js?v=figure-album01"></script>
+  <script src="generator-ui.js?v=followup-final-polish01"></script>
+  <script src="library-ui.js?v=world-intro-collapse01"></script>
+  <script src="app-shell.js?v=home-admin-figure01"></script>
+  <script src="character-view.js?v=noct-adventure-pilot01"></script>
+  <script src="adventure-ui.js?v=noct-pilot02"></script>
+  <script src="admin-tools.js?v=figure-album01"></script>
+  <script src="app-init.js?v=home-admin-figure01"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Character Archive Mobile</title>
+  <meta name="theme-color" content="#100b18">
+  <meta name="application-name" content="Character Archive Mobile">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Archive">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="mobile.css?v=final-admin-gate-image-modal-aspect-fit-20260623">
+</head>
+<body data-mobile-build="final-admin-gate-20260623">
+  <div class="mobile-app" id="mobileApp">
+    <header class="mobile-header">
+      <div class="mobile-admin-access" id="mobileAdminAccess" aria-label="모바일 화면 제목">
+        <p class="mobile-kicker">MOBILE ARCHIVE</p>
+        <h1 id="mobileScreenTitle">캐릭터</h1>
+      </div>
+      <button class="mode-chip" id="mobileModeToggle" type="button" aria-pressed="false">일반모드</button>
+    </header>
+
+    <main class="mobile-main">
+      <section class="mobile-screen is-active" id="mobileHomeScreen" data-screen="home">
+        <article class="hero-card">
+          <p class="section-kicker">VIEWER</p>
+          <h2>감상용 모바일 화면</h2>
+          <p>PC판은 그대로 두고, 캐릭터 목록·상세·서재·랜덤 생성기를 모바일에서 보기 쉽게 정리한 별도 화면입니다.</p>
+        </article>
+        <section class="status-grid">
+          <article>
+            <span>캐릭터</span>
+            <strong id="mobileHomeCharacterCount">0</strong>
+          </article>
+          <article>
+            <span>소설</span>
+            <strong id="mobileHomeStoryCount">0</strong>
+          </article>
+          <article>
+            <span>현재 모드</span>
+            <strong id="mobileHomeMode">일반모드</strong>
+          </article>
+        </section>
+      </section>
+
+      <section class="mobile-screen" id="mobileCharactersScreen" data-screen="characters">
+        <div class="mobile-toolbar">
+          <input id="mobileCharacterSearch" type="search" placeholder="캐릭터 검색">
+          <button id="mobileCharacterClear" type="button">초기화</button>
+        </div>
+        <div class="count-line" id="mobileCharacterCountLine"></div>
+        <div class="character-list" id="mobileCharacterList"></div>
+      </section>
+
+      <section class="mobile-screen" id="mobileDetailScreen" data-screen="detail">
+        <button class="back-button" id="mobileDetailBack" type="button">← 목록으로</button>
+        <article class="detail-hero">
+          <div class="detail-image-wrap">
+            <img id="mobileDetailImage" alt="">
+          </div>
+          <div class="detail-title-block">
+            <p class="section-kicker" id="mobileDetailKicker">SELECTED RECORD</p>
+            <h2 id="mobileDetailName"></h2>
+            <p id="mobileDetailEn"></p>
+            <p id="mobileDetailIntro"></p>
+          </div>
+        </article>
+        <nav class="detail-tabs" aria-label="캐릭터 상세 탭">
+          <button type="button" class="is-active" data-mobile-detail-tab="profile">프로필</button>
+          <button type="button" data-mobile-detail-tab="library">서재</button>
+          <button type="button" data-mobile-detail-tab="status">스테이터스</button>
+          <button type="button" data-mobile-detail-tab="images">이미지</button>
+        </nav>
+        <div class="detail-panel" id="mobileDetailPanel"></div>
+      </section>
+
+      <section class="mobile-screen" id="mobileLibraryScreen" data-screen="library">
+        <div class="mobile-toolbar">
+          <input id="mobileStorySearch" type="search" placeholder="소설 검색">
+          <button id="mobileStoryClear" type="button">초기화</button>
+        </div>
+        <div class="story-list" id="mobileStoryList"></div>
+        <article class="story-reader hidden" id="mobileStoryReader">
+          <div class="story-reader-head">
+            <button id="mobileStoryClose" type="button">← 목록</button>
+            <p class="section-kicker" id="mobileStoryKicker">STORY</p>
+            <h2 id="mobileStoryTitle"></h2>
+            <p id="mobileStorySummary"></p>
+          </div>
+          <div class="story-body" id="mobileStoryBody"></div>
+        </article>
+      </section>
+
+      <section class="mobile-screen" id="mobileGeneratorScreen" data-screen="generator">
+        <nav class="generator-tabs" aria-label="랜덤 생성기 탭">
+          <button type="button" class="is-active" data-mobile-generator-tab="random">랜덤 생성용</button>
+          <button type="button" data-mobile-generator-tab="followup">후속 이미지</button>
+        </nav>
+
+        
+        <div class="generator-panel is-active" id="mobileGeneratorRandomPanel">
+          <button class="primary-button" id="mobileGenerateButton" type="button">전체 랜덤 생성</button>
+          <div class="generator-lock-card">
+            <div class="generator-lock-summary" id="mobileGeneratorLockSummary">고정된 항목 없음</div>
+            <button class="secondary-button hidden" id="mobileClearGeneratorLocksButton" type="button">고정 전체 해제</button>
+          </div>
+          <div class="generated-card" id="mobileGeneratedCard">
+            <p class="muted">아직 생성된 결과가 없습니다.</p>
+          </div>
+          <section class="generator-history-card" aria-label="최근 랜덤 생성 결과">
+            <div class="generator-history-head">
+              <h2>최근 결과</h2>
+              <button id="mobileClearGeneratorHistoryButton" type="button">비우기</button>
+            </div>
+            <div class="generator-history-list" id="mobileGeneratorHistoryList" aria-live="polite"></div>
+          </section>
+          <div class="button-row">
+            <button id="mobileQuestionPromptButton" type="button">질문용 프롬프트</button>
+            <button id="mobileGeneratorSetPasteButton" type="button">연출 세트 붙여넣기</button>
+          </div>
+          <div class="generator-set-preview is-empty" id="mobileGeneratorSetPreview">
+            <p class="generator-set-preview-empty">아직 적용된 연출 세트가 없습니다. 질문용 프롬프트로 받은 A안/B안/C안을 그대로 붙여넣어 주세요.</p>
+          </div>
+          <div class="button-row">
+            <button id="mobileImagePromptButton" type="button">생성용 프롬프트</button>
+          </div>
+        </div>
+
+        <div class="generator-panel" id="mobileGeneratorFollowupPanel">
+          <div class="generator-followup-recent">
+            <label class="field-label">최근 복사본
+              <select id="mobileSketchbookRecentSelect">
+                <option value="">최근 복사본 없음</option>
+              </select>
+            </label>
+            <button id="mobileLoadSketchbookRecentButton" type="button">불러오기</button>
+          </div>
+          <label class="field-label">캐릭터 이름
+            <input id="mobileFollowupName" type="text" placeholder="이름이 필요한 후속 프롬프트용">
+          </label>
+          <div class="followup-grid">
+            <button type="button" data-followup-kind="doodle">낙서시트</button>
+            <button type="button" data-followup-kind="turnaround">삼면도</button>
+            <button type="button" data-followup-kind="magazine">잡지</button>
+            <button type="button" data-followup-kind="sketchbook">스케치북</button>
+            <button type="button" data-followup-kind="bodyinfo">신체정보</button>
+            <button type="button" data-followup-kind="cookmag">요리잡지</button>
+          </div>
+          <div class="sketchbook-fields">
+            <p class="section-kicker">스케치북 정보</p>
+            <label>종족 <input id="mobileSketchbookRace" type="text" placeholder="종족"></label>
+            <label>직업 <input id="mobileSketchbookRole" type="text" placeholder="직업"></label>
+            <label>성격 <input id="mobileSketchbookPersonality" type="text" placeholder="성격"></label>
+            <label>세계 <input id="mobileSketchbookGenre" type="text" placeholder="세계/장르"></label>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="모바일 화면 이동">
+      <button type="button" data-mobile-nav="home">홈</button>
+      <button type="button" class="is-active" data-mobile-nav="characters">캐릭터</button>
+      <button type="button" data-mobile-nav="library">서재</button>
+      <button type="button" data-mobile-nav="generator">랜덤</button>
+    </nav>
+  </div>
+
+  <div class="modal hidden" id="mobilePromptModal" role="dialog" aria-modal="true" aria-labelledby="mobilePromptTitle">
+    <div class="modal-card">
+      <p class="section-kicker" id="mobilePromptKicker">PROMPT</p>
+      <h2 id="mobilePromptTitle">프롬프트</h2>
+      <p id="mobilePromptCopy">아래 내용을 확인한 뒤 복사하세요.</p>
+      <textarea id="mobilePromptText" readonly></textarea>
+      <div class="modal-actions">
+        <button id="mobilePromptClose" type="button">닫기</button>
+        <button id="mobilePromptCopyButton" type="button">복사</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal hidden" id="mobileGeneratorSetModal" role="dialog" aria-modal="true" aria-labelledby="mobileGeneratorSetTitle">
+    <div class="modal-card modal-card--wide">
+      <p class="section-kicker">GENERATOR SET</p>
+      <h2 id="mobileGeneratorSetTitle">연출 세트 붙여넣기</h2>
+      <p class="modal-note">질문용 프롬프트로 받은 A안/B안/C안 전체를 그대로 붙여넣어 주세요. 장면 / 구도 / 연출을 자동으로 파싱합니다.</p>
+      <textarea id="mobileGeneratorSetText" placeholder="A안 / B안 / C안을 그대로 붙여넣어 주세요."></textarea>
+      <div class="modal-actions">
+        <button id="mobileGeneratorSetClose" type="button">닫기</button>
+        <button id="mobileGeneratorSetApply" type="button">적용</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal hidden" id="mobileAdminLoginModal" role="dialog" aria-modal="true" aria-labelledby="mobileAdminLoginTitle">
+    <div class="modal-card">
+      <p class="section-kicker">ADMIN</p>
+      <h2 id="mobileAdminLoginTitle">관리자모드 로그인</h2>
+      <p class="modal-note" id="mobileAdminLoginMessage">비밀번호를 입력하면 이번 브라우저 세션에서 관리자모드로 전환됩니다.</p>
+      <input id="mobileAdminPasswordInput" type="password" autocomplete="off" placeholder="비밀번호">
+      <div class="modal-actions">
+        <button id="mobileAdminLoginClose" type="button">닫기</button>
+        <button id="mobileAdminLoginSubmit" type="button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="image-viewer-modal hidden" id="mobileImageViewerModal" role="dialog" aria-modal="true" aria-labelledby="mobileImageViewerTitle">
+    <div class="image-viewer-card">
+      <div class="image-viewer-head">
+        <div>
+          <p class="section-kicker" id="mobileImageViewerKicker">IMAGE</p>
+          <h2 id="mobileImageViewerTitle">이미지 보기</h2>
+        </div>
+        <button id="mobileImageViewerClose" type="button">닫기</button>
+      </div>
+      <div class="image-viewer-stage" id="mobileImageViewerStage">
+        <img id="mobileImageViewerImage" alt="">
+      </div>
+      <p class="image-viewer-help" id="mobileImageViewerHelp">두 손가락으로 확대하거나, 두 번 탭하면 확대됩니다.</p>
+    </div>
+  </div>
+
+  <script src="characters.js?v=figure-album01"></script>
+  <script src="story-taxonomy.js?v=world-intro-collapse01"></script>
+  <script src="story-data.js?v=story-reset01"></script>
+  <script src="generator-data.js?v=age-ranges-final01"></script>
+  <script src="mobile.js?v=final-admin-gate-image-modal-aspect-fit-backnav-20260623"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(error => {
+          console.warn("Mobile PWA service worker registration failed.", error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
