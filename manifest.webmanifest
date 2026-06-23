@@ -7,7 +7,7 @@
   "start_url": "./mobile.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "background_color": "#100b18",
   "theme_color": "#100b18",
   "categories": [
