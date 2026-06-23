@@ -1,7 +1,8 @@
 // Character data only. Add/edit characters here, then refresh character-ui.html.
 // Base image paths are generated automatically from folder as:
-// assets/characters/<folder>/main.png, thumb.png, doodle.png, turn.png
+// assets/characters/<folder>/main.webp, thumb.webp, doodle.webp, turn.webp
 // Optional album slots are controlled through albumKeys. Current common keys: figure, magazine, sketch.
+// profile.basicInfo.world stores the character's 소속세계 from story-taxonomy.js.
 // Set hidden: true to keep a template character out of the list.
 // Story/detail text was reset for the character-archive baseline. Intro and quote fields remain profile fields.
 
@@ -11,10 +12,11 @@ window.CHARACTERS = [
     "en": "Lena",
     "themeColor": "#923834",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 정의감 넘친다 여우 수인 기사; 이능 없이 검과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "검은 관 앞에서도, 내 방식으로 검을 내려놓지 않겠습니다.",
+      "shortIntro": "도망칠 길목에서 혼자 검을 뽑는 여우 귀의 기사.",
+      "quote": "도망칠 사람은 도망쳐. 막는 건 내가 할 테니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "중세",
         "race": "여우 수인",
         "job": "기사",
@@ -27,7 +29,7 @@ window.CHARACTERS = [
         "measurements": "90 - 60 - 92"
       }
     },
-    "folder": "lena",
+    "folder": "001-lena",
     "albumKeys": [
       "figure",
       "magazine",
@@ -39,10 +41,11 @@ window.CHARACTERS = [
     "en": "Eliana",
     "themeColor": "#96A7C4",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 자유분방한 인간 고양이탐정; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 웃으며 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "고양이처럼 웃으며 단서를 물고 사라지는 자유로운 탐정.",
+      "quote": "문은 잠겼고, 발자국은 없고, 그러니까 재미있지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "현대",
         "race": "인간",
         "job": "고양이탐정",
@@ -55,7 +58,7 @@ window.CHARACTERS = [
         "measurements": "93 - 58 - 91"
       }
     },
-    "folder": "eliana",
+    "folder": "002-eliana",
     "albumKeys": [
       "figure",
       "magazine",
@@ -67,10 +70,11 @@ window.CHARACTERS = [
     "en": "Scarlett",
     "themeColor": "#9C2D34",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 고혹적인 뱀파이어 귀족; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "검은 관 앞에서도, 내 방식으로 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "미소 하나로 방의 주도권을 가져가는 뱀파이어 귀족.",
+      "quote": "초대받지 않은 손님도 예의만 알면 피는 덜 흘려.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "중세",
         "race": "뱀파이어",
         "job": "귀족",
@@ -83,7 +87,7 @@ window.CHARACTERS = [
         "measurements": "94 - 56 - 93"
       }
     },
-    "folder": "scarlett",
+    "folder": "003-scarlett",
     "albumKeys": [
       "figure",
       "magazine",
@@ -95,10 +99,11 @@ window.CHARACTERS = [
     "en": "Luciel",
     "themeColor": "#6E479E",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 우아한 인간 배우; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 내 방식으로 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "무대 밖에서도 품위를 잃지 않는 우아한 배우.",
+      "quote": "울어야 할 때 웃는 것, 그게 진짜 연기예요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "현대",
         "race": "인간",
         "job": "배우",
@@ -111,7 +116,7 @@ window.CHARACTERS = [
         "measurements": "92 - 56 - 91"
       }
     },
-    "folder": "luciel",
+    "folder": "004-luciel",
     "albumKeys": [
       "figure",
       "magazine",
@@ -123,10 +128,11 @@ window.CHARACTERS = [
     "en": "Luna Ferrano",
     "themeColor": "#6F4A9E",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 호전적인 늑대인간 정비공; 이능 없이 주먹과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "녹슨 경보등 앞에서도, 내 방식으로 주먹을 내려놓지 않겠습니다.",
+      "shortIntro": "주먹과 렌치로 고장 난 세상을 두드리는 늑대 정비공.",
+      "quote": "말로 안 풀리면 한 대 치고 다시 맞춰 보자.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "사이버펑크",
         "race": "늑대인간",
         "job": "정비공",
@@ -139,7 +145,7 @@ window.CHARACTERS = [
         "measurements": "96 - 58 - 98"
       }
     },
-    "folder": "lunaFerrano",
+    "folder": "005-lunaFerrano",
     "albumKeys": [
       "figure",
       "magazine",
@@ -151,10 +157,11 @@ window.CHARACTERS = [
     "en": "Elabiah",
     "themeColor": "#B3A4BE",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 섬세한 인간 시녀/디자이너; 죽어도 되살아 나는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "죽어도 되살아 나는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "상처와 옷자락을 같은 손길로 꿰매는 섬세한 시녀.",
+      "quote": "찢어진 건 버리는 게 아니라, 가장 안 보이는 곳부터 고치는 거예요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "중세",
         "race": "인간",
         "job": "시녀/디자이너",
@@ -167,7 +174,7 @@ window.CHARACTERS = [
         "measurements": "93 - 56 - 91"
       }
     },
-    "folder": "elabiah",
+    "folder": "006-elabiah",
     "albumKeys": [
       "figure",
       "magazine",
@@ -179,10 +186,11 @@ window.CHARACTERS = [
     "en": "Luna",
     "themeColor": "#B7A2E0",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 얌전한 인간 시녀; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "검은 관 앞에서도, 내 방식으로 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "얌전한 얼굴로 모두가 놓친 절차를 기억하는 시녀.",
+      "quote": "저는 조용했을 뿐이에요. 보지 않은 건 아니에요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "중세",
         "race": "인간",
         "job": "시녀",
@@ -195,7 +203,7 @@ window.CHARACTERS = [
         "measurements": "92 - 56 - 91"
       }
     },
-    "folder": "luna",
+    "folder": "007-luna",
     "albumKeys": [
       "figure",
       "magazine",
@@ -207,10 +215,11 @@ window.CHARACTERS = [
     "en": "Raina",
     "themeColor": "#6BAFF2",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 활발하고 호기심이 많다 인간 연구원; 이능 없이 수류탄과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "녹슨 경보등 앞에서도, 웃으며 수류탄을 내려놓지 않겠습니다.",
+      "shortIntro": "호기심이 먼저 달려가고 수류탄이 뒤따르는 연구원.",
+      "quote": "폭발 반응도 관찰값이에요. 조금 멀리서 보면요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "미래",
         "race": "인간",
         "job": "연구원",
@@ -223,7 +232,7 @@ window.CHARACTERS = [
         "measurements": "88 - 58 - 89"
       }
     },
-    "folder": "raina",
+    "folder": "008-raina",
     "albumKeys": [
       "figure",
       "magazine",
@@ -235,10 +244,11 @@ window.CHARACTERS = [
     "en": "Chihwaseon",
     "themeColor": "#4A3A67",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 자유분방하고 의리있다 인간 무술가; 술을 마시면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "술을 마시면 강해지는 힘은 나를 대신하는 변명이 아니라, 웃으며 버티기 위한 선택입니다.",
+      "shortIntro": "술잔이 비워질수록 의리가 더 뜨거워지는 무술가.",
+      "quote": "한잔 받았으면 한 번은 같이 맞아 줘야지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "무협",
         "race": "인간",
         "job": "무술가",
@@ -251,7 +261,7 @@ window.CHARACTERS = [
         "measurements": "96 - 59 - 96"
       }
     },
-    "folder": "chihwaseon",
+    "folder": "009-chihwaseon",
     "albumKeys": [
       "figure",
       "magazine",
@@ -263,10 +273,11 @@ window.CHARACTERS = [
     "en": "Erissa Blackmoon",
     "themeColor": "#461766",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 오만하고 똑똑한 다크엘프 매드 사이언티스트; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "모래 묻은 격리문 앞에서도, 내 이름으로 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "오만한 천재성이 폐허 위에 실험대를 차리는 다크엘프.",
+      "quote": "윤리는 기록해 둬. 성공하면 나중에 읽어 줄게.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "좀비 아포칼립스",
         "race": "다크엘프",
         "job": "매드 사이언티스트",
@@ -279,7 +290,7 @@ window.CHARACTERS = [
         "measurements": "120 - 60 - 95"
       }
     },
-    "folder": "erissaBlackmoon",
+    "folder": "010-erissaBlackmoon",
     "albumKeys": [
       "figure",
       "magazine",
@@ -291,10 +302,11 @@ window.CHARACTERS = [
     "en": "Shiraye Ailmaris",
     "themeColor": "#E11729",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 응석쟁이 엘프 마피아 보스; 이능 없이 저격총과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 내 방식으로 저격총을 내려놓지 않겠습니다.",
+      "shortIntro": "응석 섞인 목소리로 저격 명령을 내리는 엘프 보스.",
+      "quote": "나 대신 화내 줘. 조준은 내가 할게.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "호러",
         "race": "엘프",
         "job": "마피아 보스",
@@ -307,7 +319,7 @@ window.CHARACTERS = [
         "measurements": "115 - 56 - 92"
       }
     },
-    "folder": "shirayeAilmaris",
+    "folder": "011-shirayeAilmaris",
     "albumKeys": [
       "figure",
       "magazine",
@@ -319,10 +331,11 @@ window.CHARACTERS = [
     "en": "Van Palaeon",
     "themeColor": "#0FA383",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 소심한 코볼트 판사; 한번 보거나 들은 것을 잊지 않는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "한번 보거나 들은 것을 잊지 않는 힘은 나를 대신하는 변명이 아니라, 무섭지만 버티기 위한 선택입니다.",
+      "shortIntro": "소심하지만 들은 판결문은 평생 잊지 않는 코볼트 판사.",
+      "quote": "기억하고 싶어서 기억하는 게 아닙니다. 그래서 더 공정해야 해요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "일상",
         "race": "코볼트",
         "job": "판사",
@@ -335,7 +348,7 @@ window.CHARACTERS = [
         "measurements": "78 - 56 - 85"
       }
     },
-    "folder": "vanPalaeon",
+    "folder": "012-vanPalaeon",
     "albumKeys": [
       "figure",
       "magazine",
@@ -347,10 +360,11 @@ window.CHARACTERS = [
     "en": "Estril Illas",
     "themeColor": "#5D46AE",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 쿨하고 집착이 심한 다크엘프 중장보병; 타인으로 변신하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "타인으로 변신하는 힘은 나를 대신하는 변명이 아니라, 흔들리지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "무거운 갑옷 속에 집착을 숨긴 다크엘프 중장보병.",
+      "quote": "한 번 지키겠다고 정한 자리는, 내 무덤이 돼도 좋아.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "다크판타지",
         "race": "다크엘프",
         "job": "중장보병",
@@ -363,7 +377,7 @@ window.CHARACTERS = [
         "measurements": "115 - 56 - 94"
       }
     },
-    "folder": "estrilIllas",
+    "folder": "013-estrilIllas",
     "albumKeys": [
       "figure",
       "magazine",
@@ -375,10 +389,11 @@ window.CHARACTERS = [
     "en": "Rowina",
     "themeColor": "#1770D9",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 자유분방한 아수라 현자; 물에서 숨을 쉴 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "물에서 숨을 쉴 수 있는 힘은 나를 대신하는 변명이 아니라, 웃으며 버티기 위한 선택입니다.",
+      "shortIntro": "물길과 전장을 똑같이 헤엄치는 자유로운 아수라 현자.",
+      "quote": "숨이 막힌다고? 그럼 다른 방식으로 숨 쉬면 되지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "헌터물",
         "race": "아수라",
         "job": "현자",
@@ -391,7 +406,7 @@ window.CHARACTERS = [
         "measurements": "103 - 57 - 91"
       }
     },
-    "folder": "rowina",
+    "folder": "014-rowina",
     "albumKeys": [
       "figure",
       "magazine",
@@ -403,10 +418,11 @@ window.CHARACTERS = [
     "en": "Mindy",
     "themeColor": "#76789D",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 냉혹한 유령 파이터; 그림을 실체화 하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "그림을 실체화 하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "주먹보다 먼저 그림자를 실체로 세우는 냉혹한 유령 파이터.",
+      "quote": "벽에 그린 주먹도 맞으면 아파.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "수사물",
         "race": "유령",
         "job": "파이터",
@@ -419,7 +435,7 @@ window.CHARACTERS = [
         "measurements": "88 - 52 - 88"
       }
     },
-    "folder": "mindy",
+    "folder": "015-mindy",
     "albumKeys": [
       "figure",
       "magazine",
@@ -431,10 +447,11 @@ window.CHARACTERS = [
     "en": "Serothan",
     "themeColor": "#AD6ADF",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 관능적인 마신족 무희; 차가운 입김을 불 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "차가운 입김을 불 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "차가운 숨으로 춤의 온도를 바꾸는 관능적인 마신족 무희.",
+      "quote": "가까이 오지 마. 내 숨결은 박수보다 차가우니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "하이 판타지",
         "race": "마신족",
         "job": "무희",
@@ -447,7 +464,7 @@ window.CHARACTERS = [
         "measurements": "123 - 58 - 108"
       }
     },
-    "folder": "serothan",
+    "folder": "016-serothan",
     "albumKeys": [
       "figure",
       "magazine",
@@ -459,10 +476,11 @@ window.CHARACTERS = [
     "en": "Nagir",
     "themeColor": "#9F76C7",
     "profile": {
-      "shortIntro": "별먼지 개척지의 항해 속에서 움직이는 압도적인 체격을 지닌 신경과민 거인 요술사; 영원히 살 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "영원히 살 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "영원을 짊어진 채 작은 일에도 예민해지는 거인 요술사.",
+      "quote": "오래 산다고 익숙해지는 건 아니야. 상처도, 별빛도.",
       "basicInfo": {
         "gender": "여성",
+        "world": "아스트라",
         "genre": "SF",
         "race": "거인",
         "job": "요술사",
@@ -475,7 +493,7 @@ window.CHARACTERS = [
         "measurements": "138 - 76 - 128"
       }
     },
-    "folder": "nagir",
+    "folder": "017-nagir",
     "albumKeys": [
       "figure",
       "magazine",
@@ -487,10 +505,11 @@ window.CHARACTERS = [
     "en": "Kristen Cutton",
     "themeColor": "#AA834B",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 작은 체구로도 재미있다 하플링 궁수; 사물의 무게를 조종하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "사물의 무게를 조종하는 힘은 나를 대신하는 변명이 아니라, 웃으며 버티기 위한 선택입니다.",
+      "shortIntro": "화살보다 먼저 농담을 날리는 작은 하플링 궁수.",
+      "quote": "무게를 줄이면 걱정도 날아가요. 가끔 사람도요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "멜로",
         "race": "하플링",
         "job": "궁수",
@@ -503,7 +522,7 @@ window.CHARACTERS = [
         "measurements": "64 - 50 - 67"
       }
     },
-    "folder": "kristenCutton",
+    "folder": "018-kristenCutton",
     "albumKeys": [
       "figure",
       "magazine",
@@ -515,10 +534,11 @@ window.CHARACTERS = [
     "en": "Searra",
     "themeColor": "#CDD25E",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 강압적인 드레이크 교도관; 독을 다룰 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "독을 다룰 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "독기와 규율로 죄수들을 눌러 세우는 드레이크 교도관.",
+      "quote": "규칙을 씹었으면, 이제 독도 삼켜 봐.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "뉴클리어 아포칼립스",
         "race": "드레이크",
         "job": "교도관",
@@ -531,7 +551,7 @@ window.CHARACTERS = [
         "measurements": "118 - 58 - 98"
       }
     },
-    "folder": "searra",
+    "folder": "019-searra",
     "albumKeys": [
       "figure",
       "magazine",
@@ -543,10 +563,11 @@ window.CHARACTERS = [
     "en": "Lucia Nox",
     "themeColor": "#4E1187",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 용감한 마인 검투사; 큰 소리를 내서 음파를 방출하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "큰 소리를 내서 음파를 방출하는 힘은 나를 대신하는 변명이 아니라, 물러서지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "함성 하나로 경기장을 흔드는 마인 검투사.",
+      "quote": "방패 뒤에 숨어도 소리는 못 막아.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "로우 판타지",
         "race": "마인",
         "job": "검투사",
@@ -559,7 +580,7 @@ window.CHARACTERS = [
         "measurements": "118 - 63 - 108"
       }
     },
-    "folder": "luciaNox",
+    "folder": "020-luciaNox",
     "albumKeys": [
       "figure",
       "magazine",
@@ -573,10 +594,11 @@ window.CHARACTERS = [
     "en": "Essy",
     "themeColor": "#FA3EA1",
     "profile": {
-      "shortIntro": "신들의 그늘과 심연 성소 속에서 움직이는 착하고 순진한 유령 사령술사; 여러개의 목숨을 가지고 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "여러개의 목숨을 가지고 있는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "순진한 얼굴로 여러 목숨의 무게를 안고 걷는 유령 사령술사.",
+      "quote": "죽음이 끝이라면, 왜 아직 이렇게 말을 걸까요?",
       "basicInfo": {
         "gender": "여성",
+        "world": "에레보스",
         "genre": "코즈믹 호러",
         "race": "유령",
         "job": "사령술사",
@@ -589,7 +611,7 @@ window.CHARACTERS = [
         "measurements": "102 - 62 - 100"
       }
     },
-    "folder": "essy",
+    "folder": "021-essy",
     "albumKeys": [
       "figure",
       "magazine",
@@ -601,10 +623,11 @@ window.CHARACTERS = [
     "en": "Othurcu",
     "themeColor": "#F34BA2",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 여유롭다 용인 사제; 죽은 자를 되살릴 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "죽은 자를 되살릴 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "느긋한 기도로 죽은 자의 숨을 되돌리는 용인 사제.",
+      "quote": "서두르지 마세요. 돌아오는 길도 길 수 있으니까요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "바이오펑크",
         "race": "용인",
         "job": "사제",
@@ -617,7 +640,7 @@ window.CHARACTERS = [
         "measurements": "112 - 68 - 108"
       }
     },
-    "folder": "othurcu",
+    "folder": "022-othurcu",
     "albumKeys": [
       "figure",
       "magazine",
@@ -629,10 +652,11 @@ window.CHARACTERS = [
     "en": "Nive",
     "themeColor": "#09A2F8",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 장난스럽다 사티로스 바드; 미래를 볼 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "미래를 볼 수 있는 힘은 나를 대신하는 변명이 아니라, 웃으며 버티기 위한 선택입니다.",
+      "shortIntro": "장난스러운 하프 선율로 내일의 균열을 엿보는 사티로스 바드.",
+      "quote": "미래가 보였냐고? 응, 그래서 더 웃겨.",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "학원물",
         "race": "사티로스",
         "job": "바드",
@@ -645,7 +669,7 @@ window.CHARACTERS = [
         "measurements": "96 - 66 - 98"
       }
     },
-    "folder": "nive",
+    "folder": "023-nive",
     "albumKeys": [
       "figure",
       "magazine",
@@ -657,10 +681,11 @@ window.CHARACTERS = [
     "en": "Ariel",
     "themeColor": "#A94532",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 비인간적 체형을 지닌 게으르다 인어 인형술사; 불꽃을 먹으면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "불꽃을 먹으면 강해지는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "게으른 미소 아래 불꽃을 삼키는 긴 꼬리의 인어 인형술사.",
+      "quote": "움직이기 귀찮으니까, 인형들이 대신 춤춰 줄 거야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "포스트 아포칼립스",
         "race": "인어",
         "job": "인형술사",
@@ -673,7 +698,7 @@ window.CHARACTERS = [
         "measurements": "82 - 57 - 88\n(꼬리기부둘레)"
       }
     },
-    "folder": "ariel",
+    "folder": "024-ariel",
     "albumKeys": [
       "figure",
       "magazine",
@@ -685,10 +710,11 @@ window.CHARACTERS = [
     "en": "Garnet",
     "themeColor": "#7C2B2A",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 광기있고 카리스마 있음 마수족 암살자; 이능 없이 일본도과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "먼 길의 표식 앞에서도, 내 이름으로 일본도를 내려놓지 않겠습니다.",
+      "shortIntro": "의리와 광기를 같은 칼집에 넣고 다니는 마수족 암살자.",
+      "quote": "등 뒤를 맡긴 친구라면, 앞의 적은 내가 벨게.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "무협",
         "race": "마수족",
         "job": "암살자",
@@ -701,7 +727,7 @@ window.CHARACTERS = [
         "measurements": "98 - 55 - 93"
       }
     },
-    "folder": "garnet",
+    "folder": "025-garnet",
     "albumKeys": [
       "figure",
       "magazine",
@@ -713,10 +739,11 @@ window.CHARACTERS = [
     "en": "Wulin",
     "themeColor": "#99A956",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 충동적인 신수족 연금술사/빌런; 이능 없이 플라스크 유리병과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "갈라진 게이트 앞에서도, 내 방식으로 플라스크 유리병을 내려놓지 않겠습니다.",
+      "shortIntro": "충동 하나로 약병을 던지는 신수족 연금술사 빌런.",
+      "quote": "결과는 몰라. 그래서 던지는 거야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "다크히어로물",
         "race": "신수족",
         "job": "연금술사/빌런",
@@ -729,7 +756,7 @@ window.CHARACTERS = [
         "measurements": "94 - 57 - 94"
       }
     },
-    "folder": "wulin",
+    "folder": "026-wulin",
     "albumKeys": [
       "figure",
       "magazine",
@@ -741,10 +768,11 @@ window.CHARACTERS = [
     "en": "Flora Daisybay",
     "themeColor": "#A53581",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 작은 체구로도 낙천적인 요정 바리스타/마법소녀; 재채기하면 인격이 바뀌는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "재채기하면 인격이 바뀌는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "재채기 한 번으로 분위기까지 바뀌는 요정 바리스타.",
+      "quote": "커피는 달게, 사고는 더 달콤하게!",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "마법소녀물",
         "race": "요정",
         "job": "바리스타/마법소녀",
@@ -757,7 +785,7 @@ window.CHARACTERS = [
         "measurements": "55 - 43 - 58"
       }
     },
-    "folder": "floraDaisybay",
+    "folder": "027-floraDaisybay",
     "albumKeys": [
       "figure",
       "magazine",
@@ -769,10 +797,11 @@ window.CHARACTERS = [
     "en": "Mibnas",
     "themeColor": "#27D3DA",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 거대한 체구를 숨기지 못한 채 냉정한 거인 파계승; 타인에게 빙의하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "타인에게 빙의하는 힘은 나를 대신하는 변명이 아니라, 흔들리지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "절벽 같은 체구로 냉정하게 염주를 굴리는 거인 파계승.",
+      "quote": "작은 목소리도 들린다. 그러니 거짓말은 크게 하지 마라.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "판타지",
         "race": "거인",
         "job": "파계승",
@@ -785,7 +814,7 @@ window.CHARACTERS = [
         "measurements": "900 - 540 - 880"
       }
     },
-    "folder": "mibnas",
+    "folder": "028-mibnas",
     "albumKeys": [
       "figure",
       "magazine",
@@ -797,10 +826,11 @@ window.CHARACTERS = [
     "en": "Alice",
     "themeColor": "#7094CF",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 밝고 긍정적인 토끼 수인 리포터; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 내 방식으로 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "밝은 귀를 쫑긋 세우고 사건 냄새를 쫓는 토끼 리포터.",
+      "quote": "특종은 뛰어가는 사람보다 기다린 사람이 잡을 때도 있어요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "현대 드라마",
         "race": "토끼 수인",
         "job": "리포터",
@@ -813,7 +843,7 @@ window.CHARACTERS = [
         "measurements": "74 - 52 - 79"
       }
     },
-    "folder": "alice",
+    "folder": "029-alice",
     "albumKeys": [
       "figure",
       "magazine",
@@ -825,10 +855,11 @@ window.CHARACTERS = [
     "en": "Chloe",
     "themeColor": "#7E6595",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 귀엽다 구체관절인형 메이드; 싸울수록 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "싸울수록 강해지는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "귀여운 미소 뒤에 맞을수록 단단해지는 인형 메이드.",
+      "quote": "더 때려도 돼요. 청소할 힘이 늘어나거든요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "좀비 아포칼립스",
         "race": "구체관절인형",
         "job": "메이드",
@@ -841,7 +872,7 @@ window.CHARACTERS = [
         "measurements": "82 - 55 - 86"
       }
     },
-    "folder": "chloe",
+    "folder": "030-chloe",
     "albumKeys": [
       "figure",
       "magazine",
@@ -853,10 +884,11 @@ window.CHARACTERS = [
     "en": "Qeisel",
     "themeColor": "#3C7059",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 비인간적 체형을 지닌 감성이 풍부하고 빈틈이 없다 아라크네 연금술사/빌런; 피를 원하는 형태로 바꿀 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "피를 원하는 형태로 바꿀 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "피와 폭탄의 배치를 예술처럼 맞추는 아라크네 연금술사.",
+      "quote": "흩뿌린 피도 설계하면 꽃처럼 터져.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "하이 판타지",
         "race": "아라크네",
         "job": "연금술사/빌런",
@@ -869,7 +901,7 @@ window.CHARACTERS = [
         "measurements": "106 - 58 - 96\n(접합부 기준)"
       }
     },
-    "folder": "qeisel",
+    "folder": "031-qeisel",
     "albumKeys": [
       "figure",
       "magazine",
@@ -881,10 +913,11 @@ window.CHARACTERS = [
     "en": "Rhanis",
     "themeColor": "#CCAF78",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 작은 체구로도 소심한 노움 소환사; 이능 없이 더블배럴샷건과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "갈라진 게이트 앞에서도, 무섭지만 더블배럴샷건을 내려놓지 않겠습니다.",
+      "shortIntro": "작은 손에 더블배럴샷건을 꼭 쥔 소심한 노움 소환사.",
+      "quote": "무서우니까 부르는 거예요. 혼자 싸우긴 싫거든요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "이세계",
         "race": "노움",
         "job": "소환사",
@@ -897,7 +930,7 @@ window.CHARACTERS = [
         "measurements": "58 - 47 - 60"
       }
     },
-    "folder": "rhanis",
+    "folder": "032-rhanis",
     "albumKeys": [
       "figure",
       "magazine",
@@ -909,10 +942,11 @@ window.CHARACTERS = [
     "en": "Misa",
     "themeColor": "#AA91B3",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 비인간적 체형을 지닌 겁이 많다 나가 어부; 이능 없이 낚시대과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 무섭지만 낚시대를 내려놓지 않겠습니다.",
+      "shortIntro": "긴 꼬리를 말고도 낚싯대를 놓지 못하는 겁 많은 나가 어부.",
+      "quote": "커다란 물고기보다 조용한 물결이 더 무서워요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "호러",
         "race": "나가",
         "job": "어부",
@@ -925,7 +959,7 @@ window.CHARACTERS = [
         "measurements": "82 - 60 - 95\n(꼬리기부둘레)"
       }
     },
-    "folder": "misa",
+    "folder": "033-misa",
     "albumKeys": [
       "figure",
       "magazine",
@@ -937,10 +971,11 @@ window.CHARACTERS = [
     "en": "Aya",
     "themeColor": "#046B2D",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 말이 많다 염소 수인 바람술사; 빠르게 움직일수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "빠르게 움직일수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "말보다 바람이 먼저 앞질러 가는 염소 수인 바람술사.",
+      "quote": "내가 설명하는 동안에도, 총알은 이미 돌아갔어!",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "포스트 아포칼립스",
         "race": "염소 수인",
         "job": "바람술사",
@@ -953,7 +988,7 @@ window.CHARACTERS = [
         "measurements": "113 - 62 - 104"
       }
     },
-    "folder": "aya",
+    "folder": "034-aya",
     "albumKeys": [
       "figure",
       "magazine",
@@ -965,10 +1000,11 @@ window.CHARACTERS = [
     "en": "Tanila Ellamin",
     "themeColor": "#A17F1E",
     "profile": {
-      "shortIntro": "별먼지 개척지의 항해 속에서 움직이는 사심이 없다 우드엘프 우주해적; 식물의 말을 들을 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "식물의 말을 들을 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "식물의 속삭임을 듣고 포문을 여는 사심 없는 우드엘프 해적.",
+      "quote": "풀잎이 가지 말라면 안 가. 대신 대포는 쏠 수 있지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "아스트라",
         "genre": "SF",
         "race": "우드엘프",
         "job": "우주해적",
@@ -981,7 +1017,7 @@ window.CHARACTERS = [
         "measurements": "108 - 58 - 93"
       }
     },
-    "folder": "tanilaEllamin",
+    "folder": "035-tanilaEllamin",
     "albumKeys": [
       "figure",
       "magazine",
@@ -993,10 +1029,11 @@ window.CHARACTERS = [
     "en": "Celina",
     "themeColor": "#21F6CB",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 어른스럽다 봉제인형 방랑상인; 타인의 힘을 알 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "타인의 힘을 알 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "타인의 재능을 알아보는 어른스러운 봉제인형 상인.",
+      "quote": "값을 매기는 건 물건뿐이에요. 사람은 더 조심해야죠.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "로우 판타지",
         "race": "봉제인형",
         "job": "방랑상인",
@@ -1009,7 +1046,7 @@ window.CHARACTERS = [
         "measurements": "96 - 56 - 91"
       }
     },
-    "folder": "celina",
+    "folder": "036-celina",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1023,10 +1060,11 @@ window.CHARACTERS = [
     "en": "Piff Gabriel",
     "themeColor": "#8E3C92",
     "profile": {
-      "shortIntro": "저주 화물과 비단항로 속에서 움직이는 작은 체구로도 부주의한 임프 총독; 불꽃을 먹으면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "불꽃을 먹으면 강해지는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "실수처럼 날아와 불꽃을 삼키는 작은 임프 총독.",
+      "quote": "앗, 그건 사고였어. 그런데 결과는 마음에 드네.",
       "basicInfo": {
         "gender": "여성",
+        "world": "사프란해",
         "genre": "해적물",
         "race": "임프",
         "job": "총독",
@@ -1039,7 +1077,7 @@ window.CHARACTERS = [
         "measurements": "55 - 42 - 57"
       }
     },
-    "folder": "piffGabriel",
+    "folder": "037-piffGabriel",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1051,10 +1089,11 @@ window.CHARACTERS = [
     "en": "Freya",
     "themeColor": "#B1A7E2",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 고집불통인 하피 언데드사냥꾼; 햇빛에 노출되면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "햇빛에 노출되면 강해지는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "햇빛 아래 더 완고해지는 하피 언데드사냥꾼.",
+      "quote": "그늘로 숨어. 난 해가 뜰수록 더 못 물러나.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "영지물",
         "race": "하피",
         "job": "언데드사냥꾼",
@@ -1067,7 +1106,7 @@ window.CHARACTERS = [
         "measurements": "95 - 54 - 96"
       }
     },
-    "folder": "freya",
+    "folder": "038-freya",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1079,10 +1118,11 @@ window.CHARACTERS = [
     "en": "Roxy",
     "themeColor": "#35E323",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 신중한 인간 건달; 달빛에 노출되면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "달빛에 노출되면 강해지는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "달빛이 비칠수록 신중한 주먹이 무거워지는 건달.",
+      "quote": "성급하게 치면 손만 아파. 밤이 깊을 때까지 기다려.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "느와르",
         "race": "인간",
         "job": "건달",
@@ -1095,7 +1135,7 @@ window.CHARACTERS = [
         "measurements": "105 - 60 - 98"
       }
     },
-    "folder": "roxy",
+    "folder": "039-roxy",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1107,10 +1147,11 @@ window.CHARACTERS = [
     "en": "Vega",
     "themeColor": "#56D1B9",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 무책임한 셰이프시프터 샤먼; 죽으면 특정 과거로 이동하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "죽으면 특정 과거로 이동하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "죽어도 과거로 돌아가 책임을 미루는 셰이프시프터 샤먼.",
+      "quote": "실패했네. 좋아, 이번엔 다른 얼굴로 해 보자.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "어반 판타지",
         "race": "셰이프시프터",
         "job": "샤먼",
@@ -1123,7 +1164,7 @@ window.CHARACTERS = [
         "measurements": "92 - 62 - 94"
       }
     },
-    "folder": "vega",
+    "folder": "040-vega",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1138,10 +1179,11 @@ window.CHARACTERS = [
     "en": "Seoah",
     "themeColor": "#ED1C19",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 헌신적인 구체관절인형 약사; 공간을 절단해 물건들을 보관하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "공간을 절단해 물건들을 보관하는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "헌신적인 손길로 공간까지 접어 약장을 여는 인형 약사.",
+      "quote": "아픈 건 숨기지 마세요. 숨긴 곳도 제가 열어 볼게요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "일상",
         "race": "구체관절인형",
         "job": "약사",
@@ -1154,7 +1196,7 @@ window.CHARACTERS = [
         "measurements": "80 - 54 - 84"
       }
     },
-    "folder": "seoah",
+    "folder": "041-seoah",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1167,10 +1209,11 @@ window.CHARACTERS = [
     "en": "Libra",
     "themeColor": "#A9708A",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 부지런한 담피르 사서; 책을 자유자재로 조작하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "책을 자유자재로 조작하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "책장을 넘기듯 세상의 균형을 맞추는 부지런한 담피르 사서.",
+      "quote": "조용히 해. 책도 화나면 도끼보다 무거워.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "궁정물",
         "race": "담피르",
         "job": "사서",
@@ -1183,7 +1226,7 @@ window.CHARACTERS = [
         "measurements": "96 - 58 - 93"
       }
     },
-    "folder": "libra",
+    "folder": "042-libra",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1196,10 +1239,11 @@ window.CHARACTERS = [
     "en": "Wubun",
     "themeColor": "#D88A2E",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 압도적인 체격을 지닌 사교적인 미노타우로스 결계사; 이능 없이 할버드과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "먼 길의 표식 앞에서도, 내 방식으로 할버드를 내려놓지 않겠습니다.",
+      "shortIntro": "큰 뿔 아래 사교적인 웃음을 숨긴 미노타우로스 결계사.",
+      "quote": "들어오려면 이름부터 말해. 결계도 예의는 따지거든.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "무협",
         "race": "미노타우로스",
         "job": "결계사",
@@ -1212,7 +1256,7 @@ window.CHARACTERS = [
         "measurements": "178 - 112 - 181"
       }
     },
-    "folder": "wubun",
+    "folder": "043-wubun",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1225,10 +1269,11 @@ window.CHARACTERS = [
     "en": "Serena",
     "themeColor": "#4A9E87",
     "profile": {
-      "shortIntro": "저주 화물과 비단항로 속에서 움직이는 상냥한 백조수인 무희; 이능 없이 월아삽과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "짠 바람의 항로 앞에서도, 상처를 외면하지 않고 월아삽을 내려놓지 않겠습니다.",
+      "shortIntro": "상냥한 춤사위 뒤에 월아삽을 숨긴 백조 수인 무희.",
+      "quote": "춤은 부드럽게, 베는 건 망설임 없이.",
       "basicInfo": {
         "gender": "여성",
+        "world": "사프란해",
         "genre": "항해물",
         "race": "백조수인",
         "job": "무희",
@@ -1241,7 +1286,7 @@ window.CHARACTERS = [
         "measurements": "92 - 58 - 90"
       }
     },
-    "folder": "serena",
+    "folder": "044-serena",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1254,10 +1299,11 @@ window.CHARACTERS = [
     "en": "Tachyon",
     "themeColor": "#2B78D3",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 자신감 있다 다크엘프 드래곤라이더; 이능 없이 갈고리창과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "갈라진 게이트 앞에서도, 내 이름으로 갈고리창을 내려놓지 않겠습니다.",
+      "shortIntro": "자신감 하나로 용의 등까지 올라탄 다크엘프 라이더.",
+      "quote": "높은 데가 무섭다고? 그럼 더 높이 올라가면 돼.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "히어로물",
         "race": "다크엘프",
         "job": "드래곤라이더",
@@ -1270,7 +1316,7 @@ window.CHARACTERS = [
         "measurements": "88 - 60 - 90"
       }
     },
-    "folder": "tachyon",
+    "folder": "045-tachyon",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1283,10 +1329,11 @@ window.CHARACTERS = [
     "en": "Gloomy",
     "themeColor": "#9C85BA",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 우울한 캇파 사진작가; 이능 없이 독반지과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 내 방식으로 독반지를 내려놓지 않겠습니다.",
+      "shortIntro": "우울한 렌즈로 아무도 보지 않는 진실을 찍는 캇파 사진작가.",
+      "quote": "웃지 않아도 돼. 진짜 표정은 그다음 컷에 나오니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "범죄물",
         "race": "캇파",
         "job": "사진작가",
@@ -1299,7 +1346,7 @@ window.CHARACTERS = [
         "measurements": "83 - 58 - 87"
       }
     },
-    "folder": "gloomy",
+    "folder": "046-gloomy",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1312,10 +1359,11 @@ window.CHARACTERS = [
     "en": "Rust",
     "themeColor": "#ADBDA9",
     "profile": {
-      "shortIntro": "별먼지 개척지의 항해 속에서 움직이는 고요한 골렘 메카닉; 용암을 다룰 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "용암을 다룰 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "고요한 손끝으로 용암과 기계를 다루는 골렘 메카닉.",
+      "quote": "뜨겁다고 피하지 마. 식으면 움직이지 않거든.",
       "basicInfo": {
         "gender": "여성",
+        "world": "아스트라",
         "genre": "스페이스 웨스턴",
         "race": "골렘",
         "job": "메카닉",
@@ -1328,7 +1376,7 @@ window.CHARACTERS = [
         "measurements": "86 - 61 - 90"
       }
     },
-    "folder": "rust",
+    "folder": "047-rust",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1341,10 +1389,11 @@ window.CHARACTERS = [
     "en": "Niri",
     "themeColor": "#906B41",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 영적인 나비 메이드; 신체를 괴물화 하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "신체를 괴물화 하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "영적인 날개 아래 괴물의 몸을 숨긴 나비 메이드.",
+      "quote": "차를 따를까요, 아니면 이 몸을 먼저 접어 드릴까요?",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "감염병 아포칼립스",
         "race": "나비",
         "job": "메이드",
@@ -1357,7 +1406,7 @@ window.CHARACTERS = [
         "measurements": "112 - 61 - 105"
       }
     },
-    "folder": "niri",
+    "folder": "048-niri",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1370,10 +1419,11 @@ window.CHARACTERS = [
     "en": "Xi-Xi",
     "themeColor": "#355CF1",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 소심한 강시 로봇공학자; 그림자를 통해 이동하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "그림자를 통해 이동하는 힘은 나를 대신하는 변명이 아니라, 무섭지만 버티기 위한 선택입니다.",
+      "shortIntro": "소심하게 말하고 그림자 속으로 사라지는 강시 로봇공학자.",
+      "quote": "괜찮아요, 저는 뒤에 있을게요. 아주 뒤, 그림자 안쪽에.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "호러",
         "race": "강시",
         "job": "로봇공학자",
@@ -1386,7 +1436,7 @@ window.CHARACTERS = [
         "measurements": "86 - 57 - 88"
       }
     },
-    "folder": "xi-xi",
+    "folder": "049-xi-xi",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1399,10 +1449,11 @@ window.CHARACTERS = [
     "en": "Nina",
     "themeColor": "#2BCBC3",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 사려 깊은 봉제인형 수도사; 꿈을 조작하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "꿈을 조작하는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "사려 깊은 기도로 꿈을 고치는 봉제인형 수도사.",
+      "quote": "악몽도 누군가에게는 구조 신호일 수 있어요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "디젤펑크",
         "race": "봉제인형",
         "job": "수도사",
@@ -1415,7 +1466,7 @@ window.CHARACTERS = [
         "measurements": "78 - 56 - 82"
       }
     },
-    "folder": "nina",
+    "folder": "050-nina",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1428,10 +1479,11 @@ window.CHARACTERS = [
     "en": "Choa",
     "themeColor": "#45DC24",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 자유분방한 미라 예언자; 망각을 유발하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "망각을 유발하는 힘은 나를 대신하는 변명이 아니라, 웃으며 버티기 위한 선택입니다.",
+      "shortIntro": "자유로운 예언으로 남의 기억까지 흐리게 하는 미라.",
+      "quote": "잊어도 돼. 대신 내가 본 건 절대 사라지지 않아.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "무협",
         "race": "미라",
         "job": "예언자",
@@ -1444,7 +1496,7 @@ window.CHARACTERS = [
         "measurements": "84 - 58 - 86"
       }
     },
-    "folder": "choa",
+    "folder": "051-choa",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1457,10 +1509,11 @@ window.CHARACTERS = [
     "en": "Logan",
     "themeColor": "#8B7D11",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 강인한 늑대수인 경찰관; 이능 없이 화승총과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "햇빛 든 문턱 앞에서도, 물러서지 않고 화승총을 내려놓지 않겠습니다.",
+      "shortIntro": "낡은 화승총보다 굳센 등을 먼저 내미는 늑대 경찰관.",
+      "quote": "법이 늦게 와도, 나는 먼저 서 있을 수 있어.",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "일상",
         "race": "늑대수인",
         "job": "경찰관",
@@ -1473,7 +1526,7 @@ window.CHARACTERS = [
         "measurements": "92 - 58 - 94"
       }
     },
-    "folder": "logan",
+    "folder": "052-logan",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1486,10 +1539,11 @@ window.CHARACTERS = [
     "en": "Joy",
     "themeColor": "#98EF12",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 다정한 엔트 운동선수; 자신 주변에 작은 폭풍을 만들 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "자신 주변에 작은 폭풍을 만들 수 있는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "다정한 뿌리로 폭풍 속에서도 공을 놓지 않는 엔트 선수.",
+      "quote": "넘어지면 잡아 줄게. 대신 다시 뛰어야 해.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "포스트 아포칼립스",
         "race": "엔트",
         "job": "운동선수",
@@ -1502,7 +1556,7 @@ window.CHARACTERS = [
         "measurements": "80 - 57 - 83"
       }
     },
-    "folder": "joy",
+    "folder": "053-joy",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1515,10 +1569,11 @@ window.CHARACTERS = [
     "en": "Mia",
     "themeColor": "#15D927",
     "profile": {
-      "shortIntro": "저주 화물과 비단항로 속에서 움직이는 작은 체구로도 수줍은 슬라임 사신; 상대에게 불운을 부여하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상대에게 불운을 부여하는 힘은 나를 대신하는 변명이 아니라, 무섭지만 버티기 위한 선택입니다.",
+      "shortIntro": "수줍게 미소 짓고 불운을 슬쩍 건네는 슬라임 사신.",
+      "quote": "미안해요. 제 인사는 가끔 불길하게 묻어요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "사프란해",
         "genre": "실크로드판타지",
         "race": "슬라임",
         "job": "사신",
@@ -1531,7 +1586,7 @@ window.CHARACTERS = [
         "measurements": "51 - 42 -54"
       }
     },
-    "folder": "mia",
+    "folder": "054-mia",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1544,10 +1599,11 @@ window.CHARACTERS = [
     "en": "GaEun",
     "themeColor": "#1F8857",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 착한 리치 교사; 인형을 움직일 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "인형을 움직일 수 있는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "착한 목소리로 인형을 세워 수업을 이어가는 리치 교사.",
+      "quote": "죽었다고 배움까지 멈추면 선생님이 섭섭하죠.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "동양판타지",
         "race": "리치",
         "job": "교사",
@@ -1560,7 +1616,7 @@ window.CHARACTERS = [
         "measurements": "98 - 67 - 100"
       }
     },
-    "folder": "gaeun",
+    "folder": "055-gaeun",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1573,10 +1629,11 @@ window.CHARACTERS = [
     "en": "Sylvia",
     "themeColor": "#2A4C4F",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 예민한 문엘프 요리사; 상대에게 닿으면 독을 주입하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상대에게 닿으면 독을 주입하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "예민한 미각과 독의 손끝을 함께 지닌 문엘프 요리사.",
+      "quote": "한 입이면 충분해. 맛도, 독도.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "영지물",
         "race": "문엘프",
         "job": "요리사",
@@ -1589,7 +1646,7 @@ window.CHARACTERS = [
         "measurements": "84 - 55 - 86"
       }
     },
-    "folder": "sylvia",
+    "folder": "056-sylvia",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1602,10 +1659,11 @@ window.CHARACTERS = [
     "en": "Vivian",
     "themeColor": "#637115",
     "profile": {
-      "shortIntro": "저주 화물과 비단항로 속에서 움직이는 차가운 천인 탐정; 자신 주변에 작은 폭풍을 만들 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "자신 주변에 작은 폭풍을 만들 수 있는 힘은 나를 대신하는 변명이 아니라, 흔들리지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "차가운 눈으로 폭풍의 결을 읽는 천인 탐정.",
+      "quote": "바람은 거짓말을 못 해. 흔적만 빙빙 돌릴 뿐이지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "사프란해",
         "genre": "실크로드판타지",
         "race": "천인",
         "job": "탐정",
@@ -1618,7 +1676,7 @@ window.CHARACTERS = [
         "measurements": "95 - 60 - 97"
       }
     },
-    "folder": "vivian",
+    "folder": "057-vivian",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1631,10 +1689,11 @@ window.CHARACTERS = [
     "en": "Diana",
     "themeColor": "#A1DF56",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 비인간적 체형을 지닌 계획적인 나가 플로리스트; 몸속의 독을 힘으로 바꿀 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "몸속의 독을 힘으로 바꿀 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "꽃향기와 독을 같은 몸에 품은 계획적인 나가 플로리스트.",
+      "quote": "꽃은 예쁘게 피고, 독은 조용히 번져요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "첩보",
         "race": "나가",
         "job": "플로리스트",
@@ -1647,7 +1706,7 @@ window.CHARACTERS = [
         "measurements": "101 - 63 -  96\n(꼬리기부둘레)"
       }
     },
-    "folder": "diana",
+    "folder": "058-diana",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1660,10 +1719,11 @@ window.CHARACTERS = [
     "en": "Lize",
     "themeColor": "#DDD529",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 침착한 구울 현상금사냥꾼; 빛을 굴절시켜 모습을 감출 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "빛을 굴절시켜 모습을 감출 수 있는 힘은 나를 대신하는 변명이 아니라, 흔들리지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "침착한 미소로 빛을 꺾어 표적 뒤에 서는 구울 사냥꾼.",
+      "quote": "날 못 봤다면, 이미 반은 잡힌 거야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "게임판타지",
         "race": "구울",
         "job": "현상금사냥꾼",
@@ -1676,7 +1736,7 @@ window.CHARACTERS = [
         "measurements": "88 - 58 - 92"
       }
     },
-    "folder": "lize",
+    "folder": "059-lize",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1689,10 +1749,11 @@ window.CHARACTERS = [
     "en": "Grace",
     "themeColor": "#7A6670",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 자신감 있는 인간 사제; 몸을 연기처럼 흩어지게 하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "몸을 연기처럼 흩어지게 하는 힘은 나를 대신하는 변명이 아니라, 내 이름으로 버티기 위한 선택입니다.",
+      "shortIntro": "연기처럼 흩어졌다가 자신감 있게 돌아오는 인간 사제.",
+      "quote": "믿음은 붙잡는 게 아니야. 흩어져도 다시 모이는 거지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "선협",
         "race": "인간",
         "job": "사제",
@@ -1705,7 +1766,7 @@ window.CHARACTERS = [
         "measurements": "92 - 61 - 94"
       }
     },
-    "folder": "grace",
+    "folder": "060-grace",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1718,10 +1779,11 @@ window.CHARACTERS = [
     "en": "Elena",
     "themeColor": "#0F6E6E",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 꼼꼼한 안드로이드 바텐더; 이능 없이 레이피어과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "녹슨 경보등 앞에서도, 내 방식으로 레이피어를 내려놓지 않겠습니다.",
+      "shortIntro": "잔을 닦듯 상황을 정리하는 꼼꼼한 안드로이드 바텐더.",
+      "quote": "주문은 정확히. 실수는 손님보다 제가 더 싫어합니다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "바이오펑크",
         "race": "안드로이드",
         "job": "바텐더",
@@ -1734,7 +1796,7 @@ window.CHARACTERS = [
         "measurements": "94 - 59 -94"
       }
     },
-    "folder": "elena",
+    "folder": "061-elena",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1747,10 +1809,11 @@ window.CHARACTERS = [
     "en": "Ines",
     "themeColor": "#939FDC",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 당찬 유령 탐정; 독을 다룰 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "독을 다룰 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "당찬 눈빛으로 독과 단서를 함께 추적하는 유령 탐정.",
+      "quote": "죽은 뒤에도 사건은 끝까지 따라붙더라.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "궁정물",
         "race": "유령",
         "job": "탐정",
@@ -1763,7 +1826,7 @@ window.CHARACTERS = [
         "measurements": "96 - 58 -96"
       }
     },
-    "folder": "ines",
+    "folder": "062-ines",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1776,10 +1839,11 @@ window.CHARACTERS = [
     "en": "Bianca",
     "themeColor": "#5A32FF",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 불안한 인간 왕족; 괴력을 발휘하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "괴력을 발휘하는 힘은 나를 대신하는 변명이 아니라, 무섭지만 버티기 위한 선택입니다.",
+      "shortIntro": "불안한 왕관 아래 괴력을 감춘 인간 왕족.",
+      "quote": "떨리는 손이라도, 잡아야 할 건 놓치지 않을래.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "설원판타지",
         "race": "인간",
         "job": "왕족",
@@ -1792,7 +1856,7 @@ window.CHARACTERS = [
         "measurements": "91 - 56 - 90"
       }
     },
-    "folder": "bianca",
+    "folder": "063-bianca",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1805,10 +1869,11 @@ window.CHARACTERS = [
     "en": "Tina",
     "themeColor": "#783D52",
     "profile": {
-      "shortIntro": "저주 화물과 비단항로 속에서 움직이는 명랑한 요정 스캐빈저; 상대의 공격 에너지를 흡수하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상대의 공격 에너지를 흡수하는 힘은 나를 대신하는 변명이 아니라, 웃으며 버티기 위한 선택입니다.",
+      "shortIntro": "명랑한 날갯짓으로 공격의 힘을 빼앗는 요정 스캐빈저.",
+      "quote": "그거 버릴 거면 제가 쓸게요. 공격도 재활용되거든요!",
       "basicInfo": {
         "gender": "여성",
+        "world": "사프란해",
         "genre": "실크로드판타지",
         "race": "요정",
         "job": "스캐빈저",
@@ -1821,7 +1886,7 @@ window.CHARACTERS = [
         "measurements": "76 - 54 - 79"
       }
     },
-    "folder": "tina",
+    "folder": "064-tina",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1834,10 +1899,11 @@ window.CHARACTERS = [
     "en": "Iris",
     "themeColor": "#06D291",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 까칠한 쥐 수인 도사; 이능 없이 비녀과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "먼 길의 표식 앞에서도, 내 방식으로 비녀를 내려놓지 않겠습니다.",
+      "shortIntro": "까칠한 말투와 비녀 하나로 선을 긋는 쥐 수인 도사.",
+      "quote": "가까이 오지 마. 부적보다 내 성질이 먼저 나가.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "동양판타지",
         "race": "쥐 수인",
         "job": "도사",
@@ -1850,7 +1916,7 @@ window.CHARACTERS = [
         "measurements": "96 - 56 - 89"
       }
     },
-    "folder": "iris",
+    "folder": "065-iris",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1863,10 +1929,11 @@ window.CHARACTERS = [
     "en": "Amy",
     "themeColor": "#B0BC19",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 불안한 유령 경비병; 이능 없이 맨손과 판단과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 무섭지만 내가 맡은 일을 끝내겠습니다.",
+      "shortIntro": "불안한 발소리로도 자리를 지키는 유령 경비병.",
+      "quote": "무서워도 순찰은 돌아요. 누군가는 문을 봐야 하니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "유령수사물",
         "race": "유령",
         "job": "경비병",
@@ -1879,7 +1946,7 @@ window.CHARACTERS = [
         "measurements": "78 - 56 - 82"
       }
     },
-    "folder": "amy",
+    "folder": "066-amy",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1892,10 +1959,11 @@ window.CHARACTERS = [
     "en": "LianHua",
     "themeColor": "#3C5FDE",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 착한 마신족 낭인; 이능 없이 염주과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "먼 길의 표식 앞에서도, 상처를 외면하지 않고 염주를 내려놓지 않겠습니다.",
+      "shortIntro": "착한 마음으로 염주를 굴리는 마신족 낭인.",
+      "quote": "베지 않아도 끝나는 싸움이면, 그쪽을 고르고 싶어.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "신협",
         "race": "마신족",
         "job": "낭인",
@@ -1908,7 +1976,7 @@ window.CHARACTERS = [
         "measurements": "98 - 58 -92"
       }
     },
-    "folder": "lianhua",
+    "folder": "067-lianhua",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1921,10 +1989,11 @@ window.CHARACTERS = [
     "en": "Gaon",
     "themeColor": "#D01DB7",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 대담한 양 수인 사냥꾼; 상대의 힘을 짧은 시간 동안 약화시키거나 무효화하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상대의 힘을 짧은 시간 동안 약화시키거나 무효화하는 힘은 나를 대신하는 변명이 아니라, 물러서지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "대담한 눈으로 사냥감의 힘부터 꺾는 양 수인 사냥꾼.",
+      "quote": "강한 척해도 돼. 네 힘은 곧 조용해질 테니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "감염병 아포칼립스",
         "race": "양 수인",
         "job": "사냥꾼",
@@ -1937,7 +2006,7 @@ window.CHARACTERS = [
         "measurements": "105 - 60 - 94"
       }
     },
-    "folder": "gaon",
+    "folder": "068-gaon",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1950,10 +2019,11 @@ window.CHARACTERS = [
     "en": "Theira",
     "themeColor": "#11F0AA",
     "profile": {
-      "shortIntro": "신들의 그늘과 심연 성소 속에서 움직이는 거대한 체구를 숨기지 못한 채 수수께끼 같은 타이탄 고행사제; 신체를 괴물화 하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "신체를 괴물화 하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "수수께끼 같은 기도로 거대한 몸을 괴물처럼 일으키는 타이탄.",
+      "quote": "고통은 벗는 것이 아니라, 더 큰 몸으로 견디는 것이다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "에레보스",
         "genre": "신화판타지",
         "race": "타이탄",
         "job": "고행사제",
@@ -1966,7 +2036,7 @@ window.CHARACTERS = [
         "measurements": "880 - 520 - 910"
       }
     },
-    "folder": "theira",
+    "folder": "069-theira",
     "albumKeys": [
       "figure",
       "magazine",
@@ -1978,10 +2048,11 @@ window.CHARACTERS = [
     "en": "Selby",
     "themeColor": "#5EE466",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 고집 센 아수라 마피아 보스; 상대의 청각을 일시적으로 마비시키는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상대의 청각을 일시적으로 마비시키는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "고집 센 네 팔로 대형망치를 들어 올리는 아수라 보스.",
+      "quote": "내 말이 안 들리면 괜찮아. 곧 아무 소리도 못 들을 테니.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "판타지",
         "race": "아수라",
         "job": "마피아 보스",
@@ -1994,7 +2065,7 @@ window.CHARACTERS = [
         "measurements": "101 - 62 - 96"
       }
     },
-    "folder": "selby",
+    "folder": "070-selby",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2007,10 +2078,11 @@ window.CHARACTERS = [
     "en": "Guile",
     "themeColor": "#E0DD49",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 대담한 곰 수인 총잡이; 이능 없이 쿠크리과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "녹슨 경보등 앞에서도, 물러서지 않고 쿠크리를 내려놓지 않겠습니다.",
+      "shortIntro": "대담한 웃음으로 쿠크리를 빼 드는 곰 수인 총잡이.",
+      "quote": "총알이 떨어져도 손은 남아 있지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "나노펑크",
         "race": "곰 수인",
         "job": "총잡이",
@@ -2023,7 +2095,7 @@ window.CHARACTERS = [
         "measurements": "108 - 72 - 104"
       }
     },
-    "folder": "guile",
+    "folder": "071-guile",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2036,10 +2108,11 @@ window.CHARACTERS = [
     "en": "Scar",
     "themeColor": "#C0C288",
     "profile": {
-      "shortIntro": "햇살가의 일상 기담 속에서 움직이는 반항적인 늑대인간 집사; 이능 없이 식칼과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "햇빛 든 문턱 앞에서도, 내 방식으로 식칼을 내려놓지 않겠습니다.",
+      "shortIntro": "반항적인 눈빛으로 식칼을 닦는 늑대인간 집사.",
+      "quote": "명령은 듣습니다. 마음까지 복종하진 않지만요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "루미아",
         "genre": "요리물",
         "race": "늑대인간",
         "job": "집사",
@@ -2052,7 +2125,7 @@ window.CHARACTERS = [
         "measurements": "96 - 61 - 98"
       }
     },
-    "folder": "scar",
+    "folder": "072-scar",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2065,10 +2138,11 @@ window.CHARACTERS = [
     "en": "Rabi",
     "themeColor": "#BC4874",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 논리적인 토끼 수인 첩자; 작은 생물로 변신하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "작은 생물로 변신하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "논리적인 말투로 작은 생물의 틈까지 파고드는 토끼 첩자.",
+      "quote": "문이 크면 의심받죠. 그래서 작아지는 겁니다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "사이버펑크",
         "race": "토끼 수인",
         "job": "첩자",
@@ -2081,7 +2155,7 @@ window.CHARACTERS = [
         "measurements": "82 - 57 - 86"
       }
     },
-    "folder": "rabi",
+    "folder": "073-rabi",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2094,10 +2168,11 @@ window.CHARACTERS = [
     "en": "Rona",
     "themeColor": "#00801E",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 논리적인 하프엘프 외과의; 상처를 입기 전 상태로 몸을 되돌릴 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상처를 입기 전 상태로 몸을 되돌릴 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "차분한 메스로 상처를 과거로 되돌리는 하프엘프 외과의.",
+      "quote": "아프기 전으로 돌려 드릴게요. 대신 거짓말은 남습니다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "에코펑크",
         "race": "하프엘프",
         "job": "외과의",
@@ -2110,7 +2185,7 @@ window.CHARACTERS = [
         "measurements": "94 - 60 - 93"
       }
     },
-    "folder": "rona",
+    "folder": "074-rona",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2123,10 +2198,11 @@ window.CHARACTERS = [
     "en": "Anika",
     "themeColor": "#94DC09",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 비밀스러운 구울 밀수꾼; 이능 없이 수리검과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "모래 묻은 격리문 앞에서도, 내 방식으로 수리검을 내려놓지 않겠습니다.",
+      "shortIntro": "비밀스러운 웃음으로 폐허의 뒷길을 파는 구울 밀수꾼.",
+      "quote": "모르는 게 안전한 물건도 있어. 사겠다면 더 비싸고.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "감염병 아포칼립스",
         "race": "구울",
         "job": "밀수꾼",
@@ -2139,7 +2215,7 @@ window.CHARACTERS = [
         "measurements": "88 - 56 - 89"
       }
     },
-    "folder": "anika",
+    "folder": "075-anika",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2152,10 +2228,11 @@ window.CHARACTERS = [
     "en": "Garka",
     "themeColor": "#75185C",
     "profile": {
-      "shortIntro": "별먼지 개척지의 항해 속에서 움직이는 이성적인 트롤 재단사; 이능 없이 쌍검과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "먼 별빛 앞에서도, 내 방식으로 쌍검을 내려놓지 않겠습니다.",
+      "shortIntro": "이성적인 손끝으로 트롤의 체구에 딱 맞는 옷을 재단하는 장인.",
+      "quote": "천은 거짓말을 못 해. 몸의 진실을 따라 잘릴 뿐이지.",
       "basicInfo": {
         "gender": "여성",
+        "world": "아스트라",
         "genre": "스페이스 오페라",
         "race": "트롤",
         "job": "재단사",
@@ -2168,7 +2245,7 @@ window.CHARACTERS = [
         "measurements": "126 - 86 - 124"
       }
     },
-    "folder": "garka",
+    "folder": "076-garka",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2181,10 +2258,11 @@ window.CHARACTERS = [
     "en": "Zella",
     "themeColor": "#5C8479",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 오만한 와이트 배틀메이지; 햇빛에 노출되면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "햇빛에 노출되면 강해지는 힘은 나를 대신하는 변명이 아니라, 내 이름으로 버티기 위한 선택입니다.",
+      "shortIntro": "오만한 주문검으로 햇빛을 힘으로 삼는 와이트 배틀메이지.",
+      "quote": "해가 뜨면 끝이라고? 아니, 그때부터 내 차례야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "게임판타지",
         "race": "와이트",
         "job": "배틀메이지",
@@ -2197,7 +2275,7 @@ window.CHARACTERS = [
         "measurements": "94 - 58 - 91"
       }
     },
-    "folder": "zella",
+    "folder": "077-zella",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2210,10 +2288,11 @@ window.CHARACTERS = [
     "en": "Naia",
     "themeColor": "#65A7B4",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 예민한 루살카 대장장이; 햇빛에 노출되면 강해지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "햇빛에 노출되면 강해지는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "예민한 망치질로 햇빛까지 벼려 내는 루살카 대장장이.",
+      "quote": "불평할 거면 직접 달궈. 나는 빛까지 두드려 봤어.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "솔라펑크",
         "race": "루살카",
         "job": "대장장이",
@@ -2226,7 +2305,7 @@ window.CHARACTERS = [
         "measurements": "84 - 58 - 87"
       }
     },
-    "folder": "naia",
+    "folder": "078-naia",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2239,10 +2318,11 @@ window.CHARACTERS = [
     "en": "Moira",
     "themeColor": "#2910A5",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 도도한 마신족 언데드사냥꾼; 눈에서 광선을 쏠 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "눈에서 광선을 쏠 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "도도한 시선에서 광선을 쏘는 마신족 언데드사냥꾼.",
+      "quote": "눈을 피하지 마. 사냥감처럼 보이니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "궁정물",
         "race": "마신족",
         "job": "언데드사냥꾼",
@@ -2255,7 +2335,7 @@ window.CHARACTERS = [
         "measurements": "102 - 58 - 96"
       }
     },
-    "folder": "moira",
+    "folder": "079-moira",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2268,10 +2348,11 @@ window.CHARACTERS = [
     "en": "Tiska",
     "themeColor": "#883F56",
     "profile": {
-      "shortIntro": "별먼지 개척지의 항해 속에서 움직이는 우유부단한 사마귀 수인 리포터; 장소에 남은 기억을 읽을 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "장소에 남은 기억을 읽을 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "우유부단해도 남은 기억을 읽어 끝내 보도하는 사마귀 리포터.",
+      "quote": "결정은 늦어도 기록은 정확해야 해요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "아스트라",
         "genre": "우주개척물",
         "race": "사마귀 수인",
         "job": "리포터",
@@ -2284,7 +2365,7 @@ window.CHARACTERS = [
         "measurements": "83 - 58 - 86"
       }
     },
-    "folder": "tiska",
+    "folder": "080-tiska",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2297,10 +2378,11 @@ window.CHARACTERS = [
     "en": "Carmilla",
     "themeColor": "#883F56",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 서늘한 박쥐 수인 마법소녀; 이능 없이 방패과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 흔들리지 않고 방패를 내려놓지 않겠습니다.",
+      "shortIntro": "서늘한 미소로 방패를 든 박쥐 수인 마법소녀.",
+      "quote": "반짝이는 주문보다, 안 다치게 막는 게 먼저야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "호러",
         "race": "박쥐 수인",
         "job": "마법소녀",
@@ -2313,7 +2395,7 @@ window.CHARACTERS = [
         "measurements": "87 - 58 - 91"
       }
     },
-    "folder": "carmilla",
+    "folder": "081-carmilla",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2326,10 +2408,11 @@ window.CHARACTERS = [
     "en": "Ada",
     "themeColor": "#12BB89",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 강인한 오토마톤 인공지능학자; 에너지를 방어막으로 바꿀 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "에너지를 방어막으로 바꿀 수 있는 힘은 나를 대신하는 변명이 아니라, 물러서지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "강철 같은 신념으로 에너지를 방벽으로 바꾸는 오토마톤 학자.",
+      "quote": "무너지지 않는 논리라면, 방패로도 쓸 수 있죠.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "밀리터리SF",
         "race": "오토마톤",
         "job": "인공지능학자",
@@ -2342,7 +2425,7 @@ window.CHARACTERS = [
         "measurements": "92 - 58 - 90"
       }
     },
-    "folder": "ada",
+    "folder": "082-ada",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2355,10 +2438,11 @@ window.CHARACTERS = [
     "en": "Siyo",
     "themeColor": "#478DE6",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 소심한 드라이어드 식신술사; 이능 없이 장궁과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "검은 관 앞에서도, 무섭지만 장궁을 내려놓지 않겠습니다.",
+      "shortIntro": "소심하게 부적을 붙이고 식신을 부르는 드라이어드.",
+      "quote": "제가 나서기엔 무서우니까… 대신 이 아이가 갈 거예요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "소드앤소서러",
         "race": "드라이어드",
         "job": "식신술사",
@@ -2371,7 +2455,7 @@ window.CHARACTERS = [
         "measurements": "84 - 56 - 87"
       }
     },
-    "folder": "siyo",
+    "folder": "083-siyo",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2384,10 +2468,11 @@ window.CHARACTERS = [
     "en": "Shard",
     "themeColor": "#259FCD",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 불안한 구체관절인형 생존자; 몸을 투명하게 만들 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "몸을 투명하게 만들 수 있는 힘은 나를 대신하는 변명이 아니라, 무섭지만 버티기 위한 선택입니다.",
+      "shortIntro": "불안한 숨을 감추고 투명해지는 인형 생존자.",
+      "quote": "보이지 않으면 괜찮을 줄 알았는데, 심장은 더 시끄러워.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "좀비 아포칼립스",
         "race": "구체관절인형",
         "job": "생존자",
@@ -2400,7 +2485,7 @@ window.CHARACTERS = [
         "measurements": "78 - 55 - 82"
       }
     },
-    "folder": "shard",
+    "folder": "084-shard",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2413,10 +2498,11 @@ window.CHARACTERS = [
     "en": "Nova",
     "themeColor": "#E64B4F",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 고요한 골렘 로봇공학자; 자신에게 닿은 빛을 흡수해 힘으로 바꾸는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "자신에게 닿은 빛을 흡수해 힘으로 바꾸는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "빛을 먹어 힘으로 바꾸는 고요한 골렘 로봇공학자.",
+      "quote": "조용히 충전 중이다. 방해하면 출력이 올라간다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "아톰펑크",
         "race": "골렘",
         "job": "로봇공학자",
@@ -2429,7 +2515,7 @@ window.CHARACTERS = [
         "measurements": "88 - 57 - 90"
       }
     },
-    "folder": "nova",
+    "folder": "085-nova",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2442,10 +2528,11 @@ window.CHARACTERS = [
     "en": "Poko",
     "themeColor": "#751999",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 질투심 많은 너구리 수인 대학생; 어두운 곳에서 기척을 지울 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "어두운 곳에서 기척을 지울 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "질투심을 어둠에 숨기고 방패를 드는 너구리 대학생.",
+      "quote": "나도 할 수 있어. 안 보일 때 더 잘할 뿐이야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "사이버펑크",
         "race": "너구리 수인",
         "job": "대학생",
@@ -2458,7 +2545,7 @@ window.CHARACTERS = [
         "measurements": "78 - 56 - 82"
       }
     },
-    "folder": "poko",
+    "folder": "086-poko",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2471,10 +2558,11 @@ window.CHARACTERS = [
     "en": "Sia",
     "themeColor": "#1CF2AF",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 책임감 강한 캇파 현자; 상대의 움직임을 냉기로 둔하게 만드는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "상대의 움직임을 냉기로 둔하게 만드는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "책임감으로 냉기를 다루는 캇파 현자.",
+      "quote": "서두르지 마. 얼어붙은 발걸음도 생각할 시간은 벌어 줘.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "범죄물",
         "race": "캇파",
         "job": "현자",
@@ -2487,7 +2575,7 @@ window.CHARACTERS = [
         "measurements": "84 - 59 - 88"
       }
     },
-    "folder": "sia",
+    "folder": "087-sia",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2500,10 +2588,11 @@ window.CHARACTERS = [
     "en": "Yul",
     "themeColor": "#399839",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 논리적인 강시 용병; 자신이 정한 금지 행동을 상대가 하지 못하게 하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "자신이 정한 금지 행동을 상대가 하지 못하게 하는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "논리로 금지를 정하고 주술검으로 어기는 길을 막는 강시 용병.",
+      "quote": "규칙은 간단해. 내가 금지하면, 너는 못 한다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "로우 판타지",
         "race": "강시",
         "job": "용병",
@@ -2516,7 +2605,7 @@ window.CHARACTERS = [
         "measurements": "78 - 55 - 84"
       }
     },
-    "folder": "yul",
+    "folder": "088-yul",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2529,10 +2618,11 @@ window.CHARACTERS = [
     "en": "Elysia",
     "themeColor": "#435624",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 상냥한 설녀 첩자; 체력이 낮아질수록 움직임이 빨라지는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "체력이 낮아질수록 움직임이 빨라지는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "상냥한 미소로 체력이 바닥날수록 더 빠르게 움직이는 설녀 첩자.",
+      "quote": "괜찮아요. 지칠수록 저는 더 빨라지거든요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "하이 판타지",
         "race": "설녀",
         "job": "첩자",
@@ -2545,7 +2635,7 @@ window.CHARACTERS = [
         "measurements": "84 - 58 - 86"
       }
     },
-    "folder": "elysia",
+    "folder": "089-elysia",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2558,10 +2648,11 @@ window.CHARACTERS = [
     "en": "Lia",
     "themeColor": "#953E16",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 부지런한 오니 마도공학자; 말한 내용을 잠시 현실로 만들 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "말한 내용을 잠시 현실로 만들 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "부지런한 손으로 말을 현실에 잠시 고정하는 오니 기술자.",
+      "quote": "말조심해. 내 앞에서는 농담도 잠깐 살아나니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "오컬트",
         "race": "오니",
         "job": "마도공학자",
@@ -2574,7 +2665,7 @@ window.CHARACTERS = [
         "measurements": "103 - 58 - 97"
       }
     },
-    "folder": "lia",
+    "folder": "090-lia",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2587,10 +2678,11 @@ window.CHARACTERS = [
     "en": "Umbra",
     "themeColor": "#893FE2",
     "profile": {
-      "shortIntro": "비 내리는 야간도시의 사건 기록 속에서 움직이는 우울한 문엘프 교도관; 이능 없이 암기과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "젖은 가로등 앞에서도, 내 방식으로 암기를 내려놓지 않겠습니다.",
+      "shortIntro": "우울한 눈으로 암기를 숨긴 문엘프 교도관.",
+      "quote": "탈출로를 찾는 건 자유야. 돌아오는 길은 내가 막을게.",
       "basicInfo": {
         "gender": "여성",
+        "world": "미드레인",
         "genre": "법정물",
         "race": "문엘프",
         "job": "교도관",
@@ -2603,7 +2695,7 @@ window.CHARACTERS = [
         "measurements": "94 - 63 - 96"
       }
     },
-    "folder": "umbra",
+    "folder": "091-umbra",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2616,10 +2708,11 @@ window.CHARACTERS = [
     "en": "Officina",
     "themeColor": "#B51594",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 조심스러운 만드라고라 요괴사냥꾼; 손끝에서 불꽃을 만들어낼 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "손끝에서 불꽃을 만들어낼 수 있는 힘은 나를 대신하는 변명이 아니라, 내 방식으로 버티기 위한 선택입니다.",
+      "shortIntro": "조심스러운 손끝에 작은 불꽃을 피우는 만드라고라 사냥꾼.",
+      "quote": "크게 태우지 않을게요. 필요한 만큼만 뜨겁게.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "이세계",
         "race": "만드라고라",
         "job": "요괴사냥꾼",
@@ -2632,7 +2725,7 @@ window.CHARACTERS = [
         "measurements": "94 - 57 - 89"
       }
     },
-    "folder": "officina",
+    "folder": "092-officina",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2645,10 +2738,11 @@ window.CHARACTERS = [
     "en": "Yslra",
     "themeColor": "#803A7E",
     "profile": {
-      "shortIntro": "차원전장과 소환의 균열 속에서 움직이는 결단력 있는 마인 몬스터헌터; 싸움이 길어질수록 상대의 약점을 파악하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "싸움이 길어질수록 상대의 약점을 파악하는 힘은 나를 대신하는 변명이 아니라, 물러서지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "길어진 싸움 속에서 약점을 찾아내는 결단력 있는 마인 사냥꾼.",
+      "quote": "오래 버텨 봐. 그러면 네 빈틈도 오래 보이니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "게이트폴",
         "genre": "설원판타지",
         "race": "마인",
         "job": "몬스터헌터",
@@ -2661,7 +2755,7 @@ window.CHARACTERS = [
         "measurements": "101 - 58 - 93"
       }
     },
-    "folder": "yslra",
+    "folder": "093-yslra",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2674,10 +2768,11 @@ window.CHARACTERS = [
     "en": "Castiella",
     "themeColor": "#8AE087",
     "profile": {
-      "shortIntro": "저주 화물과 비단항로 속에서 움직이는 자상한 타천사 인형술사; 이능 없이 검과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "짠 바람의 항로 앞에서도, 상처를 외면하지 않고 검을 내려놓지 않겠습니다.",
+      "shortIntro": "자상한 손길로 인형과 검을 함께 움직이는 타천사.",
+      "quote": "망가진 날개라도 누군가를 안아 줄 수는 있어.",
       "basicInfo": {
         "gender": "여성",
+        "world": "사프란해",
         "genre": "해양판타지",
         "race": "타천사",
         "job": "인형술사",
@@ -2690,7 +2785,7 @@ window.CHARACTERS = [
         "measurements": "83 - 58 - 88"
       }
     },
-    "folder": "castiella",
+    "folder": "094-castiella",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2703,10 +2798,11 @@ window.CHARACTERS = [
     "en": "Kymayra",
     "themeColor": "#A0B6D4",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 집착적인 인간 소방관; 동물의 신체 힘을 잠시 얻을 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "동물의 신체 힘을 잠시 얻을 수 있는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "집착적인 용기로 짐승의 힘을 빌리는 인간 소방관.",
+      "quote": "불길 속에서는 사람답게보다, 살아남게 움직여야 해.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "밀리터리SF",
         "race": "인간",
         "job": "소방관",
@@ -2719,7 +2815,7 @@ window.CHARACTERS = [
         "measurements": "84 - 58 - 88"
       }
     },
-    "folder": "kymayra",
+    "folder": "095-kymayra",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2732,10 +2828,11 @@ window.CHARACTERS = [
     "en": "torqa",
     "themeColor": "#025847",
     "profile": {
-      "shortIntro": "묵법과 표국의 길 속에서 움직이는 비밀스러운 곰 수인 표사; 이능 없이 활과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "먼 길의 표식 앞에서도, 내 방식으로 활을 내려놓지 않겠습니다.",
+      "shortIntro": "비밀스러운 웃음으로 화살보다 먼저 길을 지키는 곰 수인 표사.",
+      "quote": "짐은 맡겼으면 믿어. 묻지 않는 것도 호위의 일부야.",
       "basicInfo": {
         "gender": "여성",
+        "world": "연묵",
         "genre": "무협",
         "race": "곰 수인",
         "job": "표사",
@@ -2748,7 +2845,7 @@ window.CHARACTERS = [
         "measurements": "90 - 60 - 91"
       }
     },
-    "folder": "torqa",
+    "folder": "096-torqa",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2761,10 +2858,11 @@ window.CHARACTERS = [
     "en": "Amelys",
     "themeColor": "#213C55",
     "profile": {
-      "shortIntro": "흑관 장례법과 변경의 맹세 속에서 움직이는 다정한 엘프 사령술사; 금속을 조종하는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "금속을 조종하는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "다정한 목소리로 죽은 자와 금속을 달래는 엘프 사령술사.",
+      "quote": "무서워하지 마세요. 죽은 이들도 거칠게 깨우면 아파해요.",
       "basicInfo": {
         "gender": "여성",
+        "world": "노크트",
         "genre": "설원판타지",
         "race": "엘프",
         "job": "사령술사",
@@ -2777,7 +2875,7 @@ window.CHARACTERS = [
         "measurements": "92 - 59 - 89"
       }
     },
-    "folder": "amelys",
+    "folder": "097-amelys",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2790,10 +2888,11 @@ window.CHARACTERS = [
     "en": "Dreadna",
     "themeColor": "#AF7237",
     "profile": {
-      "shortIntro": "신들의 그늘과 심연 성소 속에서 움직이는 자상한 다크드워프 마왕; 자신의 존재감을 지울 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "자신의 존재감을 지울 수 있는 힘은 나를 대신하는 변명이 아니라, 상처를 외면하지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "자상한 말투로 존재감마저 감추는 다크드워프 마왕.",
+      "quote": "두려워하지 마. 네가 나를 잊는 순간, 이미 끝난 거니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "에레보스",
         "genre": "신화판타지",
         "race": "다크드워프",
         "job": "마왕",
@@ -2806,7 +2905,7 @@ window.CHARACTERS = [
         "measurements": "99 - 52 - 88"
       }
     },
-    "folder": "dreadna",
+    "folder": "098-dreadna",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2819,10 +2918,11 @@ window.CHARACTERS = [
     "en": "Zahyra",
     "themeColor": "#F72212",
     "profile": {
-      "shortIntro": "황사와 격리문이 남은 폐허 속에서 움직이는 용감한 좀비 폐허탐색자; 빛을 만들어낼 수 있는 힘을/를 짊어지고 자기 역할을 선택한다.",
-      "quote": "빛을 만들어낼 수 있는 힘은 나를 대신하는 변명이 아니라, 물러서지 않고 버티기 위한 선택입니다.",
+      "shortIntro": "용감하게 빛을 들고 무너진 곳을 살피는 좀비 탐색자.",
+      "quote": "겁나도 들어가야 해. 어둠 속에 사람이 있을지 모르니까.",
       "basicInfo": {
         "gender": "여성",
+        "world": "애쉬런",
         "genre": "중동판타지",
         "race": "좀비",
         "job": "폐허탐색자",
@@ -2835,7 +2935,7 @@ window.CHARACTERS = [
         "measurements": "88 - 58 - 86"
       }
     },
-    "folder": "zahyra",
+    "folder": "099-zahyra",
     "albumKeys": [
       "figure",
       "magazine",
@@ -2848,10 +2948,11 @@ window.CHARACTERS = [
     "en": "Barretha",
     "themeColor": "#941F96",
     "profile": {
-      "shortIntro": "기업 폐허와 재난 경보 속에서 움직이는 압도적인 체격을 지닌 서늘한 거인 왕족; 이능 없이 개틀링건과 직업적 감각으로 자기 몫을 증명한다.",
-      "quote": "녹슨 경보등 앞에서도, 흔들리지 않고 개틀링건을 내려놓지 않겠습니다.",
+      "shortIntro": "서늘한 왕족의 시선으로 개틀링건을 드는 거인.",
+      "quote": "고개를 들고 말해. 나는 작게 굽히는 법을 모른다.",
       "basicInfo": {
         "gender": "여성",
+        "world": "코어벨트",
         "genre": "디스토피아SF",
         "race": "거인",
         "job": "왕족",
@@ -2864,7 +2965,7 @@ window.CHARACTERS = [
         "measurements": "520 - 390 - 560"
       }
     },
-    "folder": "barretha",
+    "folder": "100-barretha",
     "albumKeys": [
       "figure",
       "magazine",

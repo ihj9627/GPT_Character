@@ -3,18 +3,18 @@
 "use strict";
 
 const CACHE_PREFIX = "character-archive-mobile";
-const CACHE_NAME = `${CACHE_PREFIX}-v20260623-02`;
+const CACHE_NAME = `${CACHE_PREFIX}-v20260623-07`;
 const APP_SHELL_URLS = [
   "./mobile.html",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
-  "./mobile.css?v=final-admin-gate-image-modal-aspect-fit-20260623",
-  "./characters.js?v=figure-album01",
+  "./mobile.css?v=noct-world-series-01",
+  "./characters.js?v=world-profile-filter-20260623",
   "./story-taxonomy.js?v=world-intro-collapse01",
-  "./story-data.js?v=story-reset01",
+  "./story-data.js?v=noct-black-coffin-s1-01",
   "./generator-data.js?v=age-ranges-final01",
-  "./mobile.js?v=final-admin-gate-image-modal-aspect-fit-backnav-20260623",
+  "./mobile.js?v=noct-world-series-01",
   "./story/ashrun/anika/shorts/identity-short.md",
   "./story/ashrun/ariel/shorts/identity-short.md",
   "./story/ashrun/aya/shorts/identity-short.md",
@@ -114,7 +114,27 @@ const APP_SHELL_URLS = [
   "./story/yeonmuk/lia/shorts/identity-short.md",
   "./story/yeonmuk/lianhua/shorts/identity-short.md",
   "./story/yeonmuk/torqa/shorts/identity-short.md",
-  "./story/yeonmuk/wubun/shorts/identity-short.md"
+  "./story/yeonmuk/wubun/shorts/identity-short.md",
+  "./story/noct/black-coffin-war/season-1/e01.md",
+  "./story/noct/black-coffin-war/season-1/e02.md",
+  "./story/noct/black-coffin-war/season-1/e03.md",
+  "./story/noct/black-coffin-war/season-1/e04.md",
+  "./story/noct/black-coffin-war/season-1/e05.md",
+  "./story/noct/black-coffin-war/season-1/e06.md",
+  "./story/noct/black-coffin-war/season-1/e07.md",
+  "./story/noct/black-coffin-war/season-1/e08.md",
+  "./story/noct/black-coffin-war/season-1/e09.md",
+  "./story/noct/black-coffin-war/season-1/e10.md",
+  "./story/noct/black-coffin-war/season-1/e11.md",
+  "./story/noct/black-coffin-war/season-1/e12.md",
+  "./story/noct/black-coffin-war/season-1/e13.md",
+  "./story/noct/black-coffin-war/season-1/e14.md",
+  "./story/noct/black-coffin-war/season-1/e15.md",
+  "./story/noct/black-coffin-war/season-1/e16.md",
+  "./story/noct/black-coffin-war/season-1/e17.md",
+  "./story/noct/black-coffin-war/season-1/e18.md",
+  "./story/noct/black-coffin-war/season-1/e19.md",
+  "./story/noct/black-coffin-war/season-1/e20.md",
 ];
 
 self.addEventListener("install", event => {

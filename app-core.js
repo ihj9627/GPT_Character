@@ -12,24 +12,24 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
     // Shared image slots are rendered for every character.
     // Optional slots are removed automatically when the file is not present in that character folder.
     const albumImageDefinitions = [
-      { key: "illustration", title: "기본 일러스트", category: "MAIN", fileName: "main.png", fit: "cover", visibility: "safe" },
-      { key: "doodle", title: "낙서 시트", category: "REFERENCE", fileName: "doodle.png", fit: "contain", visibility: "safe" },
-      { key: "turnaround", title: "삼면도", category: "REFERENCE", fileName: "turn.png", fit: "contain", visibility: "safe" },
+      { key: "illustration", title: "기본 일러스트", category: "MAIN", fileName: "main.webp", fit: "cover", visibility: "safe" },
+      { key: "doodle", title: "낙서 시트", category: "REFERENCE", fileName: "doodle.webp", fit: "contain", visibility: "safe" },
+      { key: "turnaround", title: "삼면도", category: "REFERENCE", fileName: "turn.webp", fit: "contain", visibility: "safe" },
     ];
 
     const albumKeyDefinitions = {
-      figure: { key: "figure", title: "피규어", category: "FIGURE", fileName: "fig.png", fit: "cover", visibility: "safe", optional: true },
-      magazine: { key: "magazine", title: "광고", category: "MAGAZINE", fileName: "mag.png", fit: "cover", visibility: "restricted", optional: true },
-      sketch: { key: "sketch", title: "스케치북", category: "SCENE", fileName: "sketch.png", fit: "cover", visibility: "restricted", optional: true },
-      bra: { key: "bra", title: "생활 정보", category: "MAGAZINE", fileName: "bra.png", fit: "cover", visibility: "restricted", optional: true },
-      box: { key: "box", title: "박스티", category: "SCENE", fileName: "box.png", fit: "cover", visibility: "safe", optional: true },
-      beach: { key: "beach", title: "해수욕장", category: "EVENT", fileName: "beach.png", fit: "cover", visibility: "safe", optional: true },
-      sakura: { key: "sakura", title: "벚꽃축제", category: "EVENT", fileName: "sakura.png", fit: "cover", visibility: "safe", optional: true },
-      valen: { key: "valen", title: "발렌타인", category: "EVENT", fileName: "valen.png", fit: "cover", visibility: "safe", optional: true },
-	  school: { key: "school", title: "학교", category: "EVENT", fileName: "school.png", fit: "cover", visibility: "safe", optional: true },
-	  maid: { key: "maid", title: "메이드", category: "EVENT", fileName: "maid.png", fit: "cover", visibility: "safe", optional: true },
-	  japanFestival: { key: "japanFestival", title: "일본 축제", category: "EVENT", fileName: "japanFestival.png", fit: "cover", visibility: "safe", optional: true },
-	  cookmag: { key: "cookmag", title: "요리잡지", category: "MAGAZINE", fileName: "cookmag.png", fit: "cover", visibility: "restricted", optional: true }
+      figure: { key: "figure", title: "피규어", category: "FIGURE", fileName: "fig.webp", fit: "cover", visibility: "safe", optional: true },
+      magazine: { key: "magazine", title: "광고", category: "MAGAZINE", fileName: "mag.webp", fit: "cover", visibility: "restricted", optional: true },
+      sketch: { key: "sketch", title: "스케치북", category: "SCENE", fileName: "sketch.webp", fit: "cover", visibility: "restricted", optional: true },
+      bra: { key: "bra", title: "생활 정보", category: "MAGAZINE", fileName: "bra.webp", fit: "cover", visibility: "restricted", optional: true },
+      box: { key: "box", title: "박스티", category: "SCENE", fileName: "box.webp", fit: "cover", visibility: "safe", optional: true },
+      beach: { key: "beach", title: "해수욕장", category: "EVENT", fileName: "beach.webp", fit: "cover", visibility: "safe", optional: true },
+      sakura: { key: "sakura", title: "벚꽃축제", category: "EVENT", fileName: "sakura.webp", fit: "cover", visibility: "safe", optional: true },
+      valen: { key: "valen", title: "발렌타인", category: "EVENT", fileName: "valen.webp", fit: "cover", visibility: "safe", optional: true },
+	  school: { key: "school", title: "학교", category: "EVENT", fileName: "school.webp", fit: "cover", visibility: "safe", optional: true },
+	  maid: { key: "maid", title: "메이드", category: "EVENT", fileName: "maid.webp", fit: "cover", visibility: "safe", optional: true },
+	  japanFestival: { key: "japanFestival", title: "일본 축제", category: "EVENT", fileName: "japanFestival.webp", fit: "cover", visibility: "safe", optional: true },
+	  cookmag: { key: "cookmag", title: "요리잡지", category: "MAGAZINE", fileName: "cookmag.webp", fit: "cover", visibility: "restricted", optional: true }
     };
 
     const imageVisibilityLabels = {
@@ -39,10 +39,10 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
     };
 
     const imageFileNames = {
-      thumbnail: "thumb.png",
-      illustration: "main.png",
-      doodle: "doodle.png",
-      turnaround: "turn.png"
+      thumbnail: "thumb.webp",
+      illustration: "main.webp",
+      doodle: "doodle.webp",
+      turnaround: "turn.webp"
     };
 
 
@@ -250,19 +250,22 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
     let searchQuery = "";
     const activeFilters = {
       favorites: new Set(),
+      world: new Set(),
       genre: new Set(),
       race: new Set(),
       job: new Set()
     };
     const pendingFilters = {
       favorites: new Set(),
+      world: new Set(),
       genre: new Set(),
       race: new Set(),
       job: new Set()
     };
-    let activeFilterCategory = "genre";
+    let activeFilterCategory = "world";
     const filterSearchQueries = {
       favorites: "",
+      world: "",
       genre: "",
       race: "",
       job: ""
@@ -414,11 +417,16 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
       return normalizeDisplayValue(characterData.profile?.quote ?? characterData.speech, "준비 중입니다.");
     }
 
+    function getCharacterWorld(characterData) {
+      return getProfileBasicInfo(characterData, "world");
+    }
+
     function getCharacterGenre(characterData) {
       return getProfileBasicInfo(characterData, "genre");
     }
 
     function getFilterValue(characterData, key) {
+      if (key === "world") return getCharacterWorld(characterData);
       if (key === "genre") return getCharacterGenre(characterData);
       if (key === "race") return getProfileBasicInfo(characterData, "race");
       if (key === "job") return getProfileBasicInfo(characterData, "job");
@@ -430,7 +438,7 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
     }
 
     function getCategoryFilterKeys() {
-      return ["genre", "race", "job"];
+      return ["world", "genre", "race", "job"];
     }
 
     function getCategoryFilterCount() {
@@ -477,6 +485,7 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
 
     function getFilterGroups() {
       return [
+        ["world", "\uC18C\uC18D\uC138\uACC4"],
         ["genre", "\uC7A5\uB974"],
         ["race", "\uC885\uC871"],
         ["job", "\uC9C1\uC5C5"]
@@ -542,7 +551,7 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
       const filterGroups = getFilterGroups();
       const activeCount = getCategoryFilterCount();
       filterOpenButton.innerHTML = activeCount ? `\uD544\uD130 <b>${activeCount}</b>` : "\uD544\uD130";
-      if (!filterGroups.some(([key]) => key === activeFilterCategory)) activeFilterCategory = "genre";
+      if (!filterGroups.some(([key]) => key === activeFilterCategory)) activeFilterCategory = "world";
       const activeGroup = filterGroups.find(([key]) => key === activeFilterCategory) ?? filterGroups[0];
       const [activeKey, activeLabel] = activeGroup;
       filterPopoverBody.innerHTML = "";
@@ -631,7 +640,7 @@ const tabKeys = ["illustration", "doodle", "turnaround", "figure"];
     }
     function characterMatchesFilters(characterData) {
       if (activeFilters.favorites.size > 0 && !favoriteIds.has(getCharacterId(characterData))) return false;
-      return ["genre", "race", "job"].every(key => {
+      return getCategoryFilterKeys().every(key => {
         const values = activeFilters[key];
         return values.size === 0 || values.has(getFilterValue(characterData, key));
       });

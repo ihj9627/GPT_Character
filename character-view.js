@@ -5,6 +5,7 @@ function getSearchText(characterData) {
         characterData.en,
         getProfileBasicInfo(characterData, "race"),
         getProfileBasicInfo(characterData, "job"),
+        getProfileBasicInfo(characterData, "world"),
         getProfileBasicInfo(characterData, "genre")
       ].filter(Boolean).join(" ").toLowerCase();
     }
@@ -368,7 +369,7 @@ function getSearchText(characterData) {
     }
 
     function getUsedAlbumFileNames(characterData, items) {
-      const fileNames = new Set(["thumb.png"]);
+      const fileNames = new Set(["thumb.webp"]);
       Object.values(imageFileNames).forEach(fileName => fileNames.add(fileName.toLowerCase()));
       items.forEach(item => {
         if (!item.source) return;

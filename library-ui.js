@@ -83,21 +83,94 @@
       return lastNumberText ? Number(lastNumberText) : 1;
     }
 
+    function getStoryCharacterOrder(worldCode, characterId) {
+      const worldData = getStoryWorldByCode(worldCode);
+      const charactersInWorld = Array.isArray(worldData?.characters) ? worldData.characters : [];
+      const index = charactersInWorld.findIndex(item => normalizeStoryText(item) === characterId);
+      return index < 0 ? Number.MAX_SAFE_INTEGER : index;
+    }
+
+    function sortStoryLibraryFolderChildren(children = []) {
+      const childList = children instanceof Map
+        ? Array.from(children.values())
+        : Array.isArray(children)
+          ? children
+          : [];
+
+      return childList
+        .map(childNode => {
+          const nestedChildren = childNode?.children instanceof Map
+            ? Array.from(childNode.children.values())
+            : Array.isArray(childNode?.children)
+              ? childNode.children
+              : [];
+          return nestedChildren.length > 0
+            ? {
+              ...childNode,
+              children: sortStoryLibraryFolderChildren(nestedChildren)
+            }
+            : childNode;
+        })
+        .sort((first, second) => {
+          const firstOrder = Number(first?.sortOrder ?? Number.MAX_SAFE_INTEGER);
+          const secondOrder = Number(second?.sortOrder ?? Number.MAX_SAFE_INTEGER);
+          if (firstOrder !== secondOrder) return firstOrder - secondOrder;
+          return compareStoryLibraryTitle(first?.title, second?.title);
+        });
+    }
+
+    function createStoryLibraryDocumentNode(storyData, placementData, characterData = null) {
+      const storyId = normalizeStoryText(storyData?.id);
+      const storyFile = getStoryFilePath(storyData);
+      const characterName = normalizeStoryText(characterData?.name);
+      const relatedCharacters = Array.isArray(storyData?.relatedCharacters)
+        ? storyData.relatedCharacters.filter(Boolean)
+        : characterName
+          ? [characterName]
+          : [];
+
+      return {
+        id: storyId,
+        type: "document",
+        title: normalizeStoryText(storyData?.title, "제목 미정"),
+        access: "public",
+        storyFile,
+        storyCharacterId: getStoryCharacterId(storyData),
+        storyCharacterName: characterName,
+        storyTypeLabel: normalizeStoryText(storyData?.typeName, "단편"),
+        storyOrder: Number(storyData?.episode ?? storyData?.storyOrder ?? getStoryOrder(storyData)),
+        sortOrder: Number(storyData?.episode ?? storyData?.storyOrder ?? getStoryOrder(storyData)),
+        genreGroupCode: placementData.genreGroupCode,
+        genreGroupName: placementData.genreGroupName,
+        relatedCharacters,
+        relatedDocuments: [],
+        relatedNovels: []
+      };
+    }
+
+    function getOrCreateStoryFolder(folderMap, key, createData) {
+      if (!folderMap.has(key)) {
+        folderMap.set(key, {
+          ...createData,
+          children: new Map()
+        });
+      }
+      return folderMap.get(key);
+    }
+
     function buildStoryLibraryTreeSeeds() {
       if (storyDataSource.length === 0) return [];
       const worldMap = new Map();
 
       storyDataSource.forEach(storyData => {
         const storyId = normalizeStoryText(storyData?.id);
-        const characterId = getStoryCharacterId(storyData);
         const storyFile = getStoryFilePath(storyData);
-        if (!storyId || !characterId || !storyFile) return;
+        if (!storyId || !storyFile) return;
 
+        const characterId = getStoryCharacterId(storyData);
         const characterData = findStoryCharacter(storyData);
-        const characterName = normalizeStoryText(characterData?.name, characterId);
         const placementData = getStoryPlacement(storyData, characterData);
         const worldData = getStoryWorldByCode(placementData.genreGroupCode);
-        const storyTitle = normalizeStoryText(storyData?.title, "제목 미정");
 
         if (!worldMap.has(placementData.genreGroupCode)) {
           worldMap.set(placementData.genreGroupCode, {
@@ -110,27 +183,33 @@
         }
 
         const worldNode = worldMap.get(placementData.genreGroupCode);
-        if (!worldNode.children.has(characterId)) {
-          worldNode.children.set(characterId, {
-            title: characterName,
-            children: []
+        const documentNode = createStoryLibraryDocumentNode(storyData, placementData, characterData);
+        const seriesId = normalizeStoryText(storyData?.seriesId);
+        const seriesName = normalizeStoryText(storyData?.seriesName);
+        const isWorldSeriesStory = Boolean(seriesId || seriesName || !characterId);
+
+        if (isWorldSeriesStory) {
+          const safeSeriesId = seriesId || "world-stories";
+          const seriesNode = getOrCreateStoryFolder(worldNode.children, `series:${safeSeriesId}`, {
+            title: seriesName || "세계 소설",
+            sortOrder: Number(storyData?.seriesOrder ?? -1000)
           });
+          const seasonId = normalizeStoryText(storyData?.seasonId, "season-1");
+          const seasonNode = getOrCreateStoryFolder(seriesNode.children, `season:${seasonId}`, {
+            title: normalizeStoryText(storyData?.seasonName, "시즌 1"),
+            sortOrder: Number(storyData?.seasonOrder ?? 1)
+          });
+          seasonNode.children.set(storyId, documentNode);
+          return;
         }
 
-        worldNode.children.get(characterId).children.push({
-          id: storyId,
-          type: "document",
-          title: storyTitle,
-          access: "public",
-          storyFile,
-          storyCharacterId: characterId,
-          storyCharacterName: characterName,
-          storyTypeLabel: normalizeStoryText(storyData?.typeName, "단편"),
-          storyOrder: getStoryOrder(storyData),
-          relatedCharacters: characterData ? [characterName] : [],
-          relatedDocuments: [],
-          relatedNovels: []
+        if (!characterId) return;
+        const characterName = normalizeStoryText(characterData?.name, characterId);
+        const characterNode = getOrCreateStoryFolder(worldNode.children, `character:${characterId}`, {
+          title: characterName,
+          sortOrder: getStoryCharacterOrder(placementData.genreGroupCode, characterId)
         });
+        characterNode.children.set(storyId, documentNode);
       });
 
       const worldChildren = Array.from(worldMap.values())
@@ -146,12 +225,7 @@
           title: worldNode.title,
           coreGenre: worldNode.coreGenre,
           description: worldNode.description,
-          children: Array.from(worldNode.children.values())
-            .sort((first, second) => compareStoryLibraryTitle(first.title, second.title))
-            .map(characterNode => ({
-              title: characterNode.title,
-              children: characterNode.children.sort(compareStoryOrder)
-            }))
+          children: sortStoryLibraryFolderChildren(Array.from(worldNode.children.values()))
         }));
 
       return worldChildren;
@@ -256,24 +330,20 @@ function resolveLibraryRelatedCharacters(value) {
     }
 
     function getCharacterLibraryDocuments(characterData = currentCharacter) {
-      const characterFolder = typeof getCharacterFolder === "function"
-        ? getCharacterFolder(characterData)
-        : String(characterData?.folder ?? "").trim();
-      if (!characterFolder) return [];
+      const characterStoryId = getCharacterStoryId(characterData);
+      if (!characterStoryId) return [];
 
       return getLibraryDocuments()
         .filter(documentData => (
-          documentData?.storyCharacterId === characterFolder
+          documentData?.storyCharacterId === characterStoryId
           && isLibraryDocumentVisible(documentData)
         ))
         .sort(compareCharacterLibraryDocuments);
     }
 
     function getCharacterLibraryRelationLabel(documentData, characterData = currentCharacter) {
-      const characterFolder = typeof getCharacterFolder === "function"
-        ? getCharacterFolder(characterData)
-        : String(characterData?.folder ?? "").trim();
-      if (documentData?.storyCharacterId === characterFolder) {
+      const characterStoryId = getCharacterStoryId(characterData);
+      if (documentData?.storyCharacterId === characterStoryId) {
         return documentData?.storyTypeLabel ? `본인 ${documentData.storyTypeLabel}` : "본인 소설";
       }
       return documentData?.category || "서재";

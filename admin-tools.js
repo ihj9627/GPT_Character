@@ -9,6 +9,7 @@
 
   const BASIC_INFO_DEFAULTS = {
     gender: "미등록",
+    world: "미등록",
     genre: "미등록",
     race: "미등록",
     job: "미등록",
@@ -41,6 +42,10 @@
     "profile.quote": "profile.quote",
 
     gender: "profile.basicInfo.gender",
+    world: "profile.basicInfo.world",
+    "소속세계": "profile.basicInfo.world",
+    "소속 세계": "profile.basicInfo.world",
+    "세계": "profile.basicInfo.world",
     genre: "profile.basicInfo.genre",
     race: "profile.basicInfo.race",
     job: "profile.basicInfo.job",
@@ -144,7 +149,9 @@
 
   function getCharacterPlacement(characterFolder) {
     const taxonomy = getTaxonomy();
-    const directPlacement = taxonomy.characterPlacements?.[characterFolder];
+    const folderBase = sanitizeFolderBase(characterFolder);
+    const directPlacement = taxonomy.characterPlacements?.[characterFolder]
+      ?? taxonomy.characterPlacements?.[folderBase];
     if (directPlacement?.genreGroupCode || directPlacement?.worldCode) {
       const worldCode = text(directPlacement.worldCode, directPlacement.genreGroupCode);
       const worldName = text(directPlacement.worldName, directPlacement.genreGroupName);
@@ -524,6 +531,94 @@
     throw new Error(`유효하지 않은 hidden 값: ${value}`);
   }
 
+  function stripFolderNumber(value) {
+    return text(value).replace(/^\d{1,4}[-_]+/, "");
+  }
+
+  function sanitizeFolderBase(value) {
+    const base = stripFolderNumber(value)
+      .replace(/\\/g, "/")
+      .split("/")
+      .filter(Boolean)
+      .pop() || "";
+    return text(base).replace(/^[.\s-]+|[.\s-]+$/g, "");
+  }
+
+  function makeNumberedFolder(index, folderValue) {
+    const base = sanitizeFolderBase(folderValue);
+    if (!base) return "";
+    return `${String(index + 1).padStart(3, "0")}-${base}`;
+  }
+
+  function normalizeCharacterFolderForIndex(characterData, index) {
+    const normalizedFolder = makeNumberedFolder(index, getCharacterFolder(characterData));
+    if (normalizedFolder) characterData.folder = normalizedFolder;
+    return normalizedFolder;
+  }
+
+  function addLookupValue(map, value, index) {
+    const normalized = normalizeKey(value);
+    if (normalized && !map.has(normalized)) map.set(normalized, index);
+  }
+
+  function getRecordValueByPath(record, headerPaths, targetPath) {
+    for (const [header, path] of headerPaths.entries()) {
+      if (path === targetPath) return text(record[header]);
+    }
+    return "";
+  }
+
+  function getLookupIndex(map, value) {
+    const normalized = normalizeKey(value);
+    if (!normalized || !map.has(normalized)) return -1;
+    return map.get(normalized);
+  }
+
+  function resolveExistingCharacterIndex(record, headerPaths, lookups) {
+    const rawFolder = getRecordValueByPath(record, headerPaths, "folder");
+    const folderBase = sanitizeFolderBase(rawFolder);
+    const rawName = getRecordValueByPath(record, headerPaths, "name");
+    const rawEnglishName = getRecordValueByPath(record, headerPaths, "en");
+
+    let index = getLookupIndex(lookups.folder, rawFolder);
+    if (index >= 0) return index;
+
+    index = getLookupIndex(lookups.folderBase, folderBase);
+    if (index >= 0) return index;
+
+    index = getLookupIndex(lookups.name, rawName);
+    if (index >= 0) return index;
+
+    return getLookupIndex(lookups.en, rawEnglishName);
+  }
+
+  function buildFolderLookups(characters) {
+    const lookups = {
+      folder: new Map(),
+      folderBase: new Map(),
+      name: new Map(),
+      en: new Map()
+    };
+
+    characters.forEach((characterData, index) => {
+      const folder = getCharacterFolder(characterData);
+      const folderBase = sanitizeFolderBase(folder);
+      addLookupValue(lookups.folder, folder, index);
+      addLookupValue(lookups.folderBase, folderBase, index);
+      addLookupValue(lookups.name, getCharacterName(characterData), index);
+      addLookupValue(lookups.en, getCharacterEnglishName(characterData), index);
+    });
+
+    return lookups;
+  }
+
+  function deriveFolderBaseForRow(record, headerPaths, characterData) {
+    return sanitizeFolderBase(getCharacterFolder(characterData))
+      || sanitizeFolderBase(getRecordValueByPath(record, headerPaths, "folder"))
+      || sanitizeFolderBase(getRecordValueByPath(record, headerPaths, "en"))
+      || sanitizeFolderBase(getRecordValueByPath(record, headerPaths, "name"));
+  }
+
   function setNested(data, path, rawValue) {
     if (path === "folder") {
       data.folder = rawValue;
@@ -557,7 +652,7 @@
     const comment = [
       "// Character data only. Add/edit characters here, then refresh character-ui.html.",
       "// Base image paths are generated automatically from folder as:",
-      "// assets/characters/<folder>/main.png, thumb.png, doodle.png, turn.png",
+      "// assets/characters/<folder>/main.webp, thumb.webp, doodle.webp, turn.webp",
       "// Optional album slots are controlled through albumKeys. Current common keys: figure, magazine, sketch.",
       "// Set hidden: true to keep a template character out of the list.",
       "// Story/detail text was reset for the character-archive baseline. Intro and quote fields remain profile fields.",
@@ -627,18 +722,19 @@
       headerPaths.set(header, path);
     });
 
-    if (![...headerPaths.values()].includes("folder")) {
-      throw new Error("엑셀에는 folder 컬럼이 필요합니다.");
+    const hasFolderColumn = [...headerPaths.values()].includes("folder");
+    const hasIdentityColumn = ["name", "en"].some(path => [...headerPaths.values()].includes(path));
+    if (!hasFolderColumn && !hasIdentityColumn) {
+      throw new Error("엑셀에는 folder 컬럼 또는 이름/name/en 컬럼이 필요합니다.");
     }
 
     const characters = deepClone(getCharacters());
-    characters.forEach(normalizeCharacterSchema);
-
-    const folderToIndex = new Map();
     characters.forEach((characterData, index) => {
-      const folder = getCharacterFolder(characterData);
-      if (folder && !folderToIndex.has(folder)) folderToIndex.set(folder, index);
+      normalizeCharacterSchema(characterData);
+      normalizeCharacterFolderForIndex(characterData, index);
     });
+
+    const lookups = buildFolderLookups(characters);
 
     const results = [];
     let addedCount = 0;
@@ -648,35 +744,68 @@
     const sheetFolders = new Set();
 
     records.forEach(({ rowNumber, record }) => {
-      const folderValue = text(record.folder);
-      if (!folderValue) {
-        results.push({
-          ok: true,
-          status: "건너뜀",
-          rowNumber,
-          main: "folder 비어 있음",
-          detail: "folder가 없는 행은 반영하지 않습니다."
-        });
-        warnings.push(`행 ${rowNumber}: folder가 없어 건너뛰었습니다.`);
-        return;
-      }
-
-      if (sheetFolders.has(folderValue)) {
-        warnings.push(`엑셀 안에 같은 folder가 여러 번 등장합니다: ${folderValue}`);
-      }
-      sheetFolders.add(folderValue);
-
+      const rawFolderValue = getRecordValueByPath(record, headerPaths, "folder");
+      const existingIndex = resolveExistingCharacterIndex(record, headerPaths, lookups);
       let characterData;
       let isNew = false;
-      if (folderToIndex.has(folderValue)) {
-        characterData = characters[folderToIndex.get(folderValue)];
+
+      if (existingIndex >= 0) {
+        characterData = characters[existingIndex];
       } else {
-        characterData = makeDefaultCharacter(folderValue);
+        const newFolderBase = sanitizeFolderBase(rawFolderValue)
+          || sanitizeFolderBase(getRecordValueByPath(record, headerPaths, "en"))
+          || sanitizeFolderBase(getRecordValueByPath(record, headerPaths, "name"));
+        const newFolder = makeNumberedFolder(characters.length, newFolderBase);
+
+        if (!newFolder) {
+          results.push({
+            ok: false,
+            status: "오류",
+            rowNumber,
+            main: text(rawFolderValue, "folder 비어 있음"),
+            detail: "새 캐릭터는 folder, en, name 중 하나로 폴더명을 만들 수 있어야 합니다."
+          });
+          failedCount += 1;
+          return;
+        }
+
+        characterData = makeDefaultCharacter(newFolder);
+        normalizeCharacterSchema(characterData);
         characters.push(characterData);
-        folderToIndex.set(folderValue, characters.length - 1);
+        addLookupValue(lookups.folder, newFolder, characters.length - 1);
+        addLookupValue(lookups.folderBase, sanitizeFolderBase(newFolder), characters.length - 1);
         isNew = true;
         addedCount += 1;
       }
+
+      const characterIndex = characters.indexOf(characterData);
+      const folderBase = deriveFolderBaseForRow(record, headerPaths, characterData);
+      const normalizedFolder = makeNumberedFolder(characterIndex, folderBase);
+
+      if (!normalizedFolder) {
+        results.push({
+          ok: false,
+          status: "오류",
+          rowNumber,
+          main: text(rawFolderValue, "folder 비어 있음"),
+          detail: "폴더명을 정규화하지 못했습니다."
+        });
+        failedCount += 1;
+        return;
+      }
+
+      if (rawFolderValue && rawFolderValue !== normalizedFolder) {
+        warnings.push(`행 ${rowNumber}: folder 자동 보정 ${rawFolderValue} → ${normalizedFolder}`);
+      } else if (!rawFolderValue) {
+        warnings.push(`행 ${rowNumber}: folder 비어 있어 ${normalizedFolder}로 자동 지정했습니다.`);
+      }
+
+      if (sheetFolders.has(normalizedFolder)) {
+        warnings.push(`엑셀 안에 같은 캐릭터 folder가 여러 번 등장합니다: ${normalizedFolder}`);
+      }
+      sheetFolders.add(normalizedFolder);
+
+      characterData.folder = normalizedFolder;
 
       const beforeText = JSON.stringify(characterData);
       const changedPaths = [];
@@ -692,7 +821,7 @@
               ? albumKeys.filter(key => !knownAlbumKeys.has(key))
               : [];
             if (unknownKeys.length) {
-              warnings.push(`행 ${rowNumber} folder=${folderValue}: 알 수 없는 albumKeys ${unknownKeys.join(", ")}`);
+              warnings.push(`행 ${rowNumber} folder=${normalizedFolder}: 알 수 없는 albumKeys ${unknownKeys.join(", ")}`);
             }
           }
 
@@ -709,13 +838,14 @@
           ok: false,
           status: "오류",
           rowNumber,
-          main: folderValue,
+          main: normalizedFolder,
           detail: error?.message || "행 처리 중 오류가 발생했습니다."
         });
         failedCount += 1;
         return;
       }
 
+      characterData.folder = makeNumberedFolder(characterIndex, deriveFolderBaseForRow(record, headerPaths, characterData));
       const changed = JSON.stringify(characterData) !== beforeText;
       if (changed && !isNew) updatedCount += 1;
 
@@ -723,7 +853,7 @@
         ok: true,
         status: isNew ? "신규" : (changed ? "수정" : "변경 없음"),
         rowNumber,
-        main: `${text(characterData.name, "이름 미등록")} / ${folderValue}`,
+        main: `${text(characterData.name, "이름 미등록")} / ${characterData.folder}`,
         detail: changedPaths.length ? `${changedPaths.length}개 필드 반영` : "반영할 변경 없음"
       });
     });

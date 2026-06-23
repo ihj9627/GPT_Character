@@ -1,0 +1,9 @@
+<svg data-realm="가이지" data-realm-key="gaiji" data-realm-color="#F08AC5" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="가이지 원계 심볼">
+  <title>가이지</title>
+  <desc>학원·마법소녀 문화 대원계: 리본, 별, 무대와 밝은 권능.</desc>
+  <path d="M50 25 L55 41 L72 41 L58 51 L64 68 L50 58 L36 68 L42 51 L28 41 L45 41 Z" fill="#F08AC5" opacity="0.86"/>
+  <path d="M49 55 C39 43 26 39 24 50 C22 61 38 61 49 55 Z" fill="none" stroke="#F08AC5" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M51 55 C61 43 74 39 76 50 C78 61 62 61 51 55 Z" fill="none" stroke="#F08AC5" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="50" cy="55" r="5" fill="#F08AC5"/>
+  <path d="M30 75 C42 70 58 70 70 75" fill="none" stroke="#F08AC5" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+</svg>

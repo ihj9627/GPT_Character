@@ -586,6 +586,46 @@ button:focus-visible {
   letter-spacing: -0.03em;
 }
 
+.story-related-panel {
+  padding: 0 18px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.story-related-panel h3 {
+  margin: 14px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.story-related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.story-related-chip {
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f4ecff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+button.story-related-chip {
+  cursor: pointer;
+}
+
+.story-related-chip.is-empty {
+  color: var(--muted);
+  border-style: dashed;
+  background: transparent;
+}
+
 .image-tile {
   border: 1px solid var(--line);
   border-radius: 20px;

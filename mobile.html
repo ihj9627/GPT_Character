@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="mobile.css?v=final-admin-gate-image-modal-aspect-fit-20260623">
+  <link rel="stylesheet" href="mobile.css?v=noct-world-series-01">
 </head>
 <body data-mobile-build="final-admin-gate-20260623">
   <div class="mobile-app" id="mobileApp">
@@ -56,7 +56,6 @@
       </section>
 
       <section class="mobile-screen" id="mobileDetailScreen" data-screen="detail">
-        <button class="back-button" id="mobileDetailBack" type="button">← 목록으로</button>
         <article class="detail-hero">
           <div class="detail-image-wrap">
             <img id="mobileDetailImage" alt="">
@@ -85,12 +84,15 @@
         <div class="story-list" id="mobileStoryList"></div>
         <article class="story-reader hidden" id="mobileStoryReader">
           <div class="story-reader-head">
-            <button id="mobileStoryClose" type="button">← 목록</button>
             <p class="section-kicker" id="mobileStoryKicker">STORY</p>
             <h2 id="mobileStoryTitle"></h2>
             <p id="mobileStorySummary"></p>
           </div>
           <div class="story-body" id="mobileStoryBody"></div>
+          <section class="story-related-panel" aria-label="관련 캐릭터">
+            <h3>관련 캐릭터</h3>
+            <div class="story-related-list" id="mobileStoryRelatedCharacters"></div>
+          </section>
         </article>
       </section>
 
@@ -225,11 +227,11 @@
     </div>
   </div>
 
-  <script src="characters.js?v=figure-album01"></script>
+  <script src="characters.js?v=world-profile-filter-20260623"></script>
   <script src="story-taxonomy.js?v=world-intro-collapse01"></script>
-  <script src="story-data.js?v=story-reset01"></script>
+  <script src="story-data.js?v=noct-black-coffin-s1-01"></script>
   <script src="generator-data.js?v=age-ranges-final01"></script>
-  <script src="mobile.js?v=final-admin-gate-image-modal-aspect-fit-backnav-20260623"></script>
+  <script src="mobile.js?v=noct-world-series-01"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

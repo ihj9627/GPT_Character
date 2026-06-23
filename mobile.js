@@ -94,24 +94,24 @@
 
 
   const baseImageDefinitions = [
-    { key: "illustration", title: "기본 일러스트", category: "MAIN", fileName: "main.png", visibility: "safe" },
-    { key: "doodle", title: "낙서 시트", category: "REFERENCE", fileName: "doodle.png", visibility: "safe" },
-    { key: "turnaround", title: "삼면도", category: "REFERENCE", fileName: "turn.png", visibility: "safe" }
+    { key: "illustration", title: "기본 일러스트", category: "MAIN", fileName: "main.webp", visibility: "safe" },
+    { key: "doodle", title: "낙서 시트", category: "REFERENCE", fileName: "doodle.webp", visibility: "safe" },
+    { key: "turnaround", title: "삼면도", category: "REFERENCE", fileName: "turn.webp", visibility: "safe" }
   ];
 
   const albumKeyDefinitions = {
-    figure: { key: "figure", title: "피규어", category: "FIGURE", fileName: "fig.png", visibility: "safe" },
-    magazine: { key: "magazine", title: "광고", category: "MAGAZINE", fileName: "mag.png", visibility: "restricted" },
-    sketch: { key: "sketch", title: "스케치북", category: "SCENE", fileName: "sketch.png", visibility: "restricted" },
-    bra: { key: "bra", title: "생활 정보", category: "MAGAZINE", fileName: "bra.png", visibility: "restricted" },
-    box: { key: "box", title: "박스티", category: "SCENE", fileName: "box.png", visibility: "safe" },
-    beach: { key: "beach", title: "해수욕장", category: "EVENT", fileName: "beach.png", visibility: "safe" },
-    sakura: { key: "sakura", title: "벚꽃축제", category: "EVENT", fileName: "sakura.png", visibility: "safe" },
-    valen: { key: "valen", title: "발렌타인", category: "EVENT", fileName: "valen.png", visibility: "safe" },
-    school: { key: "school", title: "학교", category: "EVENT", fileName: "school.png", visibility: "safe" },
-    maid: { key: "maid", title: "메이드", category: "EVENT", fileName: "maid.png", visibility: "safe" },
-    japanFestival: { key: "japanFestival", title: "일본 축제", category: "EVENT", fileName: "japanFestival.png", visibility: "safe" },
-    cookmag: { key: "cookmag", title: "요리잡지", category: "MAGAZINE", fileName: "cookmag.png", visibility: "restricted" }
+    figure: { key: "figure", title: "피규어", category: "FIGURE", fileName: "fig.webp", visibility: "safe" },
+    magazine: { key: "magazine", title: "광고", category: "MAGAZINE", fileName: "mag.webp", visibility: "restricted" },
+    sketch: { key: "sketch", title: "스케치북", category: "SCENE", fileName: "sketch.webp", visibility: "restricted" },
+    bra: { key: "bra", title: "생활 정보", category: "MAGAZINE", fileName: "bra.webp", visibility: "restricted" },
+    box: { key: "box", title: "박스티", category: "SCENE", fileName: "box.webp", visibility: "safe" },
+    beach: { key: "beach", title: "해수욕장", category: "EVENT", fileName: "beach.webp", visibility: "safe" },
+    sakura: { key: "sakura", title: "벚꽃축제", category: "EVENT", fileName: "sakura.webp", visibility: "safe" },
+    valen: { key: "valen", title: "발렌타인", category: "EVENT", fileName: "valen.webp", visibility: "safe" },
+    school: { key: "school", title: "학교", category: "EVENT", fileName: "school.webp", visibility: "safe" },
+    maid: { key: "maid", title: "메이드", category: "EVENT", fileName: "maid.webp", visibility: "safe" },
+    japanFestival: { key: "japanFestival", title: "일본 축제", category: "EVENT", fileName: "japanFestival.webp", visibility: "safe" },
+    cookmag: { key: "cookmag", title: "요리잡지", category: "MAGAZINE", fileName: "cookmag.webp", visibility: "restricted" }
   };
 
 const generatorSketchSheetPromptTemplate = `첨부된 이미지 한 장 또는 여러 장 안에 있는 캐릭터를 참고 자료로 사용하세요.
@@ -906,8 +906,21 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     return text(value).replace(/\s+/g, "");
   }
 
+  function stripStoryFolderNumberPrefix(value = "") {
+    return normalizeId(value).replace(/^\d{3}-/, "");
+  }
+
   function getCharacterId(character) {
     return normalizeId(character?.folder || character?.id || character?.en || character?.name || "unknown");
+  }
+
+  function getCharacterStoryId(character) {
+    return normalizeId(character?.storyId)
+      || stripStoryFolderNumberPrefix(character?.folder)
+      || normalizeId(character?.id)
+      || normalizeId(character?.en)
+      || normalizeId(character?.name)
+      || "unknown";
   }
 
   function getCharacterFolder(character) {
@@ -968,6 +981,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
           character.name,
           character.en,
           info.gender,
+          info.world,
           info.genre,
           info.race,
           info.job,
@@ -984,14 +998,25 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
   }
 
   function storiesForCharacter(character) {
-    const id = getCharacterId(character);
+    const id = getCharacterStoryId(character);
     return getStories().filter(story => normalizeId(story.characterId) === id);
   }
 
   function storyCharacter(story) {
     const characterId = normalizeId(story?.characterId);
     if (!characterId) return null;
-    return getCharacters().find(character => getCharacterId(character) === characterId || normalizeId(character?.folder) === characterId) || null;
+    return getCharacters().find(character => {
+      const storyId = getCharacterStoryId(character);
+      return storyId === characterId || stripStoryFolderNumberPrefix(character?.folder) === characterId || getCharacterId(character) === characterId;
+    }) || null;
+  }
+
+  function getStoryRelatedCharacters(story) {
+    if (Array.isArray(story?.relatedCharacters) && story.relatedCharacters.length > 0) {
+      return [...new Set(story.relatedCharacters.filter(Boolean))];
+    }
+    const character = storyCharacter(story);
+    return character?.name ? [character.name] : [];
   }
 
   function storySearchText(story) {
@@ -1002,10 +1027,14 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
       story?.summary,
       story?.typeName,
       story?.type,
+      story?.seriesName,
+      story?.seasonName,
       story?.worldId,
       getWorldName(story?.worldId),
+      getStoryRelatedCharacters(story).join(" "),
       character?.name,
       character?.en,
+      info.world,
       info.genre,
       info.race,
       info.job
@@ -1029,8 +1058,8 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
   }
 
   function compareStories(first, second) {
-    const firstOrder = getStoryOrder(first);
-    const secondOrder = getStoryOrder(second);
+    const firstOrder = getStoryEpisodeOrder(first);
+    const secondOrder = getStoryEpisodeOrder(second);
     if (firstOrder !== secondOrder) return firstOrder - secondOrder;
     return compareStoryTitle(first?.title, second?.title);
   }
@@ -1052,36 +1081,104 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     return index < 0 ? Number.MAX_SAFE_INTEGER : index;
   }
 
+  function getStoryEpisodeOrder(story) {
+    const explicitEpisode = Number(story?.episode);
+    return Number.isFinite(explicitEpisode) && explicitEpisode > 0 ? explicitEpisode : getStoryOrder(story);
+  }
+
+  function countStoryGroupStories(groupNode) {
+    return (Array.isArray(groupNode?.stories) ? groupNode.stories.length : 0)
+      + (Array.isArray(groupNode?.children) ? groupNode.children.reduce((sum, childNode) => sum + countStoryGroupStories(childNode), 0) : 0);
+  }
+
+  function sortStoryGroups(groups = []) {
+    const groupList = groups instanceof Map
+      ? Array.from(groups.values())
+      : Array.isArray(groups)
+        ? groups
+        : [];
+
+    return groupList
+      .map(groupNode => {
+        const children = groupNode?.children instanceof Map
+          ? Array.from(groupNode.children.values())
+          : Array.isArray(groupNode?.children)
+            ? groupNode.children
+            : [];
+        return {
+          ...groupNode,
+          stories: Array.isArray(groupNode.stories) ? groupNode.stories.sort(compareStories) : [],
+          children: sortStoryGroups(children)
+        };
+      })
+      .sort((first, second) => {
+        if (first.order !== second.order) return first.order - second.order;
+        return compareStoryTitle(first.title, second.title);
+      });
+  }
+
+  function getOrCreateStoryGroup(groupMap, key, createData) {
+    if (!groupMap.has(key)) {
+      groupMap.set(key, {
+        ...createData,
+        stories: [],
+        children: new Map()
+      });
+    }
+    return groupMap.get(key);
+  }
+
   function buildStoryTree(stories) {
     const worldMap = new Map();
 
     stories.forEach(story => {
       const worldId = text(story?.worldId, "uncategorized");
-      const characterId = normalizeId(story?.characterId || "unknown");
+      const characterId = normalizeId(story?.characterId);
       const character = storyCharacter(story);
       const characterName = text(character?.name, characterId || "미등록 캐릭터");
+      const seriesId = normalizeId(story?.seriesId);
+      const seriesName = text(story?.seriesName);
+      const isWorldSeriesStory = Boolean(seriesId || seriesName || !characterId);
 
       if (!worldMap.has(worldId)) {
         worldMap.set(worldId, {
           id: worldId,
           title: getWorldName(worldId),
           order: getWorldOrder(worldId),
-          characters: new Map(),
+          groups: new Map(),
           count: 0
         });
       }
 
       const world = worldMap.get(worldId);
       world.count += 1;
-      if (!world.characters.has(characterId)) {
-        world.characters.set(characterId, {
+
+      if (isWorldSeriesStory) {
+        const series = getOrCreateStoryGroup(world.groups, `series:${seriesId || "world-stories"}`, {
+          id: seriesId || "world-stories",
+          title: seriesName || "세계 소설",
+          order: Number(story?.seriesOrder ?? -1000)
+        });
+        const seasonId = normalizeId(story?.seasonId || "season-1");
+        const season = getOrCreateStoryGroup(series.children, `season:${seasonId}`, {
+          id: seasonId,
+          title: text(story?.seasonName, "시즌 1"),
+          order: Number(story?.seasonOrder ?? 1)
+        });
+        season.stories.push(story);
+        return;
+      }
+
+      if (!world.groups.has(`character:${characterId}`)) {
+        world.groups.set(`character:${characterId}`, {
           id: characterId,
           title: characterName,
           order: getCharacterOrderInWorld(worldId, characterId),
-          stories: []
+          stories: [],
+          children: new Map()
         });
       }
-      world.characters.get(characterId).stories.push(story);
+      world.groups.get(`character:${characterId}`).stories.push(story);
     });
 
     return Array.from(worldMap.values())
@@ -1091,15 +1188,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
       })
       .map(world => ({
         ...world,
-        characters: Array.from(world.characters.values())
-          .sort((first, second) => {
-            if (first.order !== second.order) return first.order - second.order;
-            return compareStoryTitle(first.title, second.title);
-          })
-          .map(character => ({
-            ...character,
-            stories: character.stories.sort(compareStories)
-          }))
+        groups: sortStoryGroups(world.groups)
       }));
   }
 
@@ -1436,7 +1525,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
 
       const thumb = document.createElement("div");
       thumb.className = "character-thumb";
-      thumb.appendChild(createImage(imagePath(character, "thumb.png"), `${character.name || ""} 썸네일`));
+      thumb.appendChild(createImage(imagePath(character, "thumb.webp"), `${character.name || ""} 썸네일`));
 
       const main = document.createElement("div");
       main.className = "character-main";
@@ -1470,7 +1559,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     if (elements.detailImage) {
       const wrap = elements.detailImage.closest(".detail-image-wrap");
       if (wrap) wrap.classList.remove("is-missing");
-      elements.detailImage.src = imagePath(character, "main.png");
+      elements.detailImage.src = imagePath(character, "main.webp");
       elements.detailImage.alt = `${character.name || ""} 기본 일러스트`;
       elements.detailImage.onerror = () => markMissingImage(elements.detailImage);
     }
@@ -1611,6 +1700,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
   function renderProfileTab(character) {
     const rows = [
       ["성별", basic(character, "gender")],
+      ["소속세계", basic(character, "world")],
       ["장르", basic(character, "genre")],
       ["종족", basic(character, "race")],
       ["직업", basic(character, "job")],
@@ -1649,7 +1739,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     elements.detailPanel.innerHTML = `<div class="related-list"></div>`;
     const list = elements.detailPanel.querySelector(".related-list");
     related.forEach(story => list.appendChild(createStoryCard(story, () => {
-      switchScreen("library");
+      switchScreen("library", { record: false });
       openStory(story);
     })));
   }
@@ -2077,22 +2167,35 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     return button;
   }
 
-  function createStoryTreeCharacterNode(characterNode, shouldOpen) {
+  function createStoryTreeGroupNode(groupNode, shouldOpen) {
     const details = document.createElement("details");
     details.className = "story-tree-node story-tree-character";
     details.open = shouldOpen;
 
+    const storyCount = countStoryGroupStories(groupNode);
     const summary = document.createElement("summary");
     summary.innerHTML = `
-      <span>${escapeHtml(characterNode.title || "미등록 캐릭터")}</span>
-      <small>${characterNode.stories.length}편</small>
+      <span>${escapeHtml(groupNode.title || "미분류")}</span>
+      <small>${storyCount}편</small>
     `;
 
-    const list = document.createElement("div");
-    list.className = "story-tree-stories";
-    characterNode.stories.forEach(story => list.appendChild(createStoryTreeStoryButton(story)));
+    const children = document.createElement("div");
+    children.className = "story-tree-characters";
 
-    details.append(summary, list);
+    if (Array.isArray(groupNode.children) && groupNode.children.length > 0) {
+      groupNode.children.forEach(childNode => {
+        children.appendChild(createStoryTreeGroupNode(childNode, shouldOpen));
+      });
+    }
+
+    if (Array.isArray(groupNode.stories) && groupNode.stories.length > 0) {
+      const list = document.createElement("div");
+      list.className = "story-tree-stories";
+      groupNode.stories.forEach(story => list.appendChild(createStoryTreeStoryButton(story)));
+      children.appendChild(list);
+    }
+
+    details.append(summary, children);
     return details;
   }
 
@@ -2109,8 +2212,8 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
 
     const children = document.createElement("div");
     children.className = "story-tree-characters";
-    worldNode.characters.forEach(characterNode => {
-      children.appendChild(createStoryTreeCharacterNode(characterNode, shouldOpen));
+    worldNode.groups.forEach(groupNode => {
+      children.appendChild(createStoryTreeGroupNode(groupNode, shouldOpen));
     });
 
     details.append(summary, children);
@@ -2167,6 +2270,29 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     return html.join("\n");
   }
 
+  function renderMobileStoryRelatedCharacters(story) {
+    const container = elements.storyRelatedCharacters;
+    if (!container) return;
+    const relatedCharacters = getStoryRelatedCharacters(story);
+    if (relatedCharacters.length === 0) {
+      container.innerHTML = `<span class="story-related-chip is-empty">미등록</span>`;
+      return;
+    }
+    container.innerHTML = relatedCharacters.map(characterName => {
+      const safeName = escapeHtml(characterName);
+      return `<button class="story-related-chip" type="button" data-mobile-related-character="${safeName}" aria-label="${safeName} 캐릭터 상세 열기">${safeName}</button>`;
+    }).join("");
+  }
+
+  function openRelatedCharacterByName(characterName) {
+    const targetName = text(characterName);
+    if (!targetName) return;
+    const character = getCharacters().find(characterData => characterData.name === targetName || characterData.en === targetName);
+    if (!character) return;
+    closeStory({ record: false });
+    openCharacterDetail(getCharacterId(character));
+  }
+
   async function openStory(story, { record = true } = {}) {
     if (!story) return;
     state.activeStoryFile = story.file || "";
@@ -2176,6 +2302,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     if (elements.storySummary) elements.storySummary.textContent = story.summary || "";
     if (elements.storyKicker) elements.storyKicker.textContent = `${getWorldName(story.worldId)} · ${story.typeName || story.type || "STORY"}`;
     if (elements.storyBody) elements.storyBody.innerHTML = `<p class="muted">본문을 불러오는 중입니다.</p>`;
+    renderMobileStoryRelatedCharacters(story);
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (record) recordMobileRoute();
     try {
@@ -2199,6 +2326,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     elements.storyReader?.classList.add("hidden");
     state.activeStoryFile = "";
     if (elements.storyBody) elements.storyBody.innerHTML = "";
+    if (elements.storyRelatedCharacters) elements.storyRelatedCharacters.innerHTML = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (record) recordMobileRoute({ replace: true });
   }
@@ -3219,6 +3347,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
       storyTitle: $("mobileStoryTitle"),
       storySummary: $("mobileStorySummary"),
       storyBody: $("mobileStoryBody"),
+      storyRelatedCharacters: $("mobileStoryRelatedCharacters"),
       generateButton: $("mobileGenerateButton"),
       generatorLockSummary: $("mobileGeneratorLockSummary"),
       clearGeneratorLocksButton: $("mobileClearGeneratorLocksButton"),
@@ -3305,6 +3434,11 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
       renderStoryList();
     });
     elements.storyClose?.addEventListener("click", closeStory);
+    elements.storyRelatedCharacters?.addEventListener("click", event => {
+      const characterButton = event.target.closest("[data-mobile-related-character]");
+      if (!characterButton) return;
+      openRelatedCharacterByName(characterButton.dataset.mobileRelatedCharacter);
+    });
 
     document.querySelectorAll("[data-mobile-generator-tab]").forEach(button => {
       button.addEventListener("click", () => {
@@ -3372,7 +3506,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
   }
 
   function init() {
-    document.body?.setAttribute("data-mobile-random-build", "final-admin-gate-image-modal-fold-fit-backnav-20260623");
+    document.body?.setAttribute("data-mobile-random-build", "final-admin-gate-image-modal-fold-fit-backnav-originfix-20260623");
     bindMobileVisualViewport();
     bindElements();
     bindEvents();
