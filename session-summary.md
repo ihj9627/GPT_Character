@@ -1,31 +1,19 @@
 # Session Summary
 
-Last Updated: 2026-06-24 (timezone unavailable)
+Current run: world-first archive refinement.
 
-## Current Task
+The latest completed work refines the new `world.html` prototype. Existing stable pages remain untouched. The world page now uses a world hub rather than a long combined content list, groups all reading content under Novels, splits Novels into World Novels and Character Shorts, and uses the existing 16:9 WebP thumbnails as wide card imagery.
 
-Mobile library tree open-state restoration after returning from a story reader.
+Runtime files to upload for this change:
+- world.html
+- world.css
+- world.js
+- sw.js
 
-## Completed
-
-- Preserved mobile library tree opened-node keys in History API route state.
-- Restored opened-node keys before rebuilding the 서재 tree during route restoration.
-- Kept existing scroll restoration behavior.
-- Updated mobile script cache query and PWA cache version.
-- Verified JS syntax and service worker precache references.
-
-## User-Facing Runtime Files For GitHub
-
-- `mobile.js`
-- `mobile.html`
-- `sw.js`
-
-## Tracking Files
-
-- `plan/20260624-000000--work-plan--mobile-library-tree-state-restoration--v01.md`
-- `reports/20260624-000000-mobile-library-tree-state-restoration-report.md`
-
-## Open Follow-up
-
-User should test on the deployed mobile PWA:
-서재 트리 펼침 → 소설 열기 → 뒤로가기 → 트리 열린 상태 유지.
+User-facing review target:
+- Open `/world.html`
+- Select Noct
+- Confirm that the world page shows a compact hub
+- Enter Novels
+- Confirm World Novels and Character Shorts are separated
+- Enter Black Coffin War and confirm episodes appear there instead of on the first world page

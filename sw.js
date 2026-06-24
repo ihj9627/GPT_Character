@@ -3,12 +3,12 @@
 "use strict";
 
 const CACHE_PREFIX = "character-archive-mobile";
-const CACHE_NAME = `${CACHE_PREFIX}-v20260624-03`;
+const CACHE_NAME = `${CACHE_PREFIX}-v20260624-04`;
 const APP_SHELL_URLS = [
   "./mobile.html",
   "./world.html",
-  "./world.css?v=world-first-01",
-  "./world.js?v=world-first-01",
+  "./world.css?v=world-first-02",
+  "./world.js?v=world-first-02",
   "./manifest.webmanifest?v=portrait-lock-01",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
