@@ -3,9 +3,12 @@
 "use strict";
 
 const CACHE_PREFIX = "character-archive-mobile";
-const CACHE_NAME = `${CACHE_PREFIX}-v20260624-02`;
+const CACHE_NAME = `${CACHE_PREFIX}-v20260624-03`;
 const APP_SHELL_URLS = [
   "./mobile.html",
+  "./world.html",
+  "./world.css?v=world-first-01",
+  "./world.js?v=world-first-01",
   "./manifest.webmanifest?v=portrait-lock-01",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -175,10 +178,12 @@ self.addEventListener("fetch", event => {
   if (!isCacheableSameOriginGet(request)) return;
 
   if (request.mode === "navigate") {
+    const url = new URL(request.url);
+    const fallbackUrl = url.pathname.endsWith("/world.html") ? "./world.html" : "./mobile.html";
     event.respondWith(
       fetch(request)
-        .then(response => cacheSuccessfulResponse("./mobile.html", response))
-        .catch(() => caches.match("./mobile.html"))
+        .then(response => cacheSuccessfulResponse(request, response))
+        .catch(() => caches.match(request).then(cached => cached || caches.match(fallbackUrl)))
     );
     return;
   }
