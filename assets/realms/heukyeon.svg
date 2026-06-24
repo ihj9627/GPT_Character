@@ -1,9 +1,0 @@
-<svg data-realm="흑연" data-realm-key="heukyeon" data-realm-color="#8E96A8" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="흑연 원계 심볼">
-  <title>흑연</title>
-  <desc>붕괴·폐허 대원계: 균열, 탑, 잔광 회로, 폐허층을 상징.</desc>
-  <path d="M50 17 L66 45 H56 L70 83 L40 49 H50 Z" fill="none" stroke="#8E96A8" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M26 76 H74" fill="none" stroke="#8E96A8" stroke-width="4" stroke-linecap="round"/>
-  <path d="M32 76 V59 H43 V76" fill="none" stroke="#8E96A8" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M58 76 V54 H68 V76" fill="none" stroke="#8E96A8" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M31 40 H39 M67 36 H73 M24 55 H34" fill="none" stroke="#8E96A8" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
-</svg>

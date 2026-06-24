@@ -1,9 +1,0 @@
-<svg data-realm="묘월" data-realm-key="myowol" data-realm-color="#A78BFA" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="묘월 원계 심볼">
-  <title>묘월</title>
-  <desc>현대 도시괴이 대원계: 도시의 창문, 초승달, 고양이 눈/밤의 수사 분위기.</desc>
-  <path d="M36 25 C27 34 27 52 39 63 C48 71 62 69 70 60 C59 64 47 60 41 50 C35 40 37 31 46 23 C42 23 39 24 36 25 Z" fill="#A78BFA" opacity="0.88"/>
-  <path d="M28 72 H72" fill="none" stroke="#A78BFA" stroke-width="4" stroke-linecap="round"/>
-  <path d="M34 72 V48 H45 V72" fill="none" stroke="#A78BFA" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M50 72 V40 H62 V72" fill="none" stroke="#A78BFA" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M38 56 H41 M54 49 H58 M54 58 H58" fill="none" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
-</svg>

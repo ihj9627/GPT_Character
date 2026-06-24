@@ -1,0 +1,9 @@
+<svg data-realm="사프란해" data-realm-key="saffran-sea" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="사프란해 세계 심볼">
+  <title>사프란해</title>
+  <desc>이름표, 항로계약, 파도의 단색 문장.</desc>
+
+  <path fill="currentColor" fill-rule="evenodd" d="M35 13 H65 L79 27 V57 L50 74 L21 57 V27 Z M42 24 A5 5 0 1 0 42 34 A5 5 0 1 0 42 24 Z M49 29 H66 V33 H49 Z M35 44 H66 V48 H35 Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M17 78 C26 69 34 69 43 78 C52 87 60 87 69 78 C74 73 79 72 83 74"/>
+  <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M20 91 C29 83 37 83 46 91 C55 99 63 99 72 91"/>
+
+</svg>

@@ -1,0 +1,10 @@
+<svg data-realm="루미아" data-realm-key="lumia" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="루미아 세계 심볼">
+  <title>루미아</title>
+  <desc>집의 등불, 동네 기담, 작은 보호권의 단색 문장.</desc>
+
+  <path fill="currentColor" fill-rule="evenodd" d="M50 12 L75 35 V80 H25 V35 Z M38 47 C38 38 43 33 50 33 C57 33 62 38 62 47 V67 H38 Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" d="M50 36 V67 M40 52 H60"/>
+  <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M20 83 H80"/>
+  <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" d="M50 12 V5"/>
+
+</svg>

@@ -1,8 +1,0 @@
-<svg data-realm="심람" data-realm-key="simram" data-realm-color="#5EA7D8" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="심람 원계 심볼">
-  <title>심람</title>
-  <desc>수몰·수역 대원계: 심해의 물방울, 게이트, 수몰 파문.</desc>
-  <path d="M50 20 C61 34 70 45 70 58 C70 71 61 80 50 80 C39 80 30 71 30 58 C30 45 39 34 50 20 Z" fill="none" stroke="#5EA7D8" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M34 58 C41 53 47 53 54 58 C61 63 66 63 72 58" fill="none" stroke="#5EA7D8" stroke-width="4" stroke-linecap="round"/>
-  <path d="M28 69 C36 65 43 65 50 69 C57 73 64 73 72 69" fill="none" stroke="#5EA7D8" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
-  <circle cx="50" cy="47" r="8" fill="#5EA7D8" opacity="0.82"/>
-</svg>

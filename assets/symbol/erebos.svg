@@ -1,0 +1,8 @@
+<svg data-realm="에레보스" data-realm-key="erebos" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="에레보스 세계 심볼">
+  <title>에레보스</title>
+  <desc>무명왕좌, 지워진 별, 심연의 단색 문장.</desc>
+
+  <path fill="currentColor" fill-rule="evenodd" d="M22 18 C36 9 64 9 78 18 L66 80 H34 Z M31 29 C43 23 57 23 69 29 L67 33 C57 29 43 29 33 33 Z M36 44 C45 40 55 40 64 44 L62 48 C55 45 45 45 38 48 Z M42 60 C47 58 53 58 58 60 L57 64 C53 62 47 62 43 64 Z"/>
+  <path fill="currentColor" d="M41 80 H59 L50 92 Z"/>
+
+</svg>

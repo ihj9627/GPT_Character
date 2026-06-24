@@ -1,0 +1,10 @@
+<svg data-realm="노크트" data-realm-key="noct" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="노크트 세계 심볼">
+  <title>노크트</title>
+  <desc>흑관, 금속묘지, 몰락한 궁정의 단색 문장.</desc>
+
+  <path fill="currentColor" d="M27 75 L33 38 L44 49 L50 20 L56 49 L67 38 L73 75 Z"/>
+  <path fill="currentColor" d="M38 77 H62 V88 H38 Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M20 75 H80"/>
+  <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" d="M50 12 V21 M43 15 H57"/>
+
+</svg>

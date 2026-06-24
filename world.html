@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>세계관 아카이브</title>
+  <meta name="theme-color" content="#0d0a13">
+  <meta name="application-name" content="세계관 아카이브">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="world.css?v=world-story-pack-20260625-01">
+</head>
+<body>
+  <div class="world-app" id="worldApp">
+    <header class="app-topbar" id="appTopbar">
+      <button class="icon-button back-button is-hidden" id="backButton" type="button" aria-label="뒤로">‹</button>
+      <div class="top-title-block">
+        <p class="top-kicker" id="topKicker">WORLD ARCHIVE</p>
+        <h1 class="top-title-line">
+          <span class="top-symbol is-hidden" id="topSymbol" aria-hidden="true"></span>
+          <span class="top-title-text" id="topTitle">세계관 아카이브</span>
+        </h1>
+      </div>
+      <button class="ghost-button is-hidden" id="worldHomeButton" type="button">세계</button>
+    </header>
+
+    <main class="app-main" id="appMain">
+      <section class="app-screen is-active" id="worldSelectScreen" aria-labelledby="worldSelectTitle">
+        <div class="select-hero">
+          <p class="section-kicker">WORLD GATE</p>
+          <h2 id="worldSelectTitle">탐색할 세계를 선택하세요</h2>
+          <p>캐릭터와 이야기는 세계를 고른 뒤 열립니다.</p>
+        </div>
+        <div class="world-grid" id="worldGrid" aria-live="polite"></div>
+        <section class="generator-entry-shell" id="generatorEntryShell" aria-label="창작 도구">
+          <button class="generator-entry-card" id="openGeneratorButton" type="button">
+            <span class="generator-entry-orb" aria-hidden="true">✦</span>
+            <span class="generator-entry-copy">
+              <span class="section-kicker">CREATION TOOL</span>
+              <strong>랜덤 생성기</strong>
+              <small>고정 랜덤 · 연출세트 · 후속 이미지 프롬프트</small>
+            </span>
+            <span class="generator-entry-arrow" aria-hidden="true">›</span>
+          </button>
+        </section>
+        <section class="private-tool-shell" id="privateToolShell" hidden aria-label="프라이빗 데이터 관리">
+          <button class="private-tool-toggle" id="privateToolToggle" type="button" aria-expanded="false" aria-controls="privateToolPanel">
+            <span>데이터 관리</span>
+            <small>PC 전용 characters.js 생성</small>
+          </button>
+
+          <div class="private-tool-panel" id="privateToolPanel" hidden>
+            <div class="private-tool-heading">
+              <div>
+                <p class="section-kicker">PRIVATE TOOL</p>
+                <h3>캐릭터 데이터 생성</h3>
+              </div>
+              <span class="private-tool-badge">PC 전용</span>
+            </div>
+
+            <p class="private-tool-guide">
+              엑셀과 캐릭터 이미지 ZIP을 함께 선택하면 이미지 파일명 기준으로 albumKeys를 자동 생성합니다.
+              생성된 <code>characters.js</code>를 내려받아 로컬/Git 파일과 교체하세요.
+            </p>
+            <a class="private-template-link" href="tools/world-character-upload-template.xlsx" download>엑셀 업로드 양식 다운로드</a>
+
+            <div class="private-import-controls">
+              <label class="private-import-file">
+                <span>캐릭터 엑셀</span>
+                <input id="privateCharacterXlsxInput" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+              </label>
+              <label class="private-import-file">
+                <span>이미지 ZIP</span>
+                <input id="privateCharacterZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed">
+              </label>
+            </div>
+
+            <div class="private-import-actions">
+              <button class="private-import-button" id="privateImportPreviewButton" type="button">미리보기</button>
+              <button class="private-import-button private-import-primary" id="privateImportDownloadButton" type="button" disabled>characters.js 다운로드</button>
+            </div>
+
+            <p class="private-import-status" id="privateImportStatus" data-tone="muted">엑셀과 이미지 ZIP을 선택해 주세요.</p>
+            <div class="private-import-summary" id="privateImportSummary" aria-live="polite"></div>
+            <div class="private-import-results" id="privateImportResults"></div>
+          </div>
+        </section>
+
+        <section class="private-image-check-shell" id="privateImageCheckShell" hidden aria-label="프라이빗 이미지 검사">
+          <button class="private-image-check-button" id="privateImageCheckButton" type="button">
+            <span class="private-image-check-copy">
+              <span class="section-kicker">ASSET CHECK</span>
+              <strong>이미지 검사</strong>
+              <small>등록된 캐릭터 이미지 WebP 파일을 확인합니다.</small>
+            </span>
+            <span class="private-image-check-arrow" aria-hidden="true">›</span>
+          </button>
+        </section>
+      </section>
+
+      <section class="app-screen generator-screen" id="generatorScreen" aria-labelledby="generatorTitle">
+        <section class="generator-hero archive-section">
+          <div>
+            <p class="section-kicker">IMAGE PROMPT GENERATOR</p>
+            <h2 id="generatorTitle">랜덤 생성기</h2>
+            <p>랜덤 캐릭터 골격을 만들고, 연출세트를 붙여넣어 생성용·후속 이미지 프롬프트까지 이어갑니다.</p>
+          </div>
+        </section>
+
+        <nav class="generator-mode-tabs" aria-label="랜덤 생성기 작업 단계">
+          <button class="generator-mode-tab is-active" id="generatorRandomTabButton" type="button" data-generator-tab="random">랜덤 생성</button>
+          <button class="generator-mode-tab" id="generatorFollowupTabButton" type="button" data-generator-tab="followup">후속 이미지</button>
+        </nav>
+
+        <section class="generator-data-warning empty-state" id="generatorDataWarning" hidden>
+          랜덤 생성기 데이터가 없습니다. 기존 프로젝트의 <code>generator-data.js</code>가 world.html과 같은 폴더에 있는지 확인해 주세요.
+        </section>
+
+        <section class="generator-tab-panel is-active" id="generatorRandomTabPanel">
+          <section class="generator-work-grid">
+            <section class="generator-result-card archive-section">
+              <div class="generator-result-head">
+                <div>
+                  <p class="section-kicker">RANDOM RESULT</p>
+                  <h2>랜덤 생성 결과</h2>
+                </div>
+                <div class="generator-result-tools">
+                  <button class="generator-small-button" id="clearGeneratorLocksButton" type="button" hidden>고정 전체 해제</button>
+                  <p class="generator-lock-summary" id="generatorLockSummary">고정된 항목이 없습니다.</p>
+                </div>
+              </div>
+
+              <div class="generator-grid" id="generatorGrid">
+                <article class="generator-empty-card">
+                  <h3>아직 생성된 결과가 없습니다.</h3>
+                  <p>하단 액션바의 전체 버튼을 누르면 캐릭터 골격과 프롬프트 작업 영역이 준비됩니다.</p>
+                </article>
+              </div>
+
+              <section class="generator-assist-panel">
+                <div class="generator-assist-heading">
+                  <div>
+                    <p class="section-kicker">AI DIRECTION SET</p>
+                    <h2>연출 세트</h2>
+                  </div>
+                  <button class="generator-small-button" id="openGeneratorSetPasteButton" type="button">붙여넣기/수정</button>
+                </div>
+                <div class="generator-set-preview is-empty" id="generatorSetPastePreview">
+                  아직 적용된 연출 세트가 없습니다.
+                </div>
+              </section>
+
+              <section class="generator-history-panel">
+                <div class="generator-history-heading">
+                  <h3>최근 결과</h3>
+                  <button class="generator-small-button" id="clearGeneratorHistoryButton" type="button">비우기</button>
+                </div>
+                <div class="generator-history-list" id="generatorHistoryList"></div>
+              </section>
+            </section>
+          </section>
+
+          <div class="generator-sticky-actions" id="generatorStickyActions" aria-label="랜덤 생성 빠른 작업">
+            <button class="generator-sticky-button" id="generateCharacterStickyButton" type="button">전체</button>
+            <button class="generator-sticky-button primary" id="generateUnlockedCharacterStickyButton" type="button">고정유지</button>
+            <button class="generator-sticky-button" id="copyGeneratorStickyButton" type="button">질문</button>
+            <button class="generator-sticky-button" id="copyGeneratorImagePromptStickyButton" type="button">생성</button>
+          </div>
+        </section>
+
+        <section class="generator-tab-panel" id="generatorFollowupTabPanel" hidden>
+          <section class="generator-followup-card archive-section">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">FOLLOW-UP IMAGE PROMPTS</p>
+                <h2>후속 이미지</h2>
+              </div>
+            </div>
+            <p class="generator-help-text">생성용 프롬프트를 복사한 뒤 이곳에서 캐릭터 이름만 입력하면 후속 프롬프트에 필요한 기본값을 이어받습니다.</p>
+
+            <section class="generator-prompt-history-panel" aria-label="최근 생성용 프롬프트">
+              <div class="generator-history-heading">
+                <h3>최근 생성용 프롬프트</h3>
+                <button class="generator-small-button" id="clearGeneratorPromptHistoryButton" type="button">비우기</button>
+              </div>
+              <div class="generator-prompt-history-list" id="generatorPromptHistoryList"></div>
+            </section>
+
+            <label class="generator-field">
+              <span>캐릭터 이름</span>
+              <input id="generatorFollowupCharacterNameInput" type="text" autocomplete="off" placeholder="예: 레나(Lena)">
+            </label>
+
+            <div class="generator-followup-grid">
+              <label class="generator-field">
+                <span>종족</span>
+                <input id="generatorSketchbookRaceInput" type="text" autocomplete="off" placeholder="예: 엘프">
+              </label>
+              <label class="generator-field">
+                <span>직업</span>
+                <input id="generatorSketchbookRoleInput" type="text" autocomplete="off" placeholder="예: 마법사">
+              </label>
+              <label class="generator-field">
+                <span>성격</span>
+                <input id="generatorSketchbookPersonalityInput" type="text" autocomplete="off" placeholder="예: 장난스러운 성격">
+              </label>
+              <label class="generator-field">
+                <span>세계/장르</span>
+                <input id="generatorSketchbookGenreInput" type="text" autocomplete="off" placeholder="예: 판타지">
+              </label>
+            </div>
+
+            <div class="generator-followup-actions" aria-label="후속 이미지 프롬프트">
+              <button class="generator-followup-action" id="copyFollowupSketchSheetPromptButton" type="button">낙서시트</button>
+              <button class="generator-followup-action" id="copyFollowupTurnaroundPromptButton" type="button">삼면도</button>
+              <button class="generator-followup-action" id="copyFollowupMagazinePromptButton" type="button">잡지</button>
+              <button class="generator-followup-action" id="copyFollowupSketchbookPromptButton" type="button">스케치북</button>
+              <button class="generator-followup-action" id="copyFollowupBodyInfoPromptButton" type="button">신체정보</button>
+              <button class="generator-followup-action" id="copyFollowupCookingMagazinePromptButton" type="button">요리잡지</button>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <section class="app-screen" id="worldDetailScreen" aria-label="선택한 세계 상세">
+        <nav class="world-tab-bar" id="worldTabBar" aria-label="세계 상세 탐색" role="tablist">
+          <button class="world-tab-button is-active" id="worldTabInfo" type="button" role="tab" aria-selected="true" aria-controls="worldInfoPanel" data-world-tab="info">
+            세계정보
+          </button>
+          <button class="world-tab-button" id="worldTabCharacters" type="button" role="tab" aria-selected="false" aria-controls="worldCharactersPanel" data-world-tab="characters">
+            캐릭터 <span id="worldCharacterCount"></span>
+          </button>
+          <button class="world-tab-button" id="worldTabStories" type="button" role="tab" aria-selected="false" aria-controls="worldStoriesPanel" data-world-tab="stories">
+            소설 <span id="worldStoryCount"></span>
+          </button>
+        </nav>
+
+        <div class="world-tab-panels">
+          <section class="archive-section world-tab-panel is-active" id="worldInfoPanel" role="tabpanel" aria-labelledby="worldTabInfo">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">WORLD INFO</p>
+                <h2>세계정보</h2>
+              </div>
+            </div>
+            <div class="world-info-grid" id="worldInfoGrid"></div>
+          </section>
+
+          <section class="archive-section world-tab-panel" id="worldCharactersPanel" role="tabpanel" aria-labelledby="worldTabCharacters" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">CHARACTERS</p>
+                <h2 id="worldCharactersTitle">등장 캐릭터</h2>
+              </div>
+            </div>
+            <label class="archive-search">
+              <span>캐릭터 검색</span>
+              <input id="worldCharacterSearch" type="search" autocomplete="off" placeholder="한글/영어 이름 검색">
+            </label>
+            <p class="result-meta" id="worldCharacterResultMeta"></p>
+            <div class="character-card-grid" id="worldCharacterGrid"></div>
+          </section>
+
+          <section class="archive-section world-tab-panel" id="worldStoriesPanel" role="tabpanel" aria-labelledby="worldTabStories" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">STORIES</p>
+                <h2 id="worldStoriesTitle">소설</h2>
+              </div>
+            </div>
+            <label class="archive-search">
+              <span>소설 검색</span>
+              <input id="worldStorySearch" type="search" autocomplete="off" placeholder="제목/캐릭터/시리즈 검색">
+            </label>
+            <p class="result-meta" id="worldStoryResultMeta"></p>
+            <div class="story-group-list" id="worldStoryGroups"></div>
+          </section>
+        </div>      </section>
+
+      <section class="app-screen" id="characterDetailScreen" aria-labelledby="characterDetailTitle">
+        <article class="character-detail-card" id="characterDetailCard">
+          <div class="character-detail-image" id="characterDetailImageWrap">
+            <img id="characterDetailImage" alt="">
+          </div>
+          <div class="character-detail-copy">
+            <p class="section-kicker" id="characterDetailKicker">CHARACTER RECORD</p>
+            <h2 id="characterDetailTitle"></h2>
+            <p class="character-en" id="characterDetailEn"></p>
+            <div class="character-detail-meta" id="characterDetailMeta"></div>
+            <p class="character-intro" id="characterDetailIntro"></p>
+            <blockquote id="characterDetailQuote"></blockquote>
+          </div>
+        </article>
+
+        <nav class="character-tab-bar" id="characterTabBar" aria-label="캐릭터 상세 탭">
+          <button class="character-tab-button is-active" id="characterTabInfo" type="button" data-character-tab="info">정보</button>
+          <button class="character-tab-button private-only-tab" id="characterTabStatus" type="button" data-character-tab="status" hidden>스테이터스</button>
+          <button class="character-tab-button" id="characterTabImages" type="button" data-character-tab="images">이미지</button>
+        </nav>
+
+        <div class="character-tab-panels">
+          <section class="archive-section character-tab-panel" id="characterInfoPanel" data-character-panel="info">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">INFORMATION</p>
+                <h2>정보</h2>
+              </div>
+            </div>
+            <dl class="profile-grid" id="characterInfoGrid"></dl>
+            <div class="character-subsection">
+              <div class="section-heading compact-heading">
+                <div>
+                  <p class="section-kicker">IDENTITY STORY</p>
+                  <h3>관련 정체성 단편</h3>
+                </div>
+              </div>
+              <div class="story-list" id="characterIdentityStoryList"></div>
+            </div>
+          </section>
+
+          <section class="archive-section character-tab-panel" id="characterStatusPanel" data-character-panel="status" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">PRIVATE STATUS</p>
+                <h2>스테이터스</h2>
+              </div>
+            </div>
+            <div class="character-status-stack" id="characterStatusGrid"></div>
+            <p class="private-status-note">프라이빗모드에서만 표시되는 자동 스테이터스입니다. 캐릭터별로 고정된 값으로 생성됩니다.</p>
+          </section>
+
+          <section class="archive-section character-tab-panel" id="characterImagesPanel" data-character-panel="images" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">IMAGE ALBUM</p>
+                <h2>이미지</h2>
+              </div>
+              <span class="section-count" id="characterImagesMeta">0</span>
+            </div>
+            <div class="character-image-grid" id="characterImageGrid"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="app-screen" id="storyReaderScreen" aria-labelledby="storyReaderTitle">
+        <article class="reader-card">
+          <div class="reader-head">
+            <p class="section-kicker" id="storyReaderKicker">STORY</p>
+            <h2 id="storyReaderTitle"></h2>
+            <p id="storyReaderSummary"></p>
+            <div class="related-chip-row" id="storyRelatedCharacters"></div>
+          </div>
+          <div class="reader-body" id="storyReaderBody" aria-live="polite"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+
+  <section class="generator-set-modal" id="generatorSetPasteModal" hidden role="dialog" aria-modal="true" aria-labelledby="generatorSetPasteModalTitle">
+    <div class="generator-modal-backdrop" data-generator-set-close></div>
+    <div class="generator-modal-dialog">
+      <header class="generator-modal-head">
+        <div>
+          <p class="section-kicker">SET PASTE</p>
+          <h2 id="generatorSetPasteModalTitle">연출 세트 붙여넣기</h2>
+        </div>
+        <button class="generator-modal-close" id="closeGeneratorSetPasteButton" type="button" aria-label="연출 세트 닫기">×</button>
+      </header>
+      <p class="generator-modal-copy">AI 답변의 A/B/C 세트 중 하나를 통째로 붙여넣으면 장면, 구도, 연출을 자동 추출합니다.</p>
+      <textarea class="generator-modal-text" id="generatorSetPasteText" placeholder="A안&#10;- 장면: ...&#10;- 구도: ...&#10;- 연출: ..."></textarea>
+      <div class="generator-modal-actions">
+        <button class="generator-action subtle" id="cancelGeneratorSetPasteButton" type="button">닫기</button>
+        <button class="generator-action primary" id="applyGeneratorSetPasteButton" type="button">적용</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="generator-prompt-modal" id="generatorPromptModal" hidden role="dialog" aria-modal="true" aria-labelledby="generatorPromptModalTitle">
+    <div class="generator-modal-backdrop" data-generator-prompt-close></div>
+    <div class="generator-modal-dialog generator-prompt-dialog">
+      <header class="generator-modal-head">
+        <div>
+          <p class="section-kicker" id="generatorPromptModalKicker">PROMPT</p>
+          <h2 id="generatorPromptModalTitle">프롬프트 확인</h2>
+        </div>
+        <button class="generator-modal-close" id="closeGeneratorQuestionPromptButton" type="button" aria-label="프롬프트 닫기">×</button>
+      </header>
+      <p class="generator-modal-copy" id="generatorPromptModalCopy">아래 내용을 확인한 뒤 복사하세요.</p>
+      <textarea class="generator-modal-text prompt" id="generatorQuestionPromptText" readonly></textarea>
+      <div class="generator-modal-actions">
+        <button class="generator-action subtle" id="cancelGeneratorQuestionPromptButton" type="button">닫기</button>
+        <button class="generator-action primary" id="copyGeneratorQuestionPromptButton" type="button">복사</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="asset-check-modal" id="assetCheckModal" hidden role="dialog" aria-modal="true" aria-labelledby="assetCheckTitle">
+    <div class="asset-check-backdrop" data-asset-check-close></div>
+    <div class="asset-check-dialog">
+      <header class="asset-check-head">
+        <div>
+          <p class="section-kicker">ASSET CHECK</p>
+          <h2 id="assetCheckTitle">이미지 검사</h2>
+        </div>
+        <button class="asset-check-close" id="assetCheckClose" type="button" aria-label="이미지 검사 닫기">×</button>
+      </header>
+      <div class="asset-check-body" id="assetCheckBody" aria-live="polite">
+        <p>검사 대기 중입니다.</p>
+      </div>
+      <div class="asset-check-actions">
+        <button class="generator-action subtle" id="assetCheckOk" type="button">닫기</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="image-lightbox" id="imageLightbox" hidden aria-modal="true" role="dialog" aria-labelledby="imageLightboxTitle">
+    <div class="image-lightbox-backdrop" data-lightbox-close></div>
+    <section class="image-lightbox-window">
+      <header class="image-lightbox-head">
+        <div>
+          <p class="section-kicker" id="imageLightboxMeta">IMAGE</p>
+          <h2 id="imageLightboxTitle">이미지</h2>
+        </div>
+        <button class="image-lightbox-close" id="imageLightboxClose" type="button" aria-label="이미지 닫기">×</button>
+      </header>
+      <div class="image-lightbox-stage" id="imageLightboxStage">
+        <img id="imageLightboxImage" alt="">
+      </div>
+    </section>
+  </div>
+
+  <script src="story-taxonomy.js?v=world-story-pack-20260625-01"></script>
+  <script src="characters.js?v=world-story-pack-20260625-01"></script>
+  <script src="story-data.js?v=world-story-pack-20260625-01"></script>
+  <script src="generator-data.js?v=world-story-pack-20260625-01"></script>
+  <script src="world.js?v=world-story-pack-20260625-01"></script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg data-realm="미드레인" data-realm-key="midrain" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="미드레인 세계 심볼">
+  <title>미드레인</title>
+  <desc>밤비, 감시의 눈, 수사 도시의 단색 문장.</desc>
+
+  <path fill="currentColor" fill-rule="evenodd" d="M16 48 C27 31 41 23 50 23 C59 23 73 31 84 48 C73 65 59 73 50 73 C41 73 27 65 16 48 Z M50 39 A9 9 0 1 0 50 57 A9 9 0 1 0 50 39 Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M34 76 V88 M50 78 V92 M66 76 V88"/>
+  <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" d="M28 28 L38 37 M72 28 L62 37"/>
+
+</svg>

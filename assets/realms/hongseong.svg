@@ -1,8 +1,0 @@
-<svg data-realm="홍성" data-realm-key="hongseong" data-realm-color="#D95A66" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="홍성 원계 심볼">
-  <title>홍성</title>
-  <desc>생체사령·부활 대원계: 붉은 별, 생명핵, 사령의 순환.</desc>
-  <path d="M50 18 L58 40 L82 40 L62 54 L70 78 L50 63 L30 78 L38 54 L18 40 L42 40 Z" fill="none" stroke="#D95A66" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="50" cy="52" r="11" fill="#D95A66" opacity="0.82"/>
-  <path d="M50 35 C61 39 66 49 62 59 M50 69 C39 65 34 55 38 45" fill="none" stroke="#D95A66" stroke-width="3" stroke-linecap="round" opacity="0.88"/>
-  <path d="M50 43 V61 M41 52 H59" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
-</svg>

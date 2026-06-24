@@ -1,31 +1,24 @@
 {
-  "id": "./mobile.html",
-  "name": "Character Archive Mobile",
-  "short_name": "Archive",
-  "description": "캐릭터 아카이브 감상용 모바일 companion",
-  "lang": "ko",
-  "start_url": "./mobile.html",
+  "id": "./world.html",
+  "name": "세계관 아카이브",
+  "short_name": "세계관",
+  "description": "세계별 캐릭터, 소설, 제작 도구를 탐색하는 PWA 아카이브입니다.",
+  "start_url": "./world.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#100b18",
-  "theme_color": "#100b18",
-  "categories": [
-    "books",
-    "entertainment"
-  ],
+  "background_color": "#0d0a13",
+  "theme_color": "#0d0a13",
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
