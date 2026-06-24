@@ -3,18 +3,18 @@
 "use strict";
 
 const CACHE_PREFIX = "character-archive-mobile";
-const CACHE_NAME = `${CACHE_PREFIX}-v20260623-08`;
+const CACHE_NAME = `${CACHE_PREFIX}-v20260624-02`;
 const APP_SHELL_URLS = [
   "./mobile.html",
   "./manifest.webmanifest?v=portrait-lock-01",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
-  "./mobile.css?v=noct-world-series-01",
+  "./mobile.css?v=scroll-restore-01",
   "./characters.js?v=world-profile-filter-20260623",
   "./story-taxonomy.js?v=world-intro-collapse01",
   "./story-data.js?v=noct-black-coffin-s1-01",
   "./generator-data.js?v=age-ranges-final01",
-  "./mobile.js?v=noct-world-series-01",
+  "./mobile.js?v=library-tree-restore-01",
   "./story/ashrun/anika/shorts/identity-short.md",
   "./story/ashrun/ariel/shorts/identity-short.md",
   "./story/ashrun/aya/shorts/identity-short.md",

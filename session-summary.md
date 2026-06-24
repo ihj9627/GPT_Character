@@ -1,16 +1,31 @@
 # Session Summary
 
-User timezone: not provided in this session; durable timestamps are intentionally left unresolved.
+Last Updated: 2026-06-24 (timezone unavailable)
 
-Current run state:
-- Latest work added Noct world-level novel series `흑관전쟁 / 시즌 1`.
-- The series is modeled as world stories, not character stories.
-- PC and mobile library trees now support world → series → season → episode.
-- Related novel/document blocks are removed from the PC reader; only related characters remain.
-- Mobile reader now shows related characters below the body.
-- New story markdown files are under `story/noct/black-coffin-war/season-1/`.
+## Current Task
 
-Provisional score:
-- Value: 50
-- Source: assistant provisional
-- Rationale: Implementation and static verification completed, but user has not yet tested the delivered zip.
+Mobile library tree open-state restoration after returning from a story reader.
+
+## Completed
+
+- Preserved mobile library tree opened-node keys in History API route state.
+- Restored opened-node keys before rebuilding the 서재 tree during route restoration.
+- Kept existing scroll restoration behavior.
+- Updated mobile script cache query and PWA cache version.
+- Verified JS syntax and service worker precache references.
+
+## User-Facing Runtime Files For GitHub
+
+- `mobile.js`
+- `mobile.html`
+- `sw.js`
+
+## Tracking Files
+
+- `plan/20260624-000000--work-plan--mobile-library-tree-state-restoration--v01.md`
+- `reports/20260624-000000-mobile-library-tree-state-restoration-report.md`
+
+## Open Follow-up
+
+User should test on the deployed mobile PWA:
+서재 트리 펼침 → 소설 열기 → 뒤로가기 → 트리 열린 상태 유지.

@@ -34,6 +34,10 @@ body {
   overflow-x: hidden;
 }
 
+html.is-mobile-scroll-restoring .mobile-app {
+  opacity: 0;
+}
+
 button,
 input,
 textarea {

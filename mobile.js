@@ -41,6 +41,8 @@
   const mobileHistoryDetailTabs = new Set(["profile", "library", "status", "images"]);
   let restoringMobileRoute = false;
   let lastMobileRouteSignature = "";
+  let mobileScrollRestoreTimer = 0;
+  let mobileLibraryOpenKeys = new Set();
 
   function getMobileVisualViewportSize() {
     const viewport = window.visualViewport;
@@ -1257,6 +1259,107 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     };
   }
 
+  function currentMobileScrollY() {
+    return Math.max(0, Math.round(window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0));
+  }
+
+  function normalizeMobileScrollY(value) {
+    const scrollY = Number(value);
+    return Number.isFinite(scrollY) ? Math.max(0, Math.round(scrollY)) : 0;
+  }
+
+  function normalizeMobileLibraryOpenKeys(keys) {
+    if (!Array.isArray(keys)) return [];
+    return [...new Set(keys.map(key => text(key)).filter(Boolean))];
+  }
+
+  function setMobileLibraryOpenKeys(keys) {
+    mobileLibraryOpenKeys = new Set(normalizeMobileLibraryOpenKeys(keys));
+  }
+
+  function getStoryTreeOpenKeys() {
+    if (!elements.storyList) return Array.from(mobileLibraryOpenKeys);
+    const details = Array.from(elements.storyList.querySelectorAll("details[data-story-tree-key]"));
+    const openKeys = details
+      .filter(node => node.open)
+      .map(node => text(node.dataset.storyTreeKey))
+      .filter(Boolean);
+    return normalizeMobileLibraryOpenKeys(openKeys);
+  }
+
+  function captureMobileLibraryOpenKeys() {
+    setMobileLibraryOpenKeys(getStoryTreeOpenKeys());
+  }
+
+  function storyTreeKey(kind, id, parentKey = "") {
+    const safeKind = text(kind, "node");
+    const safeId = normalizeId(id) || "unknown";
+    return parentKey ? `${parentKey}/${safeKind}:${safeId}` : `${safeKind}:${safeId}`;
+  }
+
+  function applyStoryTreeNodeState(details, key, shouldOpen) {
+    const safeKey = text(key);
+    if (!details || !safeKey) return;
+    details.dataset.storyTreeKey = safeKey;
+    details.open = Boolean(shouldOpen || mobileLibraryOpenKeys.has(safeKey));
+    details.addEventListener("toggle", () => {
+      if (details.open) {
+        mobileLibraryOpenKeys.add(safeKey);
+      } else {
+        mobileLibraryOpenKeys.delete(safeKey);
+      }
+      if (!restoringMobileRoute && state.screen === "library" && !isStoryReaderOpen()) {
+        recordMobileRoute({ replace: true });
+      }
+    });
+  }
+
+  function saveCurrentMobileRouteScroll() {
+    if (restoringMobileRoute || !canUseMobileHistory()) return;
+    const route = currentMobileHistoryRoute();
+    if (!route) return;
+    const nextRoute = {
+      ...route,
+      scrollY: currentMobileScrollY()
+    };
+    if (route.screen === "library") {
+      nextRoute.libraryOpenKeys = getStoryTreeOpenKeys();
+    }
+    try {
+      window.history.replaceState(nextRoute, "");
+      lastMobileRouteSignature = mobileRouteSignature(nextRoute);
+    } catch (error) {
+      lastMobileRouteSignature = "";
+    }
+  }
+
+  function beginSilentMobileScrollRestore() {
+    clearTimeout(mobileScrollRestoreTimer);
+    document.documentElement.classList.add("is-mobile-scroll-restoring");
+  }
+
+  function endSilentMobileScrollRestore() {
+    clearTimeout(mobileScrollRestoreTimer);
+    mobileScrollRestoreTimer = window.setTimeout(() => {
+      document.documentElement.classList.remove("is-mobile-scroll-restoring");
+    }, 80);
+  }
+
+  function restoreMobileScrollY(scrollY, { silent = false } = {}) {
+    const targetY = normalizeMobileScrollY(scrollY);
+    if (silent) beginSilentMobileScrollRestore();
+    const apply = () => {
+      window.scrollTo({ top: targetY, behavior: "auto" });
+      if (silent) {
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: targetY, behavior: "auto" });
+          endSilentMobileScrollRestore();
+        });
+      }
+    };
+    window.requestAnimationFrame(apply);
+  }
+
   function normalizeMobileRoute(route) {
     const screen = mobileHistoryScreens.has(route?.screen) ? route.screen : "characters";
     const detailTab = mobileHistoryDetailTabs.has(route?.detailTab) ? route.detailTab : "profile";
@@ -1271,21 +1374,27 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
       selectedCharacterId: text(route?.selectedCharacterId),
       detailTab,
       storyFile: text(route?.storyFile),
-      imageViewer
+      imageViewer,
+      libraryOpenKeys: normalizeMobileLibraryOpenKeys(route?.libraryOpenKeys),
+      scrollY: normalizeMobileScrollY(route?.scrollY)
     };
   }
 
   function buildMobileRoute() {
     const route = {
       __orviaMobileHistory: mobileHistoryMarker,
-      screen: mobileHistoryScreens.has(state.screen) ? state.screen : "characters"
+      screen: mobileHistoryScreens.has(state.screen) ? state.screen : "characters",
+      scrollY: currentMobileScrollY()
     };
 
     if (state.selectedCharacterId) route.selectedCharacterId = state.selectedCharacterId;
     if (state.detailTab) route.detailTab = state.detailTab;
 
-    if (state.screen === "library" && isStoryReaderOpen() && state.activeStoryFile) {
-      route.storyFile = state.activeStoryFile;
+    if (state.screen === "library") {
+      route.libraryOpenKeys = getStoryTreeOpenKeys();
+      if (isStoryReaderOpen() && state.activeStoryFile) {
+        route.storyFile = state.activeStoryFile;
+      }
     }
 
     if (isImageViewerOpen() && state.activeImageViewer) {
@@ -1334,7 +1443,8 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     return Boolean(currentMobileHistoryRoute()?.imageViewer?.fileName);
   }
 
-  function switchScreen(screen, { record = true } = {}) {
+  function switchScreen(screen, { record = true, scroll = "top", restoreScrollY = 0 } = {}) {
+    if (!restoringMobileRoute) saveCurrentMobileRouteScroll();
     state.screen = mobileHistoryScreens.has(screen) ? screen : "characters";
     document.querySelectorAll(".mobile-screen").forEach(node => {
       node.classList.toggle("is-active", node.dataset.screen === state.screen);
@@ -1354,7 +1464,11 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     if (state.screen === "library") renderStoryList();
     if (state.screen === "generator") renderGenerator();
     if (state.screen === "home") renderHome();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (scroll === "restore") {
+      restoreMobileScrollY(restoreScrollY, { silent: true });
+    } else if (scroll !== false && scroll !== "none") {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
     if (record) recordMobileRoute();
   }
 
@@ -1362,24 +1476,29 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     if (!isMobileHistoryRoute(route)) return;
     const nextRoute = normalizeMobileRoute(route);
     restoringMobileRoute = true;
+    beginSilentMobileScrollRestore();
 
     try {
       if (nextRoute.selectedCharacterId) state.selectedCharacterId = nextRoute.selectedCharacterId;
       state.detailTab = nextRoute.detailTab;
+      if (nextRoute.screen === "library") setMobileLibraryOpenKeys(nextRoute.libraryOpenKeys);
 
       if (!nextRoute.imageViewer) closeImageViewer({ record: false });
-      if (!(nextRoute.screen === "library" && nextRoute.storyFile)) closeStory({ record: false });
+      if (!(nextRoute.screen === "library" && nextRoute.storyFile)) closeStory({ record: false, scroll: false });
 
-      switchScreen(nextRoute.screen, { record: false });
+      switchScreen(nextRoute.screen, { record: false, scroll: false });
       if (nextRoute.screen === "detail") renderDetail();
 
       if (nextRoute.screen === "library" && nextRoute.storyFile) {
         const story = findStoryByFile(nextRoute.storyFile);
         if (story) {
-          openStory(story, { record: false });
+          openStory(story, { record: false, restoreScrollY: nextRoute.scrollY });
         } else {
-          closeStory({ record: false });
+          closeStory({ record: false, scroll: false });
+          restoreMobileScrollY(nextRoute.scrollY, { silent: true });
         }
+      } else {
+        restoreMobileScrollY(nextRoute.scrollY, { silent: true });
       }
 
       if (nextRoute.imageViewer) {
@@ -1394,11 +1513,17 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     } finally {
       restoringMobileRoute = false;
       lastMobileRouteSignature = mobileRouteSignature(buildMobileRoute());
+      endSilentMobileScrollRestore();
     }
   }
 
   function bindMobileHistory() {
     if (!canUseMobileHistory()) return;
+    try {
+      if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    } catch (error) {
+      // Some embedded browsers expose history without allowing scrollRestoration changes.
+    }
     window.addEventListener("popstate", event => {
       if (isMobileHistoryRoute(event.state)) applyMobileRoute(event.state);
     });
@@ -1740,7 +1865,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     const list = elements.detailPanel.querySelector(".related-list");
     related.forEach(story => list.appendChild(createStoryCard(story, () => {
       switchScreen("library", { record: false });
-      openStory(story);
+      openStory(story, { savePreviousScroll: false });
     })));
   }
 
@@ -2086,6 +2211,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
 
   function openImageViewer(character, def, { record = true } = {}) {
     if (!elements.imageViewerModal || !elements.imageViewerImage) return;
+    if (record) saveCurrentMobileRouteScroll();
     state.activeImageViewer = {
       characterId: getCharacterId(character),
       fileName: def.fileName,
@@ -2123,6 +2249,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
 
   function closeImageViewer({ record = true } = {}) {
     if (record && shouldCloseImageViewerThroughHistory()) {
+      saveCurrentMobileRouteScroll();
       window.history.back();
       return;
     }
@@ -2167,10 +2294,11 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     return button;
   }
 
-  function createStoryTreeGroupNode(groupNode, shouldOpen) {
+  function createStoryTreeGroupNode(groupNode, shouldOpen, parentKey) {
     const details = document.createElement("details");
     details.className = "story-tree-node story-tree-character";
-    details.open = shouldOpen;
+    const nodeKey = storyTreeKey("group", groupNode?.id || groupNode?.title, parentKey);
+    applyStoryTreeNodeState(details, nodeKey, shouldOpen);
 
     const storyCount = countStoryGroupStories(groupNode);
     const summary = document.createElement("summary");
@@ -2184,7 +2312,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
 
     if (Array.isArray(groupNode.children) && groupNode.children.length > 0) {
       groupNode.children.forEach(childNode => {
-        children.appendChild(createStoryTreeGroupNode(childNode, shouldOpen));
+        children.appendChild(createStoryTreeGroupNode(childNode, shouldOpen, nodeKey));
       });
     }
 
@@ -2202,7 +2330,8 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
   function createStoryTreeWorldNode(worldNode, shouldOpen) {
     const details = document.createElement("details");
     details.className = "story-tree-node story-tree-world";
-    details.open = shouldOpen;
+    const nodeKey = storyTreeKey("world", worldNode?.id || worldNode?.title);
+    applyStoryTreeNodeState(details, nodeKey, shouldOpen);
 
     const summary = document.createElement("summary");
     summary.innerHTML = `
@@ -2213,7 +2342,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     const children = document.createElement("div");
     children.className = "story-tree-characters";
     worldNode.groups.forEach(groupNode => {
-      children.appendChild(createStoryTreeGroupNode(groupNode, shouldOpen));
+      children.appendChild(createStoryTreeGroupNode(groupNode, shouldOpen, nodeKey));
     });
 
     details.append(summary, children);
@@ -2222,6 +2351,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
 
   function renderStoryList() {
     if (!elements.storyList) return;
+    if (!restoringMobileRoute) captureMobileLibraryOpenKeys();
     const q = state.storyQuery.trim().toLowerCase();
     const stories = getStories().filter(story => storyMatchesQuery(story, q));
     elements.storyList.innerHTML = "";
@@ -2289,12 +2419,14 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     if (!targetName) return;
     const character = getCharacters().find(characterData => characterData.name === targetName || characterData.en === targetName);
     if (!character) return;
-    closeStory({ record: false });
+    saveCurrentMobileRouteScroll();
+    closeStory({ record: false, scroll: false });
     openCharacterDetail(getCharacterId(character));
   }
 
-  async function openStory(story, { record = true } = {}) {
+  async function openStory(story, { record = true, restoreScrollY = null, savePreviousScroll = true } = {}) {
     if (!story) return;
+    if (record && savePreviousScroll) saveCurrentMobileRouteScroll();
     state.activeStoryFile = story.file || "";
     elements.libraryScreen?.classList.add("is-reading");
     if (elements.storyReader) elements.storyReader.classList.remove("hidden");
@@ -2303,13 +2435,18 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     if (elements.storyKicker) elements.storyKicker.textContent = `${getWorldName(story.worldId)} · ${story.typeName || story.type || "STORY"}`;
     if (elements.storyBody) elements.storyBody.innerHTML = `<p class="muted">본문을 불러오는 중입니다.</p>`;
     renderMobileStoryRelatedCharacters(story);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (restoreScrollY !== null) {
+      restoreMobileScrollY(restoreScrollY, { silent: true });
+    } else {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
     if (record) recordMobileRoute();
     try {
       const response = await fetch(story.file);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const markdown = await response.text();
       if (elements.storyBody) elements.storyBody.innerHTML = markdownToHtml(markdown);
+      if (restoreScrollY !== null) restoreMobileScrollY(restoreScrollY, { silent: true });
     } catch (error) {
       if (elements.storyBody) {
         elements.storyBody.innerHTML = `<p class="warning">본문 파일을 불러오지 못했습니다.</p><p>${escapeHtml(story.file || "")}</p>`;
@@ -2317,8 +2454,9 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     }
   }
 
-  function closeStory({ record = true } = {}) {
+  function closeStory({ record = true, scroll = "top" } = {}) {
     if (record && shouldCloseStoryThroughHistory()) {
+      saveCurrentMobileRouteScroll();
       window.history.back();
       return;
     }
@@ -2327,7 +2465,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
     state.activeStoryFile = "";
     if (elements.storyBody) elements.storyBody.innerHTML = "";
     if (elements.storyRelatedCharacters) elements.storyRelatedCharacters.innerHTML = "";
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (scroll !== false && scroll !== "none") window.scrollTo({ top: 0, behavior: "auto" });
     if (record) recordMobileRoute({ replace: true });
   }
 
@@ -3506,7 +3644,7 @@ const generatorSketchbookSpeciesPromptMap = generatorSketchbookSpeciesPromptEntr
   }
 
   function init() {
-    document.body?.setAttribute("data-mobile-random-build", "final-admin-gate-image-modal-fold-fit-backnav-originfix-20260623");
+    document.body?.setAttribute("data-mobile-random-build", "final-admin-gate-image-modal-fold-fit-backnav-tree-restore-20260624");
     bindMobileVisualViewport();
     bindElements();
     bindEvents();
