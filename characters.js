@@ -101,7 +101,7 @@ window.CHARACTERS = [
       "quote": "울어야 할 때 웃는 것, 그게 진짜 연기예요.",
       "basicInfo": {
         "gender": "여성",
-        "world": "미드레인",
+        "world": "루미아",
         "genre": "현대",
         "race": "인간",
         "job": "배우",
@@ -449,7 +449,7 @@ window.CHARACTERS = [
       "quote": "가까이 오지 마. 내 숨결은 박수보다 차가우니까.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "에레보스",
         "genre": "하이 판타지",
         "race": "마신족",
         "job": "무희",
@@ -565,7 +565,7 @@ window.CHARACTERS = [
       "quote": "방패 뒤에 숨어도 소리는 못 막아.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "게이트폴",
         "genre": "로우 판타지",
         "race": "마인",
         "job": "검투사",
@@ -799,7 +799,7 @@ window.CHARACTERS = [
       "quote": "작은 목소리도 들린다. 그러니 거짓말은 크게 하지 마라.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "게이트폴",
         "genre": "판타지",
         "race": "거인",
         "job": "파계승",
@@ -828,7 +828,7 @@ window.CHARACTERS = [
       "quote": "특종은 뛰어가는 사람보다 기다린 사람이 잡을 때도 있어요.",
       "basicInfo": {
         "gender": "여성",
-        "world": "미드레인",
+        "world": "루미아",
         "genre": "현대 드라마",
         "race": "토끼 수인",
         "job": "리포터",
@@ -886,7 +886,7 @@ window.CHARACTERS = [
       "quote": "흩뿌린 피도 설계하면 꽃처럼 터져.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "게이트폴",
         "genre": "하이 판타지",
         "race": "아라크네",
         "job": "연금술사/빌런",
@@ -1031,7 +1031,7 @@ window.CHARACTERS = [
       "quote": "값을 매기는 건 물건뿐이에요. 사람은 더 조심해야죠.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "사프란해",
         "genre": "로우 판타지",
         "race": "봉제인형",
         "job": "방랑상인",
@@ -1811,7 +1811,7 @@ window.CHARACTERS = [
       "quote": "죽은 뒤에도 사건은 끝까지 따라붙더라.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "미드레인",
         "genre": "궁정물",
         "race": "유령",
         "job": "탐정",
@@ -2050,7 +2050,7 @@ window.CHARACTERS = [
       "quote": "내 말이 안 들리면 괜찮아. 곧 아무 소리도 못 들을 테니.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "게이트폴",
         "genre": "판타지",
         "race": "아수라",
         "job": "마피아 보스",
@@ -2440,7 +2440,7 @@ window.CHARACTERS = [
       "quote": "제가 나서기엔 무서우니까… 대신 이 아이가 갈 거예요.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "연묵",
         "genre": "소드앤소서러",
         "race": "드라이어드",
         "job": "식신술사",
@@ -2590,7 +2590,7 @@ window.CHARACTERS = [
       "quote": "규칙은 간단해. 내가 금지하면, 너는 못 한다.",
       "basicInfo": {
         "gender": "여성",
-        "world": "노크트",
+        "world": "연묵",
         "genre": "로우 판타지",
         "race": "강시",
         "job": "용병",
@@ -2740,7 +2740,7 @@ window.CHARACTERS = [
       "quote": "오래 버텨 봐. 그러면 네 빈틈도 오래 보이니까.",
       "basicInfo": {
         "gender": "여성",
-        "world": "게이트폴",
+        "world": "노크트",
         "genre": "설원판타지",
         "race": "마인",
         "job": "몬스터헌터",
@@ -2920,7 +2920,7 @@ window.CHARACTERS = [
       "quote": "겁나도 들어가야 해. 어둠 속에 사람이 있을지 모르니까.",
       "basicInfo": {
         "gender": "여성",
-        "world": "애쉬런",
+        "world": "사프란해",
         "genre": "중동판타지",
         "race": "좀비",
         "job": "폐허탐색자",
@@ -3010,7 +3010,7 @@ window.CHARACTERS = [
       "quote": "조용한 어둠 속에서야 별이 남긴 문장이 보입니다.",
       "basicInfo": {
         "gender": "여성",
-        "world": "아스트라",
+        "world": "에레보스",
         "genre": "고대문명판타지",
         "race": "올빼미 수인",
         "job": "인챈터",
@@ -3040,7 +3040,7 @@ window.CHARACTERS = [
       "quote": "멈춰야 산다면, 제 몸부터 고장 내겠습니다.",
       "basicInfo": {
         "gender": "여성",
-        "world": "코어벨트",
+        "world": "애쉬런",
         "genre": "EMP 아포칼립스",
         "race": "사이보그",
         "job": "원소술사",
@@ -3096,7 +3096,7 @@ window.CHARACTERS = [
       "quote": "그린 장면은 사라지지 않아요. 그러니까 끝까지 봐야 해요.",
       "basicInfo": {
         "gender": "여성",
-        "world": "루미아",
+        "world": "코어벨트",
         "genre": "미래",
         "race": "인간",
         "job": "만화가",
@@ -3153,7 +3153,7 @@ window.CHARACTERS = [
       "quote": "욕심은 숨기지 않겠습니다. 대신 놓치지도 않겠습니다.",
       "basicInfo": {
         "gender": "여성",
-        "world": "사프란해",
+        "world": "게이트폴",
         "genre": "하이 판타지",
         "race": "문어 수인",
         "job": "기사",
@@ -3209,7 +3209,7 @@ window.CHARACTERS = [
       "quote": "빌린 힘입니다. 그러니 반드시 갚아야 합니다.",
       "basicInfo": {
         "gender": "여성",
-        "world": "에레보스",
+        "world": "미드레인",
         "genre": "호러",
         "race": "엘프",
         "job": "퇴마사",
@@ -3265,7 +3265,7 @@ window.CHARACTERS = [
       "quote": "제가 이기적이라서, 같은 죽음은 두 번 못 보겠습니다.",
       "basicInfo": {
         "gender": "여자",
-        "world": "아스트라",
+        "world": "에레보스",
         "genre": "신화판타지",
         "race": "켄타우로스",
         "job": "조련사",
@@ -3489,7 +3489,7 @@ window.CHARACTERS = [
       "quote": "상냥함은 느린 수리가 아니라, 다시 망가지지 않게 보는 거예요.",
       "basicInfo": {
         "gender": "여자",
-        "world": "아스트라",
+        "world": "코어벨트",
         "genre": "소프트SF",
         "race": "여우 수인",
         "job": "메카닉",

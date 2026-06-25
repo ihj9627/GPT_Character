@@ -16,6 +16,7 @@
     privateTapTimer: 0,
     privateToolOpen: false,
     storyReturnHash: "",
+    characterReturnHash: "",
     imageLightboxItems: [],
     imageLightboxIndex: -1,
     imageLightboxScale: 1,
@@ -24,9 +25,34 @@
     imageLightboxPointers: new Map(),
     imageLightboxLastDistance: 0,
     imageLightboxPanStart: null,
+    imageLightboxHistoryPushed: false,
+    imageLightboxSuppressNextPop: false,
+    routeBackFallbackTimer: 0,
+    routeBackFallbackHash: "",
+    routeBackOriginHash: "",
+    currentRouteHash: "",
+    previousRouteHash: "",
+    pendingNavigationHash: "",
+    tabSwipe: null,
+    tabSwipeSuppressClickUntil: 0,
     scrollPositions: Object.create(null),
     storyOpenGroups: Object.create(null),
-    generatorTab: "random"
+    generatorTab: "random",
+    quizActive: false,
+    quizQuestions: [],
+    quizIndex: 0,
+    quizScore: 0,
+    quizAnswered: false,
+    allowGameQuizRoute: false,
+    worldCupActive: false,
+    worldCupModeLabel: "",
+    worldCupSlotCount: 0,
+    worldCupEntrantCount: 0,
+    worldCupRound: [],
+    worldCupNextRound: [],
+    worldCupMatchIndex: 0,
+    worldCupRoundNumber: 0,
+    worldCupWinner: null
   };
 
   const palette = [
@@ -70,6 +96,12 @@
   const MAX_PRIVATE_PREVIEW_ROWS = 90;
 
   const generatorCommonOptions = window.GENERATOR_COMMON_OPTIONS ?? {};
+  const generatorPersonalityGroups = window.GENERATOR_PERSONALITY_GROUPS ?? {};
+  const generatorAuraGroups = window.GENERATOR_AURA_GROUPS ?? {};
+  const generatorPersonalityAuraMap = window.GENERATOR_PERSONALITY_AURA_MAP ?? {};
+  const generatorAuraContrastRate = Number.isFinite(Number(window.GENERATOR_AURA_CONTRAST_RATE))
+    ? Math.max(0, Math.min(1, Number(window.GENERATOR_AURA_CONTRAST_RATE)))
+    : 0.1;
   const generatorGenreGroups = Array.isArray(window.GENERATOR_GENRE_GROUPS) ? window.GENERATOR_GENRE_GROUPS : [];
   const generatorGenreRules = window.GENERATOR_GENRE_RULES ?? {};
   const generatorSpeciesGroups = window.GENERATOR_SPECIES_GROUPS ?? {};
@@ -77,10 +109,30 @@
   const generatorWeaponGroups = window.GENERATOR_WEAPON_GROUPS ?? {};
   const generatorFields = Array.isArray(window.GENERATOR_FIELDS) ? window.GENERATOR_FIELDS : [];
   const generatorCountWeights = window.GENERATOR_COUNT_WEIGHTS ?? {};
-  const generatorHistoryStorageKey = "world-app-generator-history-v1";
+  const generatorHistoryStorageKey = "world-app-generator-history-v2";
+  const legacyGeneratorHistoryStorageKeys = ["world-app-generator-history-v1"];
   const generatorHistoryLimit = 8;
-  const generatorPromptHistoryStorageKey = "world-app-generator-prompt-history-v1";
+  const generatorPromptHistoryStorageKey = "world-app-generator-prompt-history-v2";
+  const legacyGeneratorPromptHistoryStorageKeys = ["world-app-generator-prompt-history-v1"];
   const generatorPromptHistoryLimit = 5;
+  const characterQuizQuestionCount = 10;
+  const characterQuizOptionCount = 4;
+  const characterQuizImageQuestionTypes = [
+    {
+      id: "normal",
+      label: "IMAGE",
+      title: "이 캐릭터는 누구인가요?",
+      question: "이미지를 보고 이름을 선택하세요."
+    },
+    {
+      id: "blur",
+      label: "BLUR",
+      title: "흐린 이미지 속 캐릭터는 누구인가요?",
+      question: "흐린 이미지를 보고 이름을 선택하세요."
+    }
+  ];
+  const worldCupMinimumOptionSize = 32;
+
   const lockableGeneratorKeys = new Set(generatorFields.map(([key]) => key));
   const generatorFieldGroups = [
     { title: "캐릭터 핵심", keys: ["genre", "race", "role", "personality", "visualAge"] },
@@ -88,6 +140,8 @@
     { title: "복장 · 소품", keys: ["outfit", "fashionPoints", "weapon"] },
     { title: "연출 · 특수 요소", keys: ["power"] }
   ];
+  removeLegacyGeneratorStorage();
+
   let generatorResult = {};
   let generatorHistory = loadGeneratorHistory();
   let generatorPromptHistory = loadGeneratorPromptHistory();
@@ -96,6 +150,8 @@
   let generatorPromptModalDefaultLabel = "복사";
   let generatorPromptModalConfirmAction = null;
   const lockedGeneratorKeys = new Set();
+  const generatorGenreDependentLockKeys = new Set(["race", "role", "weapon"]);
+  const generatorHiddenResultKeys = new Set(["personalityTrait", "personalityGroup", "aura", "auraGroup", "auraContrast", "hairDetail"]);
 
   function normalizeGeneratorSketchbookSpeciesKey(value) {
     return String(value || "").replace(/\s+/g, "").toLowerCase();
@@ -1097,6 +1153,27 @@
     return world?.name || raw;
   }
 
+  function worldCodeForCharacter(character) {
+    const characterId = getCharacterStoryId(character);
+    const lookup = normalizeLookupId(characterId);
+
+    const listedWorld = getWorlds().find(world => (
+      Array.isArray(world?.characters)
+      && world.characters.some(id => normalizeLookupId(id) === lookup)
+    ));
+    if (listedWorld?.code) return listedWorld.code;
+
+    const rawWorld = basicInfo(character, "world", "");
+    const worldLookup = normalizeLookupId(rawWorld);
+    const matchedWorld = getWorlds().find(world => (
+      normalizeLookupId(world?.name) === worldLookup
+      || normalizeLookupId(world?.code) === worldLookup
+      || normalizeLookupId(world?.slug) === worldLookup
+    ));
+
+    return matchedWorld?.code || "";
+  }
+
 
   function characterThemeColor(character) {
     return text(character?.themeColor, "rgba(231, 196, 122, 0.58)");
@@ -1322,6 +1399,9 @@
   function routeKeyFromRoute(route) {
     if (!route || route.view === "worlds") return "worlds";
     if (route.view === "world") return routeKeyForWorld(route.worldId);
+    if (route.view === "game") return "game";
+    if (route.view === "gameQuiz") return "game:quiz";
+    if (route.view === "worldCup") return "game:worldcup";
     if (route.view === "generator") return "generator";
     if (route.view === "character") return `character:${normalizeLookupId(route.worldId)}:${normalizeLookupId(route.characterId)}`;
     if (route.view === "story") return `story:${normalizeLookupId(route.worldId)}:${normalizeLookupId(route.storyId)}`;
@@ -1383,6 +1463,7 @@
   function setScreen(screenId) {
     [
       elements.worldSelectScreen,
+      elements.gameScreen,
       elements.generatorScreen,
       elements.worldDetailScreen,
       elements.characterDetailScreen,
@@ -1460,6 +1541,579 @@
 
     elements.worldGrid.appendChild(fragment);
   }
+
+
+  function renderGameScreen() {
+    state.view = "game";
+    state.worldId = "";
+    state.characterId = "";
+    state.storyId = "";
+    state.quizActive = false;
+    setTopbar({ title: "게임", kicker: "GAME CENTER", backVisible: true });
+    setScreen("gameScreen");
+    renderGameHub();
+  }
+
+  function renderGameQuizScreen() {
+    state.view = "gameQuiz";
+    state.worldId = "";
+    state.characterId = "";
+    state.storyId = "";
+    setTopbar({ title: "캐릭터 퀴즈", kicker: "CHARACTER QUIZ", backVisible: true });
+    setScreen("gameScreen");
+    if (!state.quizActive) {
+      initializeCharacterQuiz();
+    }
+    renderGameHub();
+  }
+
+  function renderWorldCupScreen() {
+    state.view = "worldCup";
+    state.worldId = "";
+    state.characterId = "";
+    state.storyId = "";
+    state.quizActive = false;
+    setTopbar({ title: "이상형 월드컵", kicker: "CHARACTER WORLDCUP", backVisible: true });
+    setScreen("gameScreen");
+    renderGameHub();
+  }
+
+  function setElementVisibility(element, shouldShow) {
+    if (!element) return;
+    element.hidden = !shouldShow;
+    element.style.display = shouldShow ? "" : "none";
+  }
+
+  function renderGameHub() {
+    const isQuizRoute = state.view === "gameQuiz";
+    const isWorldCupRoute = state.view === "worldCup";
+    const isGameHubRoute = !isQuizRoute && !isWorldCupRoute;
+    setElementVisibility(elements.gameHero, isGameHubRoute);
+    setElementVisibility(elements.gameHubGrid, isGameHubRoute);
+    setElementVisibility(elements.characterQuizPanel, isQuizRoute);
+    setElementVisibility(elements.worldCupPanel, isWorldCupRoute);
+    if (isQuizRoute) renderCharacterQuiz();
+    if (isWorldCupRoute) renderWorldCup();
+  }
+
+  function shuffledItems(items) {
+    const copy = [...items];
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+    }
+    return copy;
+  }
+
+  function uniqueCharactersByQuizId(characters) {
+    const seen = new Set();
+    return characters.filter(character => {
+      const characterId = getCharacterStoryId(character);
+      if (!characterId || seen.has(characterId)) return false;
+      seen.add(characterId);
+      return true;
+    });
+  }
+
+  function characterQuizCandidates() {
+    return uniqueCharactersByQuizId(getCharacters().filter(character => text(character?.name)));
+  }
+
+  function randomQuizImageQuestionType() {
+    return characterQuizImageQuestionTypes[Math.floor(Math.random() * characterQuizImageQuestionTypes.length)]
+      || characterQuizImageQuestionTypes[0];
+  }
+
+  function createCharacterQuizQuestion(character) {
+    return {
+      character,
+      type: randomQuizImageQuestionType()
+    };
+  }
+
+  function initializeCharacterQuiz() {
+    const candidates = characterQuizCandidates();
+
+    state.quizActive = true;
+    state.quizQuestions = candidates.length < characterQuizOptionCount
+      ? []
+      : shuffledItems(candidates)
+        .slice(0, Math.min(characterQuizQuestionCount, candidates.length))
+        .map(createCharacterQuizQuestion);
+    state.quizIndex = 0;
+    state.quizScore = 0;
+    state.quizAnswered = false;
+  }
+
+  function startCharacterQuiz() {
+    initializeCharacterQuiz();
+    state.allowGameQuizRoute = true;
+    navigateGameQuiz();
+  }
+
+  function restartCharacterQuiz() {
+    initializeCharacterQuiz();
+    renderGameHub();
+  }
+
+  function endCharacterQuiz() {
+    state.quizActive = false;
+    state.quizQuestions = [];
+    state.quizIndex = 0;
+    state.quizScore = 0;
+    state.quizAnswered = false;
+    navigateLogicalBack();
+  }
+
+
+  function characterWorldCupCandidates() {
+    return uniqueCharactersByQuizId(getCharacters().filter(character => text(character?.name)));
+  }
+
+  function nextPowerOfTwo(value) {
+    let power = 1;
+    const target = Math.max(1, Number(value) || 1);
+    while (power < target) power *= 2;
+    return power;
+  }
+
+  function availableWorldCupOptions() {
+    const total = characterWorldCupCandidates().length;
+    const options = [];
+    for (let size = worldCupMinimumOptionSize; size <= total; size *= 2) {
+      options.push({
+        id: String(size),
+        label: `${size}강`,
+        entrantCount: size,
+        slotCount: size,
+        description: `${size}명을 랜덤으로 뽑아 진행합니다.`
+      });
+    }
+
+    if (total >= 2) {
+      const fullSlotCount = nextPowerOfTwo(total);
+      options.push({
+        id: "all",
+        label: "전체 월드컵",
+        entrantCount: total,
+        slotCount: fullSlotCount,
+        description: `현재 ${total}명 참여 / ${fullSlotCount}강 슬롯${fullSlotCount > total ? ` · 부전승 ${fullSlotCount - total}개` : ""}`
+      });
+    }
+
+    return options;
+  }
+
+  function createByeEntry(index) {
+    return {
+      isBye: true,
+      id: `bye-${index}`,
+      name: "부전승"
+    };
+  }
+
+  function initializeWorldCup(optionId) {
+    const options = availableWorldCupOptions();
+    const selectedOption = options.find(option => option.id === String(optionId)) || options[options.length - 1];
+    const candidates = characterWorldCupCandidates();
+
+    if (!selectedOption || candidates.length < 2) {
+      resetWorldCupState();
+      renderWorldCup();
+      return;
+    }
+
+    const entrants = shuffledItems(candidates).slice(0, selectedOption.entrantCount);
+    const byeCount = Math.max(0, selectedOption.slotCount - entrants.length);
+    const byes = Array.from({ length: byeCount }, (_, index) => createByeEntry(index + 1));
+    const round = shuffledItems([...entrants, ...byes]);
+
+    state.worldCupActive = true;
+    state.worldCupModeLabel = selectedOption.label;
+    state.worldCupSlotCount = selectedOption.slotCount;
+    state.worldCupEntrantCount = entrants.length;
+    state.worldCupRound = round;
+    state.worldCupNextRound = [];
+    state.worldCupMatchIndex = 0;
+    state.worldCupRoundNumber = 1;
+    state.worldCupWinner = null;
+    advanceWorldCupByes();
+    renderWorldCup();
+  }
+
+  function resetWorldCupState() {
+    state.worldCupActive = false;
+    state.worldCupModeLabel = "";
+    state.worldCupSlotCount = 0;
+    state.worldCupEntrantCount = 0;
+    state.worldCupRound = [];
+    state.worldCupNextRound = [];
+    state.worldCupMatchIndex = 0;
+    state.worldCupRoundNumber = 0;
+    state.worldCupWinner = null;
+  }
+
+  function currentWorldCupPair() {
+    return [
+      state.worldCupRound[state.worldCupMatchIndex] || null,
+      state.worldCupRound[state.worldCupMatchIndex + 1] || null
+    ];
+  }
+
+  function isWorldCupBye(entry) {
+    return !entry || Boolean(entry.isBye);
+  }
+
+  function advanceWorldCupByes() {
+    while (state.worldCupActive && !state.worldCupWinner) {
+      const [left, right] = currentWorldCupPair();
+
+      if (!left && !right) {
+        completeWorldCupRound();
+        continue;
+      }
+
+      if (isWorldCupBye(left) && isWorldCupBye(right)) {
+        state.worldCupMatchIndex += 2;
+        continue;
+      }
+
+      if (isWorldCupBye(left) && !isWorldCupBye(right)) {
+        state.worldCupNextRound.push(right);
+        state.worldCupMatchIndex += 2;
+        continue;
+      }
+
+      if (!isWorldCupBye(left) && isWorldCupBye(right)) {
+        state.worldCupNextRound.push(left);
+        state.worldCupMatchIndex += 2;
+        continue;
+      }
+
+      break;
+    }
+  }
+
+  function completeWorldCupRound() {
+    if (state.worldCupNextRound.length <= 1) {
+      state.worldCupWinner = state.worldCupNextRound[0] || state.worldCupRound.find(entry => !isWorldCupBye(entry)) || null;
+      state.worldCupActive = false;
+      return;
+    }
+
+    state.worldCupRound = state.worldCupNextRound;
+    state.worldCupNextRound = [];
+    state.worldCupMatchIndex = 0;
+    state.worldCupRoundNumber += 1;
+  }
+
+  function selectWorldCupWinner(characterId) {
+    const [left, right] = currentWorldCupPair();
+    const selected = [left, right].find(entry => !isWorldCupBye(entry) && getCharacterStoryId(entry) === characterId);
+    if (!selected) return;
+
+    state.worldCupNextRound.push(selected);
+    state.worldCupMatchIndex += 2;
+    advanceWorldCupByes();
+    renderWorldCup();
+  }
+
+  function worldCupRoundLabel() {
+    const currentSize = state.worldCupRound.filter(entry => !isWorldCupBye(entry)).length + state.worldCupRound.filter(isWorldCupBye).length;
+    if (currentSize <= 2) return "결승";
+    if (currentSize <= 4) return "4강";
+    if (currentSize <= 8) return "8강";
+    if (currentSize <= 16) return "16강";
+    if (currentSize <= 32) return "32강";
+    if (currentSize <= 64) return "64강";
+    if (currentSize <= 128) return "128강";
+    if (currentSize <= 256) return "256강";
+    return `${currentSize}강`;
+  }
+
+  function renderWorldCupCharacterCard(character, sideLabel = "") {
+    if (isWorldCupBye(character)) {
+      return `
+        <article class="worldcup-choice is-bye">
+          <div class="worldcup-image-wrap">
+            <span>부전승</span>
+          </div>
+          <strong>부전승</strong>
+          <small>자동으로 상대 캐릭터가 진출합니다.</small>
+        </article>
+      `;
+    }
+
+    return `
+      <button class="worldcup-choice" type="button" data-worldcup-winner="${escapeHtml(getCharacterStoryId(character))}">
+        <div class="worldcup-image-wrap">
+          <img src="${escapeHtml(imagePath(character, "main.webp"))}" alt="${escapeHtml(text(character?.name, "이름 미등록"))} 캐릭터 이미지">
+        </div>
+        <span class="section-kicker">${escapeHtml(sideLabel)}</span>
+        <strong>${escapeHtml(text(character?.name, "이름 미등록"))}</strong>
+        <small>${escapeHtml(normalizeWorldDisplayName(basicInfo(character, "world", "세계 미등록")))}</small>
+      </button>
+    `;
+  }
+
+  function renderWorldCupSetup() {
+    const options = availableWorldCupOptions();
+
+    if (!options.length) {
+      elements.worldCupPanel.innerHTML = `
+        <div class="worldcup-head">
+          <div>
+            <p class="section-kicker">CHARACTER WORLDCUP</p>
+            <h3>이상형 월드컵</h3>
+          </div>
+        </div>
+        <div class="empty-state">월드컵을 진행하려면 이름이 있는 캐릭터가 2명 이상 필요합니다.</div>
+      `;
+      return;
+    }
+
+    elements.worldCupPanel.innerHTML = `
+      <div class="worldcup-head">
+        <div>
+          <p class="section-kicker">CHARACTER WORLDCUP</p>
+          <h3>이상형 월드컵</h3>
+          <p>원하는 규모를 고르면 랜덤으로 대진표를 만들고, 부족한 슬롯은 부전승으로 자동 처리합니다.</p>
+        </div>
+      </div>
+      <div class="worldcup-options" aria-label="이상형 월드컵 시작 옵션">
+        ${options.map(option => `
+          <button class="worldcup-option" type="button" data-worldcup-start="${escapeHtml(option.id)}">
+            <strong>${escapeHtml(option.label)}</strong>
+            <small>${escapeHtml(option.description)}</small>
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderWorldCupMatch() {
+    const [left, right] = currentWorldCupPair();
+    const totalMatches = Math.floor(state.worldCupRound.length / 2);
+    const currentMatch = Math.floor(state.worldCupMatchIndex / 2) + 1;
+
+    elements.worldCupPanel.innerHTML = `
+      <div class="worldcup-head">
+        <div>
+          <p class="section-kicker">${escapeHtml(state.worldCupModeLabel || "WORLDCUP")} · ${escapeHtml(worldCupRoundLabel())}</p>
+          <h3>더 마음에 드는 캐릭터를 선택하세요</h3>
+          <p>라운드 ${state.worldCupRoundNumber} · 매치 ${Math.min(currentMatch, totalMatches)} / ${Math.max(totalMatches, 1)}</p>
+        </div>
+      </div>
+      <div class="worldcup-match">
+        ${renderWorldCupCharacterCard(left, "LEFT")}
+        <div class="worldcup-versus" aria-hidden="true">VS</div>
+        ${renderWorldCupCharacterCard(right, "RIGHT")}
+      </div>
+    `;
+  }
+
+  function renderWorldCupResult() {
+    const winner = state.worldCupWinner;
+
+    elements.worldCupPanel.innerHTML = `
+      <div class="worldcup-head">
+        <div>
+          <p class="section-kicker">WINNER</p>
+          <h3>최종 우승 캐릭터</h3>
+          <p>${escapeHtml(state.worldCupModeLabel || "이상형 월드컵")} 결과입니다.</p>
+        </div>
+      </div>
+      ${winner ? `
+        <div class="worldcup-result">
+          <div class="worldcup-image-wrap">
+            <img src="${escapeHtml(imagePath(winner, "main.webp"))}" alt="${escapeHtml(text(winner?.name, "이름 미등록"))} 캐릭터 이미지">
+          </div>
+          <strong>${escapeHtml(text(winner?.name, "이름 미등록"))}</strong>
+          <small>${escapeHtml(normalizeWorldDisplayName(basicInfo(winner, "world", "세계 미등록")))}</small>
+        </div>
+      ` : `<div class="empty-state">우승 캐릭터가 없습니다.</div>`}
+      <div class="worldcup-actions">
+        ${winner ? `<button class="primary-button worldcup-detail-button" type="button" data-worldcup-winner-detail="${escapeHtml(getCharacterStoryId(winner))}">우승 캐릭터 상세보기</button>` : ""}
+        <button class="primary-button" type="button" data-worldcup-reset>다시 선택하기</button>
+      </div>
+    `;
+  }
+
+  function renderWorldCup() {
+    if (!elements.worldCupPanel) return;
+    elements.worldCupPanel.classList.toggle("is-result", Boolean(state.worldCupWinner));
+
+    if (state.worldCupWinner) {
+      renderWorldCupResult();
+      return;
+    }
+
+    if (!state.worldCupActive) {
+      renderWorldCupSetup();
+      return;
+    }
+
+    advanceWorldCupByes();
+    if (state.worldCupWinner) {
+      renderWorldCupResult();
+      return;
+    }
+
+    renderWorldCupMatch();
+  }
+
+  function openWorldCup() {
+    resetWorldCupState();
+    navigateWorldCup();
+  }
+
+  function openWorldCupWinnerDetail(characterId) {
+    const winner = state.worldCupWinner;
+    const resolvedCharacterId = characterId || getCharacterStoryId(winner);
+    const character = findCharacter(resolvedCharacterId);
+
+    if (!winner || !character) return;
+
+    const worldId = worldCodeForCharacter(character);
+    if (!worldId) return;
+
+    navigateCharacter(worldId, getCharacterStoryId(character), { returnHash: "#/game/worldcup" });
+  }
+
+  function currentQuizQuestion() {
+    return state.quizQuestions[state.quizIndex] || null;
+  }
+
+  function currentQuizCharacter() {
+    const question = currentQuizQuestion();
+    return question?.character || question || null;
+  }
+
+  function currentQuizQuestionType() {
+    const question = currentQuizQuestion();
+    return question?.type || characterQuizImageQuestionTypes[0];
+  }
+
+  function setQuizImageType(type) {
+    if (!elements.quizCharacterImage) return;
+    const typeId = text(type?.id, "normal");
+    elements.quizCharacterImage.classList.toggle("is-quiz-blur", typeId === "blur");
+    elements.quizCharacterImage.classList.remove("is-quiz-silhouette");
+  }
+
+  function quizOptionsFor(character) {
+    const answerId = getCharacterStoryId(character);
+    const wrongOptions = shuffledItems(characterQuizCandidates())
+      .filter(item => getCharacterStoryId(item) !== answerId)
+      .slice(0, characterQuizOptionCount - 1);
+    return shuffledItems(uniqueCharactersByQuizId([character, ...wrongOptions]));
+  }
+
+  function setQuizResultLayout(isResult) {
+    elements.characterQuizPanel?.classList.toggle("is-result", isResult);
+  }
+
+  function renderCharacterQuizResult() {
+    const total = state.quizQuestions.length;
+    const rate = total ? Math.round((state.quizScore / total) * 100) : 0;
+    setQuizResultLayout(true);
+    elements.quizProgressText.textContent = "RESULT";
+    elements.quizTitle.textContent = "퀴즈 결과";
+    elements.quizScoreText.textContent = `점수 ${state.quizScore} / ${total}`;
+    elements.quizQuestionText.textContent = "최종 점수";
+    setQuizImageType(null);
+    elements.quizCharacterImage.removeAttribute("src");
+    elements.quizCharacterImage.alt = "";
+    elements.quizOptions.innerHTML = `
+      <div class="quiz-result-summary" aria-label="퀴즈 최종 점수">
+        <strong>${state.quizScore} / ${total}</strong>
+        <span>정답률 ${rate}%</span>
+        <small>총 ${total}문제 중 ${state.quizScore}문제를 맞혔습니다.</small>
+      </div>
+      <button class="quiz-option" type="button" id="restartQuizInlineButton">다시 시작</button>
+    `;
+    elements.quizFeedback.textContent = "상단 뒤로가기 또는 다시 시작을 사용할 수 있습니다.";
+    elements.nextQuizButton.hidden = true;
+  }
+
+  function renderCharacterQuiz() {
+    if (!elements.characterQuizPanel) return;
+
+    if (!state.quizQuestions.length) {
+      setQuizResultLayout(true);
+      elements.quizProgressText.textContent = "CHARACTER QUIZ";
+      elements.quizTitle.textContent = "캐릭터 퀴즈";
+      elements.quizScoreText.textContent = "0 / 0";
+      elements.quizQuestionText.textContent = "퀴즈를 만들 캐릭터 데이터가 부족합니다.";
+      setQuizImageType(null);
+      elements.quizCharacterImage.removeAttribute("src");
+      elements.quizCharacterImage.alt = "";
+      elements.quizOptions.innerHTML = "";
+      elements.quizFeedback.textContent = "이름이 있는 캐릭터가 4명 이상 필요합니다.";
+      elements.nextQuizButton.hidden = true;
+      return;
+    }
+
+    if (state.quizIndex >= state.quizQuestions.length) {
+      renderCharacterQuizResult();
+      return;
+    }
+
+    setQuizResultLayout(false);
+    const character = currentQuizCharacter();
+    const questionType = currentQuizQuestionType();
+    const total = state.quizQuestions.length;
+    const options = quizOptionsFor(character);
+    elements.quizProgressText.textContent = `QUESTION ${state.quizIndex + 1} / ${total} · ${text(questionType?.label, "IMAGE")}`;
+    elements.quizTitle.textContent = text(questionType?.title, "이 캐릭터는 누구인가요?");
+    elements.quizScoreText.textContent = `${state.quizScore} / ${total}`;
+    elements.quizQuestionText.textContent = text(questionType?.question, "이미지를 보고 이름을 선택하세요.");
+    elements.quizCharacterImage.src = imagePath(character, "main.webp");
+    elements.quizCharacterImage.alt = `${text(character?.name)} 캐릭터 이미지`;
+    setQuizImageType(questionType);
+    elements.quizOptions.innerHTML = options.map(option => `
+      <button class="quiz-option" type="button" data-quiz-answer="${escapeHtml(getCharacterStoryId(option))}">
+        ${escapeHtml(text(option?.name, "이름 미등록"))}
+      </button>
+    `).join("");
+    elements.quizFeedback.textContent = "";
+    elements.nextQuizButton.hidden = true;
+  }
+
+  function handleQuizAnswer(button) {
+    if (!button || state.quizAnswered) return;
+    const character = currentQuizCharacter();
+    if (!character) return;
+
+    state.quizAnswered = true;
+    const correctId = getCharacterStoryId(character);
+    const selectedId = button.dataset.quizAnswer;
+    const isCorrect = selectedId === correctId;
+    if (isCorrect) state.quizScore += 1;
+
+    elements.quizOptions.querySelectorAll(".quiz-option[data-quiz-answer]").forEach(optionButton => {
+      const optionId = optionButton.dataset.quizAnswer;
+      optionButton.disabled = true;
+      optionButton.classList.toggle("is-correct", optionId === correctId);
+      optionButton.classList.toggle("is-wrong", optionButton === button && !isCorrect);
+    });
+
+    elements.quizScoreText.textContent = `${state.quizScore} / ${state.quizQuestions.length}`;
+    elements.quizFeedback.textContent = isCorrect
+      ? "정답입니다."
+      : `오답입니다. 정답은 ${text(character?.name, "이름 미등록")}입니다.`;
+    elements.nextQuizButton.textContent = state.quizIndex + 1 >= state.quizQuestions.length ? "결과 보기" : "다음 문제";
+    elements.nextQuizButton.hidden = false;
+  }
+
+  function goNextQuizQuestion() {
+    if (!state.quizActive) return;
+    if (!state.quizAnswered && state.quizIndex < state.quizQuestions.length) return;
+    state.quizIndex += 1;
+    state.quizAnswered = false;
+    renderCharacterQuiz();
+  }
+
 
   function renderWorldDetail(worldId) {
     const world = findWorld(worldId);
@@ -2080,38 +2734,132 @@
     return [...files].sort((first, second) => first.localeCompare(second, "ko"));
   }
 
-  function checkImageFile(source, timeout = 7000) {
-    return new Promise(resolve => {
-      const image = new Image();
-      const timer = window.setTimeout(() => {
-        cleanup();
-        resolve(false);
-      }, timeout);
+  function getAssetCheckCharacterLabel(character) {
+    const name = text(character?.name);
+    const en = text(character?.en);
+    if (name && en) return `${name} · ${en}`;
+    return name || en || getCharacterStoryId(character);
+  }
 
-      function cleanup() {
-        window.clearTimeout(timer);
-        image.onload = null;
-        image.onerror = null;
+  function extractAssetCheckZipInfo(path) {
+    const rawPath = String(path ?? "").replace(/\\/g, "/");
+    const parts = rawPath.split("/").filter(Boolean);
+    const fileName = (parts.pop() || "").trim();
+    if (!fileName || parts.length === 0) return null;
+
+    const charactersIndex = parts.lastIndexOf("characters");
+    let folder = "";
+
+    if (charactersIndex >= 0) {
+      folder = parts[charactersIndex + 1] || "";
+    } else if (parts.length === 1) {
+      folder = parts[0];
+    } else {
+      return null;
+    }
+
+    if (!folder || folder === "assets") return null;
+
+    const normalizedFileName = fileName.toLowerCase();
+    if ([".ds_store", "thumbs.db", "desktop.ini"].includes(normalizedFileName)) return null;
+
+    const dotIndex = normalizedFileName.lastIndexOf(".");
+    const extension = dotIndex >= 0 ? normalizedFileName.slice(dotIndex + 1) : "";
+
+    return {
+      path: rawPath,
+      folder: normalizeId(folder),
+      folderBase: sanitizeImportFolderBase(folder),
+      fileName,
+      normalizedFileName,
+      extension
+    };
+  }
+
+  function buildAssetCheckPathIndex(paths) {
+    const folders = new Map();
+    const foldersByBase = new Map();
+
+    paths.forEach(path => {
+      const info = extractAssetCheckZipInfo(path);
+      if (!info) return;
+
+      if (!folders.has(info.folder)) {
+        folders.set(info.folder, {
+          folder: info.folder,
+          folderBase: info.folderBase,
+          files: new Set(),
+          entries: []
+        });
       }
 
-      image.onload = () => {
-        cleanup();
-        resolve(true);
-      };
+      const folderRecord = folders.get(info.folder);
+      folderRecord.files.add(info.normalizedFileName);
+      folderRecord.entries.push(info);
 
-      image.onerror = () => {
-        cleanup();
-        resolve(false);
-      };
-
-      image.src = source;
+      if (info.folderBase && !foldersByBase.has(info.folderBase)) {
+        foldersByBase.set(info.folderBase, folderRecord);
+      }
     });
+
+    return { folders, foldersByBase };
+  }
+
+  function buildAssetCheckFolderIndex(fileList) {
+    const paths = Array.from(fileList || [])
+      .map(file => file?.webkitRelativePath || file?.relativePath || file?.name || "")
+      .filter(Boolean);
+    return buildAssetCheckPathIndex(paths);
+  }
+
+  function buildAssetCheckZipIndex(fileNames) {
+    return buildAssetCheckPathIndex(fileNames);
+  }
+
+  function findAssetCheckFolderRecord(character, index) {
+    const folder = getCharacterFolder(character);
+    const folderBase = sanitizeImportFolderBase(folder);
+    const expected = [folder, makeImportFolder(index, folderBase)].filter(Boolean);
+
+    return {
+      folder,
+      folderBase,
+      expected,
+      findIn(indexedFolders) {
+        return indexedFolders.folders.get(folder)
+          || indexedFolders.foldersByBase.get(folderBase)
+          || expected.map(item => indexedFolders.folders.get(item)).find(Boolean)
+          || null;
+      }
+    };
+  }
+
+  function getRegisteredAlbumFileNames(character) {
+    const files = new Set();
+    (Array.isArray(character?.albumKeys) ? character.albumKeys : []).forEach(key => {
+      const definition = albumKeyDefinitions[key];
+      if (definition?.fileName) files.add(definition.fileName.toLowerCase());
+    });
+    return files;
+  }
+
+  function renderAssetCheckInitial() {
+    if (!elements.assetCheckBody) return;
+    elements.assetCheckBody.innerHTML = `<p class="asset-check-message">검사할 이미지 폴더 또는 ZIP을 선택한 뒤 실행해 주세요.</p>`;
+  }
+
+  function openPrivateImageCheck() {
+    if (!state.privateMode) return;
+    if (elements.assetCheckFolderInput) elements.assetCheckFolderInput.value = "";
+    if (elements.assetCheckZipInput) elements.assetCheckZipInput.value = "";
+    openAssetCheckModal();
+    renderAssetCheckInitial();
   }
 
   function openAssetCheckModal() {
     if (!elements.assetCheckModal) return;
     elements.assetCheckModal.hidden = false;
-    elements.assetCheckClose?.focus();
+    elements.assetCheckFolderInput?.focus();
   }
 
   function closeAssetCheckModal() {
@@ -2122,65 +2870,205 @@
 
   function renderAssetCheckProgress(message) {
     if (!elements.assetCheckBody) return;
-    elements.assetCheckBody.innerHTML = `<p>${escapeHtml(message)}</p>`;
+    elements.assetCheckBody.innerHTML = `<p class="asset-check-message">${escapeHtml(message)}</p>`;
+  }
+
+  function renderAssetCheckList(title, items, renderItem, emptyText = "") {
+    if (!items.length) {
+      return emptyText ? `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(emptyText)}</p>` : "";
+    }
+
+    return `
+      <h3>${escapeHtml(title)}</h3>
+      <ul class="asset-check-list">
+        ${items.map(renderItem).join("")}
+      </ul>
+    `;
   }
 
   function renderAssetCheckResult(result) {
     if (!elements.assetCheckBody) return;
-    const missingRows = result.missing.map(item => `
-      <li><b>${escapeHtml(item.characterName)}</b>: ${item.files.map(fileName => escapeHtml(fileName)).join(", ")}</li>
-    `).join("");
+
+    const issueCount = result.missingFolders.length
+      + result.missingImages.reduce((sum, item) => sum + item.files.length, 0)
+      + result.unregisteredAlbumFiles.reduce((sum, item) => sum + item.files.length, 0)
+      + result.unknownWebpFiles.reduce((sum, item) => sum + item.files.length, 0)
+      + result.invalidExtensionFiles.reduce((sum, item) => sum + item.files.length, 0)
+      + result.unusedFolders.length;
 
     elements.assetCheckBody.innerHTML = `
       <div class="asset-check-summary">
         <div class="asset-check-summary-card"><strong>${result.characterCount}</strong><span>캐릭터</span></div>
+        <div class="asset-check-summary-card"><strong>${result.sourceFolderCount}</strong><span>이미지 폴더</span></div>
         <div class="asset-check-summary-card"><strong>${result.checkedFileCount}</strong><span>확인 파일</span></div>
-        <div class="asset-check-summary-card"><strong>${result.missingFileCount}</strong><span>누락</span></div>
+        <div class="asset-check-summary-card"><strong>${issueCount}</strong><span>확인 필요</span></div>
       </div>
-      ${result.missing.length
-        ? `<h3>이미지 누락</h3><ul>${missingRows}</ul>`
-        : `<h3>정상입니다</h3><p>등록된 캐릭터의 기본 WebP 이미지와 albumKeys 이미지가 모두 로드되었습니다.</p>`}
+      ${issueCount === 0
+        ? `<h3>정상입니다</h3><p>characters.js와 선택한 이미지 폴더/ZIP의 기본 이미지, albumKeys, 폴더 구성이 일치합니다.</p>`
+        : `<h3>검사 결과</h3><p>아래 항목을 확인해 주세요.</p>`}
+      ${renderAssetCheckList("캐릭터 폴더 누락", result.missingFolders, item => `
+        <li><b>${escapeHtml(item.characterName)}</b><br><span>${escapeHtml(item.folder)} 폴더를 선택한 이미지 폴더/ZIP에서 찾지 못했습니다.</span></li>
+      `)}
+      ${renderAssetCheckList("등록 이미지 누락", result.missingImages, item => `
+        <li><b>${escapeHtml(item.characterName)}</b><br><span>${item.files.map(fileName => `<code>${escapeHtml(fileName)}</code>`).join(", ")}</span></li>
+      `)}
+      ${renderAssetCheckList("albumKeys 미등록 이미지", result.unregisteredAlbumFiles, item => `
+        <li><b>${escapeHtml(item.characterName)}</b><br><span>${item.files.map(file => `<code>${escapeHtml(file.fileName)}</code> → ${escapeHtml(file.key)}`).join(", ")}</span></li>
+      `)}
+      ${renderAssetCheckList("미인식 WebP 파일", result.unknownWebpFiles, item => `
+        <li><b>${escapeHtml(item.folder)}</b><br><span>${item.files.map(fileName => `<code>${escapeHtml(fileName)}</code>`).join(", ")}</span></li>
+      `)}
+      ${renderAssetCheckList("WebP가 아닌 파일", result.invalidExtensionFiles, item => `
+        <li><b>${escapeHtml(item.folder)}</b><br><span>${item.files.map(fileName => `<code>${escapeHtml(fileName)}</code>`).join(", ")}</span></li>
+      `)}
+      ${renderAssetCheckList("characters.js에 없는 이미지 폴더", result.unusedFolders, item => `
+        <li><b>${escapeHtml(item.folder)}</b><br><span>${item.fileCount}개 파일</span></li>
+      `)}
       <h3>검사 범위</h3>
-      <p><code>thumb.webp</code>, <code>main.webp</code>, <code>doodle.webp</code>, <code>turn.webp</code>와 characters.js의 <code>albumKeys</code>에 등록된 WebP 파일을 확인합니다.</p>
-      <p>정적 브라우저 환경에서는 폴더 안의 미등록 파일 목록을 직접 훑을 수 없으므로, 이 화면은 누락 이미지 확인에 집중합니다.</p>
+      <p><code>thumb.webp</code>, <code>main.webp</code>, <code>doodle.webp</code>, <code>turn.webp</code>, characters.js의 <code>albumKeys</code>, 선택한 폴더/ZIP 안의 추가 WebP/비WebP/미사용 폴더를 확인합니다.</p>
     `;
   }
 
   async function runPrivateImageCheck() {
     if (!state.privateMode) return;
-    const characters = getCharacters();
-    elements.privateImageCheckButton.disabled = true;
-    elements.privateImageCheckButton.querySelector("strong").textContent = "검사 중...";
-    openAssetCheckModal();
-    renderAssetCheckProgress("등록된 캐릭터 이미지 파일을 확인하는 중입니다.");
 
-    const missing = [];
-    let checkedFileCount = 0;
+    const folderFiles = elements.assetCheckFolderInput?.files;
+    const zipFile = elements.assetCheckZipInput?.files?.[0];
+    const hasFolderSelection = folderFiles && folderFiles.length > 0;
+
+    if (!hasFolderSelection && !zipFile) {
+      renderAssetCheckProgress("검사할 assets/characters 폴더 또는 캐릭터 이미지 ZIP을 선택해 주세요.");
+      return;
+    }
+
+    const button = elements.assetCheckRunButton;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "검사 중...";
+    }
+
+    renderAssetCheckProgress(hasFolderSelection
+      ? "선택한 이미지 폴더와 characters.js를 비교하는 중입니다."
+      : "이미지 ZIP과 characters.js를 비교하는 중입니다.");
 
     try {
-      for (const character of characters) {
-        const expectedFiles = getExpectedImageFilesForCharacter(character);
-        const missingFiles = [];
+      let indexedFolders;
+      let sourceLabel;
 
-        for (const fileName of expectedFiles) {
-          checkedFileCount += 1;
-          const ok = await checkImageFile(imagePath(character, fileName));
-          if (!ok) missingFiles.push(fileName);
+      if (hasFolderSelection) {
+        indexedFolders = buildAssetCheckFolderIndex(folderFiles);
+        sourceLabel = "폴더";
+      } else {
+        const zipBuffer = await readPrivateFileAsArrayBuffer(zipFile);
+        const zipFileNames = readPrivateZipNames(zipBuffer);
+        indexedFolders = buildAssetCheckZipIndex(zipFileNames);
+        sourceLabel = "ZIP";
+      }
+
+      if (indexedFolders.folders.size === 0) {
+        throw new Error(hasFolderSelection
+          ? "선택한 폴더에서 캐릭터 이미지 파일을 찾지 못했습니다. assets/characters 폴더 또는 그 상위 폴더를 선택해 주세요."
+          : "ZIP에서 캐릭터 이미지 파일을 찾지 못했습니다. assets/characters 구조가 들어 있는 ZIP인지 확인해 주세요.");
+      }
+
+      const characters = getCharacters();
+
+      const missingFolders = [];
+      const missingImages = [];
+      const unregisteredAlbumFiles = [];
+      const unknownWebpFiles = [];
+      const invalidExtensionFiles = [];
+      const matchedFolders = new Set();
+      let checkedFileCount = 0;
+
+      characters.forEach((character, index) => {
+        const folderInfo = findAssetCheckFolderRecord(character, index);
+        const folderRecord = folderInfo.findIn(indexedFolders);
+        const characterName = getAssetCheckCharacterLabel(character);
+
+        if (!folderRecord) {
+          missingFolders.push({
+            characterName,
+            folder: folderInfo.folder
+          });
+          return;
         }
 
-        if (missingFiles.length > 0) {
-          missing.push({
-            characterName: character.name || character.en || getCharacterStoryId(character),
-            files: missingFiles
+        matchedFolders.add(folderRecord.folder);
+
+        const expectedFiles = getExpectedImageFilesForCharacter(character);
+        const missing = expectedFiles.filter(fileName => !folderRecord.files.has(fileName.toLowerCase()));
+        checkedFileCount += expectedFiles.length;
+
+        if (missing.length > 0) {
+          missingImages.push({ characterName, files: missing });
+        }
+
+        const registeredAlbumFiles = getRegisteredAlbumFileNames(character);
+        const extraAlbumFiles = [];
+        folderRecord.files.forEach(fileName => {
+          if (baseImageFiles.has(fileName)) return;
+          const key = albumFileToKey[fileName];
+          if (key && !registeredAlbumFiles.has(fileName)) {
+            extraAlbumFiles.push({ fileName, key });
+          }
+        });
+
+        if (extraAlbumFiles.length > 0) {
+          unregisteredAlbumFiles.push({ characterName, files: extraAlbumFiles });
+        }
+      });
+
+      indexedFolders.folders.forEach(folderRecord => {
+        const unknownWebp = [];
+        const invalidExtensions = [];
+
+        folderRecord.entries.forEach(entry => {
+          if (entry.normalizedFileName.endsWith(".webp")) {
+            if (!baseImageFiles.has(entry.normalizedFileName) && !albumFileToKey[entry.normalizedFileName]) {
+              unknownWebp.push(entry.fileName);
+            }
+          } else {
+            invalidExtensions.push(entry.fileName);
+          }
+        });
+
+        if (unknownWebp.length > 0) {
+          unknownWebpFiles.push({
+            folder: folderRecord.folder,
+            files: Array.from(new Set(unknownWebp)).sort((a, b) => a.localeCompare(b, "ko"))
           });
         }
-      }
+
+        if (invalidExtensions.length > 0) {
+          invalidExtensionFiles.push({
+            folder: folderRecord.folder,
+            files: Array.from(new Set(invalidExtensions)).sort((a, b) => a.localeCompare(b, "ko"))
+          });
+        }
+      });
+
+      const unusedFolders = [];
+      indexedFolders.folders.forEach(folderRecord => {
+        if (!matchedFolders.has(folderRecord.folder)) {
+          unusedFolders.push({
+            folder: folderRecord.folder,
+            fileCount: folderRecord.entries.length
+          });
+        }
+      });
 
       renderAssetCheckResult({
         characterCount: characters.length,
+        sourceLabel,
+        sourceFolderCount: indexedFolders.folders.size,
         checkedFileCount,
-        missing,
-        missingFileCount: missing.reduce((sum, item) => sum + item.files.length, 0)
+        missingFolders,
+        missingImages,
+        unregisteredAlbumFiles,
+        unknownWebpFiles,
+        invalidExtensionFiles,
+        unusedFolders
       });
     } catch (error) {
       if (elements.assetCheckBody) {
@@ -2190,8 +3078,10 @@
         `;
       }
     } finally {
-      elements.privateImageCheckButton.disabled = false;
-      elements.privateImageCheckButton.querySelector("strong").textContent = "이미지 검사";
+      if (button) {
+        button.disabled = false;
+        button.textContent = "검사 실행";
+      }
     }
   }
 
@@ -2204,7 +3094,7 @@
     }));
     elements.characterImageGrid.innerHTML = "";
     if (elements.characterImagesMeta) {
-      elements.characterImagesMeta.textContent = `${items.length}`;
+      elements.characterImagesMeta.textContent = `${items.length}장`;
     }
 
     if (items.length === 0) {
@@ -2288,10 +3178,21 @@
     resetImageLightboxTransform();
     elements.imageLightbox.hidden = false;
     document.body.classList.add("has-lightbox-open");
+
+    if (!state.imageLightboxHistoryPushed) {
+      try {
+        history.pushState({ ...(history.state || {}), imageLightbox: true }, "", window.location.href);
+        state.imageLightboxHistoryPushed = true;
+      } catch (error) {
+        state.imageLightboxHistoryPushed = false;
+      }
+    }
   }
 
-  function closeImageLightbox() {
+  function closeImageLightbox(options = {}) {
     if (!elements.imageLightbox || elements.imageLightbox.hidden) return;
+
+    const shouldStepBack = state.imageLightboxHistoryPushed && !options.fromHistory;
     elements.imageLightbox.hidden = true;
     elements.imageLightboxImage.removeAttribute("src");
     state.imageLightboxIndex = -1;
@@ -2299,6 +3200,125 @@
     state.imageLightboxPanStart = null;
     resetImageLightboxTransform();
     document.body.classList.remove("has-lightbox-open");
+
+    if (options.fromHistory) {
+      state.imageLightboxHistoryPushed = false;
+      state.imageLightboxSuppressNextPop = false;
+      return;
+    }
+
+    if (shouldStepBack) {
+      state.imageLightboxSuppressNextPop = true;
+      try {
+        history.back();
+      } catch (error) {
+        state.imageLightboxHistoryPushed = false;
+        state.imageLightboxSuppressNextPop = false;
+      }
+    }
+  }
+
+  function handleWindowPopState() {
+    if (state.imageLightboxSuppressNextPop) {
+      state.imageLightboxSuppressNextPop = false;
+      state.imageLightboxHistoryPushed = false;
+      return;
+    }
+
+    if (state.imageLightboxHistoryPushed && elements.imageLightbox && !elements.imageLightbox.hidden) {
+      closeImageLightbox({ fromHistory: true });
+      return;
+    }
+
+    if (state.view && state.view !== "worlds") {
+      performLogicalBack();
+      return;
+    }
+
+    renderFromHash();
+  }
+
+  function visibleWorldTabs() {
+    return ["info", "characters", "stories"];
+  }
+
+  function visibleCharacterTabs() {
+    return state.privateMode ? ["info", "status", "images"] : ["info", "images"];
+  }
+
+  function shouldIgnoreTabSwipeTarget(target, surface) {
+    if (!target?.closest) return false;
+    if (target.closest("input, textarea, select, a, .image-lightbox, .generator-sticky-actions")) return true;
+
+    const swipeFriendlyButton = target.closest(
+      ".world-tab-button, .character-tab-button, .character-card, .story-item, .character-image-card"
+    );
+    if (swipeFriendlyButton) return false;
+
+    return Boolean(target.closest("button, [role='button']"));
+  }
+
+  function resolveTabSwipeSurface() {
+    if (state.view === "world") return "world";
+    if (state.view === "character") return "character";
+    return "";
+  }
+
+  function beginRouteTabSwipe(event) {
+    const surface = resolveTabSwipeSurface();
+    if (!surface) return;
+    beginTabSwipe(event, surface);
+  }
+
+  function endRouteTabSwipe(event) {
+    const surface = state.tabSwipe?.surface || resolveTabSwipeSurface();
+    if (!surface) return;
+    endTabSwipe(event, surface);
+  }
+
+  function beginTabSwipe(event, surface) {
+    if (!event.touches || event.touches.length !== 1) return;
+    if (elements.imageLightbox && !elements.imageLightbox.hidden) return;
+    if (shouldIgnoreTabSwipeTarget(event.target, surface)) return;
+    if (surface === "world" && state.view !== "world") return;
+    if (surface === "character" && state.view !== "character") return;
+
+    const touch = event.touches[0];
+    state.tabSwipe = {
+      surface,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      startedAt: Date.now()
+    };
+  }
+
+  function endTabSwipe(event, surface) {
+    const swipe = state.tabSwipe;
+    state.tabSwipe = null;
+    if (!swipe || swipe.surface !== surface || !event.changedTouches || event.changedTouches.length === 0) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - swipe.startX;
+    const deltaY = touch.clientY - swipe.startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (absX < 58 || absX < absY * 1.35) return;
+
+    const tabs = surface === "world" ? visibleWorldTabs() : visibleCharacterTabs();
+    const currentTab = surface === "world" ? state.worldTab : state.characterTab;
+    const currentIndex = tabs.indexOf(currentTab);
+    if (currentIndex < 0) return;
+
+    const nextIndex = currentIndex + (deltaX < 0 ? 1 : -1);
+    if (nextIndex < 0 || nextIndex >= tabs.length) return;
+
+    state.tabSwipeSuppressClickUntil = Date.now() + 420;
+    if (surface === "world") {
+      setWorldTab(tabs[nextIndex]);
+    } else {
+      setCharacterTab(tabs[nextIndex]);
+    }
   }
 
   function pointerDistance(pointerA, pointerB) {
@@ -3449,6 +4469,16 @@ function renderStoryReader(worldId, storyId) {
       && Object.keys(generatorCommonOptions).length > 0;
   }
 
+  function removeLegacyGeneratorStorage() {
+    try {
+      [...legacyGeneratorHistoryStorageKeys, ...legacyGeneratorPromptHistoryStorageKeys].forEach(key => {
+        localStorage.removeItem(key);
+      });
+    } catch (error) {
+      console.warn("이전 랜덤 생성기 저장값을 정리하지 못했습니다.", error);
+    }
+  }
+
   function loadGeneratorHistory() {
     try {
       const parsed = JSON.parse(localStorage.getItem(generatorHistoryStorageKey) || "[]");
@@ -3538,6 +4568,105 @@ function renderStoryReader(worldId, storyId) {
     return pickRandomFrom(candidates);
   }
 
+  function getGeneratorObjectKeys(map = {}) {
+    return Object.keys(map || {}).filter(key => Array.isArray(map[key]) && map[key].length > 0);
+  }
+
+  function pickRandomGroupKey(map = {}, preferredKeys = []) {
+    const validPreferred = Array.isArray(preferredKeys)
+      ? preferredKeys.filter(key => Array.isArray(map?.[key]) && map[key].length > 0)
+      : [];
+    return pickRandomFrom(validPreferred.length ? validPreferred : getGeneratorObjectKeys(map));
+  }
+
+  function formatGeneratorPersonalityDisplay(personalityTrait, aura) {
+    const trait = String(personalityTrait || "").trim();
+    const auraValue = String(aura || "").trim();
+    if (trait && auraValue) return `${trait} 성격 / ${auraValue} 분위기`;
+    return trait || auraValue || "";
+  }
+
+  function createGeneratorPersonalityResult(overrides = {}) {
+    const lockedTrait = String(overrides.personalityTrait || "").trim();
+    const lockedAura = String(overrides.aura || "").trim();
+    if (lockedTrait && lockedAura) {
+      const personality = formatGeneratorPersonalityDisplay(lockedTrait, lockedAura);
+      return {
+        personality,
+        personalityTrait: lockedTrait,
+        personalityGroup: overrides.personalityGroup ?? "",
+        aura: lockedAura,
+        auraGroup: overrides.auraGroup ?? "",
+        auraContrast: Boolean(overrides.auraContrast)
+      };
+    }
+
+    const personalityGroup = pickRandomGroupKey(generatorPersonalityGroups);
+    const personalityTrait = pickRandomFrom(generatorPersonalityGroups[personalityGroup] ?? []);
+    const auraRule = generatorPersonalityAuraMap[personalityGroup] ?? {};
+    const canUseContrast = Array.isArray(auraRule.contrast) && auraRule.contrast.length > 0;
+    const auraContrast = canUseContrast && Math.random() < generatorAuraContrastRate;
+    const preferredAuraGroups = auraContrast ? auraRule.contrast : auraRule.normal;
+    const auraGroup = pickRandomGroupKey(generatorAuraGroups, preferredAuraGroups);
+    const aura = pickRandomFrom(generatorAuraGroups[auraGroup] ?? []);
+    const personality = formatGeneratorPersonalityDisplay(personalityTrait, aura);
+
+    return {
+      personality,
+      personalityTrait,
+      personalityGroup,
+      aura,
+      auraGroup,
+      auraContrast
+    };
+  }
+
+  function getGeneratorPersonalityPromptLine() {
+    const personalityTrait = String(getGeneratorEntry("personalityTrait") || "").trim();
+    const aura = String(getGeneratorEntry("aura") || "").trim();
+    if (!personalityTrait || !aura) return "";
+    return getGeneratorEntry("auraContrast")
+      ? `캐릭터는 ${personalityTrait} 성격이지만, ${aura} 분위기입니다.`
+      : `캐릭터는 ${personalityTrait} 성격, ${aura} 분위기입니다.`;
+  }
+
+  function createGeneratorHairResult(overrides = {}) {
+    const hairstyle = String(overrides.hairstyle || "").trim() || pickRandomFrom(generatorCommonOptions.hairstyles ?? []);
+    const lockedHairDetail = String(overrides.hairDetail || "").trim();
+    const hairDetail = Object.prototype.hasOwnProperty.call(overrides, "hairDetail")
+      ? lockedHairDetail
+      : (Math.random() < 0.5 ? pickRandomFrom(generatorCommonOptions.hairDetails ?? []) : "");
+    return { hairstyle, hairDetail };
+  }
+
+  function getGeneratorHairDisplay() {
+    const hairstyle = String(getGeneratorEntry("hairstyle") || "").trim();
+    const hairDetail = String(getGeneratorEntry("hairDetail") || "").trim();
+    return [hairstyle, hairDetail].filter(Boolean).join(" / ");
+  }
+
+  function getGeneratorQuestionHairPromptLine() {
+    const hairstyle = String(getGeneratorEntry("hairstyle") || "").trim();
+    const hairDetail = String(getGeneratorEntry("hairDetail") || "").trim();
+    if (!hairstyle) return "";
+    return hairDetail
+      ? `캐릭터의 헤어스타일은 ${hairstyle} 이며, 헤어디테일은 ${hairDetail} 입니다.`
+      : `캐릭터의 헤어스타일은 ${hairstyle}입니다`;
+  }
+
+  function getGeneratorImageHairPromptLine() {
+    const hairstyle = String(getGeneratorEntry("hairstyle") || "").trim();
+    const hairDetail = String(getGeneratorEntry("hairDetail") || "").trim();
+    const hairColor = getGeneratorListValue("colors", "머리");
+    const eyeColor = getGeneratorListValue("colors", "눈");
+    const skinColor = getGeneratorListValue("colors", "피부");
+    const symbolColor = getGeneratorListValue("colors", "상징");
+    if (!hairstyle) return "";
+    return hairDetail
+      ? `캐릭터의 헤어스타일은 ${hairstyle} 이며, 헤어디테일은 ${hairDetail} 입니다. 머리색은 ${hairColor}, 눈색은 ${eyeColor}, 피부색은 ${skinColor} 이고 상징 색은 ${symbolColor} 입니다.`
+      : `캐릭터의 헤어스타일은 ${hairstyle} 이며, 머리색은 ${hairColor}, 눈색은 ${eyeColor}, 피부색은 ${skinColor} 이고 상징 색은 ${symbolColor} 입니다.`;
+  }
+
   function createColorSet() {
     return [
       { label: "머리", value: randomHexColor() },
@@ -3571,17 +4700,19 @@ function renderStoryReader(worldId, storyId) {
     const powerCount = pickWeightedCount(generatorCountWeights.power);
     const fashionPointCount = pickWeightedCount(generatorCountWeights.fashionPoints);
     const visualAgeGroup = pickRandomFrom(generatorCommonOptions.visualAgeGroups ?? []);
+    const personalityResult = createGeneratorPersonalityResult(overrides);
+    const hairResult = createGeneratorHairResult(overrides);
 
     return {
       genre,
       race: overrides.race ?? pickFromAllowedGroups(generatorSpeciesGroups, rule.allowedSpeciesGroups, rule.allowedSpeciesItems),
       role: overrides.role ?? pickFromAllowedGroups(generatorJobGroups, rule.allowedJobGroups, rule.allowedJobItems),
-      personality: overrides.personality ?? pickRandomFrom(generatorCommonOptions.personality ?? []),
+      ...personalityResult,
       visualAge: overrides.visualAge ?? visualAgeGroup,
       features: overrides.features ?? (pickUnique(generatorCommonOptions.features ?? [], featureCount).join(", ") || "없음"),
       weapon: overrides.weapon ?? pickFromAllowedGroups(generatorWeaponGroups, rule.allowedWeaponGroups, rule.allowedWeaponItems),
       power: overrides.power ?? (pickUnique(generatorCommonOptions.powers ?? [], powerCount).join(", ") || "없음"),
-      hairstyle: overrides.hairstyle ?? pickRandomFrom(generatorCommonOptions.hairstyles ?? []),
+      ...hairResult,
       outfit: overrides.outfit ?? createOutfitResult(),
       fashionPoints: overrides.fashionPoints ?? (pickUnique(generatorCommonOptions.fashionPoints ?? [], fashionPointCount).join(", ") || "없음"),
       colors: overrides.colors ?? createColorSet()
@@ -3647,11 +4778,42 @@ function renderStoryReader(worldId, storyId) {
     }
   }
 
+  function canLockGeneratorKey(key) {
+    return key === "genre" || lockedGeneratorKeys.has("genre") || !generatorGenreDependentLockKeys.has(key);
+  }
+
+  function clearGenreDependentGeneratorLocks() {
+    let didClear = false;
+    generatorGenreDependentLockKeys.forEach(key => {
+      if (lockedGeneratorKeys.delete(key)) didClear = true;
+    });
+    return didClear;
+  }
+
+  function enforceGeneratorLockDependencies() {
+    if (!lockedGeneratorKeys.has("genre")) {
+      clearGenreDependentGeneratorLocks();
+    }
+  }
+
   function getLockedGeneratorOverrides() {
+    enforceGeneratorLockDependencies();
     const overrides = {};
+    const isGenreLocked = lockedGeneratorKeys.has("genre");
     lockedGeneratorKeys.forEach(key => {
+      if (!isGenreLocked && generatorGenreDependentLockKeys.has(key)) return;
       if (Object.prototype.hasOwnProperty.call(generatorResult, key)) {
         overrides[key] = structuredCloneSafe(generatorResult[key]);
+      }
+      if (key === "personality") {
+        ["personalityTrait", "personalityGroup", "aura", "auraGroup", "auraContrast"].forEach(metaKey => {
+          if (Object.prototype.hasOwnProperty.call(generatorResult, metaKey)) {
+            overrides[metaKey] = structuredCloneSafe(generatorResult[metaKey]);
+          }
+        });
+      }
+      if (key === "hairstyle" && Object.prototype.hasOwnProperty.call(generatorResult, "hairDetail")) {
+        overrides.hairDetail = structuredCloneSafe(generatorResult.hairDetail);
       }
     });
     return overrides;
@@ -3845,46 +5007,41 @@ function renderStoryReader(worldId, storyId) {
     const fashionPoints = getGeneratorEntry("fashionPoints");
     return [
       `캐릭터는 ${getGeneratorEntry("genre")} 장르에 나오는 여성 캐릭터입니다.`,
-      `캐릭터의 외형 나이대는 ${getGeneratorEntry("visualAge")} 입니다.`,
-      `캐릭터의 종족은 ${getGeneratorEntry("race")}입니다.`,
-      `캐릭터의 직업은 ${getGeneratorEntry("role")}입니다.`,
-      `캐릭터의 성격/분위기는 ${getGeneratorEntry("personality")} 입니다.`,
-      `캐릭터의 무기는 ${getGeneratorEntry("weapon")} 입니다.`,
-      hasGeneratorOptionalValue(power) ? `캐릭터의 능력은 ${power} 입니다.` : "",
-      outfitText ? `캐릭터는 ${outfitText} 을 입고 있습니다.` : "",
-      hasGeneratorOptionalValue(fashionPoints) ? `캐릭터의 패션포인트는 ${fashionPoints}입니다.` : "",
-      hasGeneratorOptionalValue(features) ? `캐릭터의 특징은 ${features} 입니다.` : "",
-      `캐릭터의 헤어스타일은 ${getGeneratorEntry("hairstyle")} 입니다.`,
+      `캐릭터의 외형 나이대는 ${getGeneratorEntry("visualAge")}세 이며, 종족은 ${getGeneratorEntry("race")} 입니다.`,
+      `캐릭터의 직업은 ${getGeneratorEntry("role")} 이며, 무기는 ${getGeneratorEntry("weapon")} 를 사용합니다`,
+      hasGeneratorOptionalValue(power) ? `캐릭터의 능력은 ${power} 입니다.` : null,
+      getGeneratorPersonalityPromptLine(),
+
       "",
+
+      outfitText ? `캐릭터의 의상은 ${outfitText} 입니다.` : null,
+      "전체 의상은 장르와 결합된 디자인으로 표현해주세요.",
+      hasGeneratorOptionalValue(fashionPoints) ? `캐릭터의 패션포인트는 ${fashionPoints} 입니다` : null,
+      hasGeneratorOptionalValue(features) ? `캐릭터의 외형 특징은 ${features} 입니다.` : null,
+      getGeneratorQuestionHairPromptLine(),
+
+      "",
+
       "이 캐릭터의 일러스트를 생성하려하는데 어떤 장면을 생성하면 좋을까요?",
-      "",
       "3개의 장면으로 추천해주세요.",
-      "",
       "각각 장면,구도,연출 을 기본적으로 알려주시고 종족/직업/능력/무기에 따라 해당 표현이 필요한경우 알려주세요.(아니면 연출에 포함시켜 주셔도 됩니다)",
-      "",
       "기본적으로 전신이 다 나와야합니다.",
-      "",
       "화면 비율은 9:16 입니다.",
-      "",
       "답변은 아래 형식으로 작성해주세요.",
-      "",
       "A안",
       "- 장면:",
       "- 구도:",
       "- 연출:",
-      "",
       "B안",
       "- 장면:",
       "- 구도:",
       "- 연출:",
-      "",
       "C안",
       "- 장면:",
       "- 구도:",
       "- 연출:"
-    ].filter(line => line !== "").join("\n");
+    ].filter(line => line !== null && line !== undefined).join("\n");
   }
-
   function hasGeneratorOptionalValue(value) {
     const normalized = String(value || "").trim();
     return normalized !== "" && normalized !== "없음";
@@ -3907,34 +5064,38 @@ function renderStoryReader(worldId, storyId) {
     const power = getGeneratorEntry("power");
     return [
       "캐릭터의 일러스트를 생성해주세요.",
-      "",
       `캐릭터는 ${getGeneratorEntry("genre")} 장르에 나오는 여성 캐릭터입니다.`,
-      `캐릭터의 외형 나이대는 ${getGeneratorEntry("visualAge")} 입니다.`,
-      `캐릭터의 종족은 ${getGeneratorEntry("race")}입니다.`,
-      `캐릭터의 직업은 ${getGeneratorEntry("role")}입니다.`,
-      `캐릭터의 성격/분위기는 ${getGeneratorEntry("personality")} 입니다.`,
-      `캐릭터의 무기는 ${getGeneratorEntry("weapon")} 입니다.`,
-      hasGeneratorOptionalValue(power) ? `캐릭터의 능력은 ${power} 입니다.` : "",
-      outfitText ? `캐릭터는 ${outfitText}을 입고 있습니다.` : "",
-      hasGeneratorOptionalValue(fashionPoints) ? `캐릭터의 패션포인트는 ${fashionPoints}입니다.` : "",
-      hasGeneratorOptionalValue(features) ? `캐릭터의 특징은 ${features} 입니다.` : "",
-      `캐릭터의 헤어스타일은 ${getGeneratorEntry("hairstyle")} 입니다.`,
-      `캐릭터의 머리색은 ${getGeneratorListValue("colors", "머리")} 이고 눈색은 ${getGeneratorListValue("colors", "눈")} 입니다.`,
-      `캐릭터의 피부색은 ${getGeneratorListValue("colors", "피부")} 이고 상징 색은 ${getGeneratorListValue("colors", "상징")} 입니다.`,
-      "",
-      notes.scene ? `장면: ${notes.scene}` : "",
-      notes.composition ? `구도: ${notes.composition}` : "",
-      notes.direction ? `연출: ${notes.direction}` : "",
-      "",
-      "기본적으로 전신이 모두 보여야 합니다.",
-      "머리, 발, 무기, 의상이 화면 밖으로 잘리지 않게 해 주세요.",
-      "이미지 스타일은 고퀄리티 애니메이션풍의 게임 일러스트이고 반실사 렌더링 입니다.",
-      "설명문은 만들지 말아주세요.",
-      "",
-      "가로세로 비율을 9:16로 설정해주세요."
-    ].filter(line => line !== "").join("\n");
-  }
+      `캐릭터의 외형 나이대는 ${getGeneratorEntry("visualAge")}세 이며, 종족은 ${getGeneratorEntry("race")} 입니다.`,
+      `캐릭터의 직업은 ${getGeneratorEntry("role")} 이며, 무기는 ${getGeneratorEntry("weapon")} 를 사용합니다`,
+      hasGeneratorOptionalValue(power) ? `캐릭터의 능력은 ${power} 입니다.` : null,
+      getGeneratorPersonalityPromptLine(),
 
+      "",
+
+      outfitText ? `캐릭터의 의상은 ${outfitText} 입니다.` : null,
+      "전체 의상은 장르와 결합된 디자인으로 표현해주세요.",
+      hasGeneratorOptionalValue(fashionPoints) ? `캐릭터의 패션포인트는 ${fashionPoints} 입니다` : null,
+      hasGeneratorOptionalValue(features) ? `캐릭터의 외형 특징은 ${features} 입니다.` : null,
+      getGeneratorImageHairPromptLine(),
+
+      "",
+
+      notes.scene ? `장면: ${notes.scene}` : null,
+      notes.composition ? `구도: ${notes.composition}` : null,
+      notes.direction ? `연출: ${notes.direction}` : null,
+
+      "",
+
+      "전신이 모두 보이는 풀 숏(full shot) 구도로 표현해주세요.",
+      "머리부터 발끝까지 캐릭터 전체가 프레임 안에 완전히 들어오게 해주세요.",
+      "이미지 스타일은 고퀄리티 애니메이션풍의 게임 일러스트이고 반실사 렌더링 입니다.",
+      "주 피사체인 캐릭터가 가장 돋보이도록 해주세요.",
+      "배경은 단순하고 절제되게, 낮은 채도와 낮은 대비로 표현해주세요.",
+      "배경 디테일과 조명 효과는 최소화해주세요",
+      "설명문은 만들지 말아주세요.",
+      "가로세로 비율은 9:16 입니다."
+    ].filter(line => line !== null && line !== undefined).join("\n");
+  }
   function getGeneratorFollowupCharacterName() {
     return String(elements.generatorFollowupCharacterNameInput?.value || "").trim();
   }
@@ -4172,7 +5333,7 @@ function renderStoryReader(worldId, storyId) {
   }
 
   function renderGeneratorValue(container, key) {
-    const value = generatorResult[key] ?? "";
+    const value = key === "hairstyle" ? getGeneratorHairDisplay() : (generatorResult[key] ?? "");
     container.innerHTML = "";
     if (Array.isArray(value)) {
       value.forEach(entry => {
@@ -4204,7 +5365,8 @@ function renderStoryReader(worldId, storyId) {
 
   function createGeneratorItem(key) {
     const item = document.createElement("article");
-    const locked = lockedGeneratorKeys.has(key);
+    const canLock = canLockGeneratorKey(key);
+    const locked = canLock && lockedGeneratorKeys.has(key);
     item.className = "generator-item";
     item.classList.toggle("is-locked", locked);
 
@@ -4221,7 +5383,9 @@ function renderStoryReader(worldId, storyId) {
     lockButton.className = "generator-lock-button";
     lockButton.classList.toggle("is-active", locked);
     lockButton.dataset.generatorLock = key;
-    lockButton.textContent = locked ? "고정됨" : "고정";
+    lockButton.disabled = !canLock;
+    lockButton.title = canLock ? "" : "장르를 먼저 고정해야 사용할 수 있습니다.";
+    lockButton.textContent = locked ? "고정됨" : (canLock ? "고정" : "장르 필요");
 
     item.append(label, value, lockButton);
     return item;
@@ -4230,13 +5394,14 @@ function renderStoryReader(worldId, storyId) {
   function getGeneratorResultKeysInDisplayOrder() {
     const orderedKeys = generatorFieldGroups
       .flatMap(group => group.keys)
-      .filter(key => Object.prototype.hasOwnProperty.call(generatorResult, key));
+      .filter(key => Object.prototype.hasOwnProperty.call(generatorResult, key) && !generatorHiddenResultKeys.has(key));
     const known = new Set(orderedKeys);
-    const extraKeys = Object.keys(generatorResult).filter(key => !known.has(key));
+    const extraKeys = Object.keys(generatorResult).filter(key => !known.has(key) && !generatorHiddenResultKeys.has(key));
     return [...orderedKeys, ...extraKeys];
   }
 
   function renderGeneratorResult() {
+    enforceGeneratorLockDependencies();
     if (!elements.generatorGrid) return;
     elements.generatorGrid.innerHTML = "";
     if (!hasGeneratorResult()) {
@@ -4258,6 +5423,7 @@ function renderStoryReader(worldId, storyId) {
   }
 
   function renderGeneratorLockSummary() {
+    enforceGeneratorLockDependencies();
     if (!elements.generatorLockSummary) return;
     const labels = [...lockedGeneratorKeys].map(getGeneratorFieldLabel);
     elements.generatorLockSummary.textContent = labels.length
@@ -4411,11 +5577,24 @@ function renderStoryReader(worldId, storyId) {
     navigate("#/generator");
   }
 
+  function navigateGame(replace = false) {
+    navigate("#/game", replace);
+  }
+
+  function navigateGameQuiz(replace = false) {
+    navigate("#/game/quiz", replace);
+  }
+
+  function navigateWorldCup(replace = false) {
+    navigate("#/game/worldcup", replace);
+  }
+
   function navigateWorld(worldId, replace = false) {
     navigate(`#/world/${encodeURIComponent(worldId)}`, replace);
   }
 
-  function navigateCharacter(worldId, characterId) {
+  function navigateCharacter(worldId, characterId, options = {}) {
+    state.characterReturnHash = options.returnHash ? normalizeRouteHash(options.returnHash) : "";
     navigate(`#/world/${encodeURIComponent(worldId)}/character/${encodeURIComponent(characterId)}`);
   }
 
@@ -4426,18 +5605,85 @@ function renderStoryReader(worldId, storyId) {
   function navigate(hash, replace = false) {
     rememberRouteScroll();
 
+    const normalizedHash = normalizeRouteHash(hash);
+    state.pendingNavigationHash = normalizedHash;
+
     if (replace) {
-      history.replaceState(null, "", hash);
+      history.replaceState(null, "", normalizedHash);
       renderFromHash();
       return;
     }
 
-    if (window.location.hash === hash) {
+    if (window.location.hash === normalizedHash) {
       renderFromHash();
       return;
     }
 
-    window.location.hash = hash;
+    history.pushState(null, "", normalizedHash);
+    renderFromHash();
+  }
+
+  function normalizeRouteHash(hash = "") {
+    return hash || "#/worlds";
+  }
+
+  function normalizedCurrentHash() {
+    return normalizeRouteHash(window.location.hash);
+  }
+
+  function routeBackTargetFromState() {
+    if (state.view === "story" && state.storyReturnHash) {
+      return normalizeRouteHash(state.storyReturnHash);
+    }
+
+    if (state.view === "character" && state.characterReturnHash) {
+      return normalizeRouteHash(state.characterReturnHash);
+    }
+
+    if (state.view === "gameQuiz" || state.view === "worldCup") return "#/game";
+    if (state.view === "game") return "#/worlds";
+    if (state.view === "world" || state.view === "generator") return "#/worlds";
+
+    if (state.worldId) {
+      return `#/world/${encodeURIComponent(state.worldId)}`;
+    }
+
+    return "#/worlds";
+  }
+
+  function consumeStoryReturnForBackTarget(targetHash) {
+    if (state.view === "story" && state.storyReturnHash && normalizeRouteHash(state.storyReturnHash) === targetHash) {
+      state.storyReturnHash = "";
+    }
+  }
+
+  function consumeCharacterReturnForBackTarget(targetHash) {
+    if (state.view === "character" && state.characterReturnHash && normalizeRouteHash(state.characterReturnHash) === targetHash) {
+      state.characterReturnHash = "";
+    }
+  }
+
+  function clearRouteBackFallback() {
+    if (state.routeBackFallbackTimer) {
+      clearTimeout(state.routeBackFallbackTimer);
+      state.routeBackFallbackTimer = 0;
+    }
+    state.routeBackFallbackHash = "";
+    state.routeBackOriginHash = "";
+  }
+
+  function performLogicalBack() {
+    rememberRouteScroll();
+    clearRouteBackFallback();
+
+    const targetHash = routeBackTargetFromState();
+    consumeStoryReturnForBackTarget(targetHash);
+    consumeCharacterReturnForBackTarget(targetHash);
+    navigate(targetHash, true);
+  }
+
+  function navigateLogicalBack() {
+    performLogicalBack();
   }
 
   function decodePart(value = "") {
@@ -4460,6 +5706,16 @@ function renderStoryReader(worldId, storyId) {
       return { view: "generator" };
     }
 
+    if (parts[0] === "game") {
+      if (parts[1] === "quiz") {
+        return { view: "gameQuiz" };
+      }
+      if (parts[1] === "worldcup") {
+        return { view: "worldCup" };
+      }
+      return { view: "game" };
+    }
+
     if (parts[0] === "world" && parts[1]) {
       if (parts[2] === "character" && parts[3]) {
         return { view: "character", worldId: parts[1], characterId: parts[3] };
@@ -4474,6 +5730,17 @@ function renderStoryReader(worldId, storyId) {
   }
 
   function renderFromHash() {
+    clearRouteBackFallback();
+    const currentHash = normalizedCurrentHash();
+    const previousHash = state.currentRouteHash;
+    state.pendingNavigationHash = "";
+    state.allowGameQuizRoute = false;
+
+    if (previousHash && previousHash !== currentHash) {
+      state.previousRouteHash = previousHash;
+    }
+    state.currentRouteHash = currentHash;
+
     const route = parseHash();
     const nextRouteKey = routeKeyFromRoute(route);
 
@@ -4492,6 +5759,21 @@ function renderStoryReader(worldId, storyId) {
       return;
     }
 
+    if (route.view === "game") {
+      renderGameScreen();
+      return;
+    }
+
+    if (route.view === "gameQuiz") {
+      renderGameQuizScreen();
+      return;
+    }
+
+    if (route.view === "worldCup") {
+      renderWorldCupScreen();
+      return;
+    }
+
     if (route.view === "character") {
       renderCharacterDetail(route.worldId, route.characterId);
       return;
@@ -4506,30 +5788,25 @@ function renderStoryReader(worldId, storyId) {
   }
 
   function bindEvents() {
-    elements.backButton.addEventListener("click", () => {
-      if (state.view === "story" && state.storyReturnHash) {
-        const returnHash = state.storyReturnHash;
-        state.storyReturnHash = "";
-        navigate(returnHash);
-        return;
-      }
-      if (state.view === "world" || state.view === "generator") {
-        navigateWorlds();
-        return;
-      }
-      if (state.worldId) {
-        navigateWorld(state.worldId);
-        return;
-      }
-      navigateWorlds();
-    });
+    elements.backButton.addEventListener("click", navigateLogicalBack);
 
-    elements.worldHomeButton.addEventListener("click", () => navigateWorlds());
+    elements.worldHomeButton.addEventListener("click", () => navigateWorlds(true));
     elements.topTitle?.addEventListener("click", handlePrivateTitleTap);
     elements.privateToolToggle?.addEventListener("click", togglePrivateToolPanel);
     elements.privateImportPreviewButton?.addEventListener("click", handlePrivateImportPreview);
     elements.privateImportDownloadButton?.addEventListener("click", handlePrivateImportDownload);
-    elements.privateImageCheckButton?.addEventListener("click", runPrivateImageCheck);
+    elements.privateImageCheckButton?.addEventListener("click", openPrivateImageCheck);
+    elements.assetCheckFolderInput?.addEventListener("change", () => {
+      if (elements.assetCheckFolderInput?.files?.length && elements.assetCheckZipInput) {
+        elements.assetCheckZipInput.value = "";
+      }
+    });
+    elements.assetCheckZipInput?.addEventListener("change", () => {
+      if (elements.assetCheckZipInput?.files?.length && elements.assetCheckFolderInput) {
+        elements.assetCheckFolderInput.value = "";
+      }
+    });
+    elements.assetCheckRunButton?.addEventListener("click", runPrivateImageCheck);
     elements.assetCheckClose?.addEventListener("click", closeAssetCheckModal);
     elements.assetCheckOk?.addEventListener("click", closeAssetCheckModal);
     elements.assetCheckModal?.addEventListener("click", event => {
@@ -4538,6 +5815,10 @@ function renderStoryReader(worldId, storyId) {
       }
     });
     elements.openGeneratorButton?.addEventListener("click", navigateGenerator);
+    elements.openGameButton?.addEventListener("click", navigateGame);
+    elements.startCharacterQuizButton?.addEventListener("click", startCharacterQuiz);
+    elements.startWorldCupButton?.addEventListener("click", openWorldCup);
+    elements.nextQuizButton?.addEventListener("click", goNextQuizQuestion);
     elements.generateCharacterButton?.addEventListener("click", () => handleGenerateCharacter({ clearLocks: true }));
     elements.generateCharacterStickyButton?.addEventListener("click", () => handleGenerateCharacter({ clearLocks: true }));
     elements.generateUnlockedCharacterButton?.addEventListener("click", () => handleGenerateCharacter());
@@ -4600,6 +5881,9 @@ function renderStoryReader(worldId, storyId) {
     elements.imageLightboxImage?.addEventListener("dblclick", () => {
       setImageLightboxZoom(state.imageLightboxScale > 1.01 ? 1 : 2.25);
     });
+    elements.appMain?.addEventListener("touchstart", beginRouteTabSwipe, { passive: true });
+    elements.appMain?.addEventListener("touchend", endRouteTabSwipe, { passive: true });
+    window.addEventListener("popstate", handleWindowPopState);
     window.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         closeGeneratorSetPasteModal();
@@ -4610,14 +5894,63 @@ function renderStoryReader(worldId, storyId) {
     });
 
     elements.appMain.addEventListener("click", event => {
+      if (state.tabSwipeSuppressClickUntil && Date.now() < state.tabSwipeSuppressClickUntil) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      const quizAnswerButton = event.target.closest(".quiz-option[data-quiz-answer]");
+      if (quizAnswerButton) {
+        handleQuizAnswer(quizAnswerButton);
+        return;
+      }
+
+      if (event.target.closest("#restartQuizInlineButton")) {
+        restartCharacterQuiz();
+        return;
+      }
+
+      const worldCupStartButton = event.target.closest("[data-worldcup-start]");
+      if (worldCupStartButton) {
+        initializeWorldCup(worldCupStartButton.dataset.worldcupStart);
+        return;
+      }
+
+      const worldCupWinnerDetailButton = event.target.closest("[data-worldcup-winner-detail]");
+      if (worldCupWinnerDetailButton) {
+        openWorldCupWinnerDetail(worldCupWinnerDetailButton.dataset.worldcupWinnerDetail);
+        return;
+      }
+
+      const worldCupWinnerButton = event.target.closest("[data-worldcup-winner]");
+      if (worldCupWinnerButton) {
+        selectWorldCupWinner(worldCupWinnerButton.dataset.worldcupWinner);
+        return;
+      }
+
+      if (event.target.closest("[data-worldcup-reset]")) {
+        resetWorldCupState();
+        renderWorldCup();
+        return;
+      }
+
       const generatorLockButton = event.target.closest(".generator-lock-button[data-generator-lock]");
       if (generatorLockButton) {
         const key = generatorLockButton.dataset.generatorLock;
+        if (generatorLockButton.disabled || !canLockGeneratorKey(key)) {
+          openGeneratorPromptNotice("장르 고정이 필요합니다.", "종족, 직업, 무기는 장르를 먼저 고정해야 고정할 수 있습니다.");
+          return;
+        }
         if (lockedGeneratorKeys.has(key)) {
           lockedGeneratorKeys.delete(key);
+          if (key === "genre" && clearGenreDependentGeneratorLocks()) {
+            openGeneratorPromptNotice("하위 고정 해제", "장르 고정이 해제되어 종족, 직업, 무기 고정도 함께 해제되었습니다.");
+          }
         } else {
           lockedGeneratorKeys.add(key);
         }
+        enforceGeneratorLockDependencies();
         renderGenerator();
         return;
       }
@@ -4636,13 +5969,13 @@ function renderStoryReader(worldId, storyId) {
 
       const tabButton = event.target.closest(".world-tab-button[data-world-tab]");
       if (tabButton) {
-        setWorldTab(tabButton.dataset.worldTab, { scrollToTop: true });
+        setWorldTab(tabButton.dataset.worldTab);
         return;
       }
 
       const characterTabButton = event.target.closest(".character-tab-button[data-character-tab]");
       if (characterTabButton) {
-        setCharacterTab(characterTabButton.dataset.characterTab, { scrollToTop: true });
+        setCharacterTab(characterTabButton.dataset.characterTab);
         return;
       }
 
@@ -4712,10 +6045,28 @@ function renderStoryReader(worldId, storyId) {
       "topSymbol",
       "topTitle",
       "worldSelectScreen",
+      "gameScreen",
+      "gameHero",
       "worldDetailScreen",
       "characterDetailScreen",
       "storyReaderScreen",
       "worldGrid",
+      "openGameButton",
+      "startCharacterQuizButton",
+      "startWorldCupButton",
+      "characterQuizPanel",
+      "worldCupPanel",
+      "gameHubGrid",
+      "quizProgressText",
+      "quizTitle",
+      "quizScoreText",
+      "quizStage",
+      "quizCharacterImage",
+      "quizQuestionText",
+      "quizOptions",
+      "quizFeedback",
+      "quitQuizButton",
+      "nextQuizButton",
       "worldTabBar",
       "worldTabCharacters",
       "worldTabStories",
@@ -4780,6 +6131,9 @@ function renderStoryReader(worldId, storyId) {
       "assetCheckBody",
       "assetCheckClose",
       "assetCheckOk",
+      "assetCheckFolderInput",
+      "assetCheckZipInput",
+      "assetCheckRunButton",
       "generatorScreen",
       "openGeneratorButton",
       "generatorDataWarning",
