@@ -6187,9 +6187,34 @@ function renderStoryReader(worldId, storyId) {
     });
   }
 
+
+  function requestPortraitOrientationLock() {
+    const orientation = screen && screen.orientation;
+    if (!orientation || typeof orientation.lock !== "function") return;
+
+    try {
+      const lockResult = orientation.lock("portrait");
+      if (lockResult && typeof lockResult.catch === "function") {
+        lockResult.catch(() => {});
+      }
+    } catch (error) {
+      // Some mobile browsers only allow orientation locking for installed PWAs
+      // or fullscreen contexts. The manifest remains the primary PWA hint.
+    }
+  }
+
+  function bindOrientationLockEvents() {
+    requestPortraitOrientationLock();
+    window.addEventListener("orientationchange", requestPortraitOrientationLock, { passive: true });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) requestPortraitOrientationLock();
+    });
+  }
+
   function init() {
     collectElements();
     bindEvents();
+    bindOrientationLockEvents();
     renderFromHash();
   }
 

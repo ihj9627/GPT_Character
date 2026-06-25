@@ -2,17 +2,17 @@
 "use strict";
 
 const CACHE_PREFIX = "world-archive-pwa";
-const CACHE_NAME = `${CACHE_PREFIX}-identity-short-60-20260625-01`;
+const CACHE_NAME = `${CACHE_PREFIX}-orientation-lock-20260625-01`;
 const APP_SHELL_URLS = [
   "./",
   "./world.html",
   "./world.css?v=worldcup-winner-button-style-20260625-01",
-  "./world.js?v=prompt-template-20260625-01",
+  "./world.js?v=orientation-lock-20260625-01",
   "./characters.js?v=world-genre-character-20260625-01",
   "./story-data.js?v=identity-short-60-20260625-01",
   "./story-taxonomy.js?v=world-genre-character-20260625-01",
   "./generator-data.js?v=generator-outerwear-20260625-01",
-  "./manifest.webmanifest",
+  "./manifest.webmanifest?v=orientation-lock-20260625-01",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./tools/world-character-upload-template.xlsx"
