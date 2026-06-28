@@ -2220,6 +2220,7 @@ body.has-lightbox-open {
   border-radius: var(--radius-xl);
 }
 
+
 .game-hero h2 {
   margin: 4px 0 8px;
   font-size: clamp(24px, 6vw, 34px);

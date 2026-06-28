@@ -107,6 +107,8 @@
   const generatorSpeciesGroups = window.GENERATOR_SPECIES_GROUPS ?? {};
   const generatorJobGroups = window.GENERATOR_JOB_GROUPS ?? {};
   const generatorWeaponGroups = window.GENERATOR_WEAPON_GROUPS ?? {};
+  const generatorJobSpeciesRules = window.GENERATOR_JOB_SPECIES_RULES ?? {};
+  const generatorJobWeaponRules = window.GENERATOR_JOB_WEAPON_RULES ?? {};
   const generatorFields = Array.isArray(window.GENERATOR_FIELDS) ? window.GENERATOR_FIELDS : [];
   const generatorCountWeights = window.GENERATOR_COUNT_WEIGHTS ?? {};
   const generatorHistoryStorageKey = "world-app-generator-history-v2";
@@ -135,10 +137,8 @@
 
   const lockableGeneratorKeys = new Set(generatorFields.map(([key]) => key));
   const generatorFieldGroups = [
-    { title: "캐릭터 핵심", keys: ["genre", "race", "role", "personality", "visualAge"] },
-    { title: "외형", keys: ["features", "hairstyle", "colors"] },
-    { title: "복장 · 소품", keys: ["outfit", "fashionPoints", "weapon"] },
-    { title: "연출 · 특수 요소", keys: ["power"] }
+    { title: "캐릭터 핵심", keys: ["genre", "role", "race", "weapon", "power", "visualAge", "personality"] },
+    { title: "외형", keys: ["features", "fashionPoints", "hairstyle", "outfit", "colors"] }
   ];
   removeLegacyGeneratorStorage();
 
@@ -150,7 +150,8 @@
   let generatorPromptModalDefaultLabel = "복사";
   let generatorPromptModalConfirmAction = null;
   const lockedGeneratorKeys = new Set();
-  const generatorGenreDependentLockKeys = new Set(["race", "role", "weapon"]);
+  const generatorGenreDependentLockKeys = new Set(["role", "race", "weapon"]);
+  const generatorRoleDependentLockKeys = new Set(["race", "weapon"]);
   const generatorHiddenResultKeys = new Set(["personalityTrait", "personalityGroup", "aura", "auraGroup", "auraContrast", "hairDetail"]);
 
   function normalizeGeneratorSketchbookSpeciesKey(value) {
@@ -4545,6 +4546,213 @@ function renderStoryReader(worldId, storyId) {
     return `#${value.toString(16).padStart(6, "0").toUpperCase()}`;
   }
 
+  function rgbToHsl({ r, g, b }) {
+    const red = r / 255;
+    const green = g / 255;
+    const blue = b / 255;
+    const max = Math.max(red, green, blue);
+    const min = Math.min(red, green, blue);
+    const lightness = (max + min) / 2;
+    let hue = 0;
+    let saturation = 0;
+
+    if (max !== min) {
+      const delta = max - min;
+      saturation = lightness > 0.5
+        ? delta / (2 - max - min)
+        : delta / (max + min);
+
+      switch (max) {
+        case red:
+          hue = ((green - blue) / delta + (green < blue ? 6 : 0)) * 60;
+          break;
+        case green:
+          hue = ((blue - red) / delta + 2) * 60;
+          break;
+        case blue:
+          hue = ((red - green) / delta + 4) * 60;
+          break;
+        default:
+          hue = 0;
+      }
+    }
+
+    return { h: hue, s: saturation, l: lightness };
+  }
+
+  function getColorBrightnessName(lightness) {
+    if (lightness < 0.10) return "거의 검정에 가까운";
+    if (lightness < 0.22) return "매우 어두운";
+    if (lightness < 0.38) return "어두운";
+    if (lightness < 0.62) return "중간 밝기의";
+    if (lightness < 0.82) return "밝은";
+    return "매우 밝은";
+  }
+
+  function getColorSaturationName(saturation) {
+    if (saturation < 0.10) return "무채색에 가까운";
+    if (saturation < 0.28) return "탁한";
+    if (saturation < 0.55) return "부드러운";
+    if (saturation < 0.78) return "선명한";
+    return "강한";
+  }
+
+  function getColorHueName(hue, saturation, lightness) {
+    if (saturation < 0.10) {
+      if (lightness < 0.20) return "차콜 그레이";
+      if (lightness < 0.45) return "그레이";
+      if (lightness < 0.75) return "라이트 그레이";
+      return "오프화이트";
+    }
+
+    if (hue >= 15 && hue < 45 && lightness < 0.42) {
+      if (lightness < 0.20) return "에스프레소 브라운";
+      if (lightness < 0.32) return "다크 브라운";
+      return "브라운";
+    }
+
+    if (hue < 15 || hue >= 345) return "레드";
+    if (hue < 25) return "코랄";
+    if (hue < 45) return "오렌지";
+    if (hue < 65) return "옐로우";
+    if (hue < 85) return "라임";
+    if (hue < 150) return "그린";
+    if (hue < 180) return "민트";
+    if (hue < 200) return "틸";
+    if (hue < 220) return "스카이 블루";
+    if (hue < 245) return "블루";
+    if (hue < 265) return "인디고";
+    if (hue < 290) return "바이올렛";
+    if (hue < 330) return "퍼플";
+    return "핑크";
+  }
+
+  function describeHexColorKo(hexColor) {
+    const rgb = hexToRgb(hexColor);
+    if (!rgb) return "";
+    const { h, s, l } = rgbToHsl(rgb);
+    return [
+      getColorBrightnessName(l),
+      getColorSaturationName(s),
+      getColorHueName(h, s, l)
+    ].join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  function formatHexColorForPrompt(hexColor) {
+    const normalized = String(hexColor || "").trim().toUpperCase();
+    const description = describeHexColorKo(normalized);
+    return description ? `${description}(${normalized})` : normalized;
+  }
+
+  const generatorHairTwoToneRate = 0.15;
+  const generatorHairColorSimilarityThreshold = 96;
+  const generatorHairTwoToneStyles = [
+    { key: "highlight", label: "하이라이트", weight: 18 },
+    { key: "ombre", label: "옴브레", weight: 18 },
+    { key: "dipDye", label: "끝부분 염색", weight: 18 },
+    { key: "peekabooInner", label: "피카부 이너", weight: 18 },
+    { key: "underlayer", label: "언더레이어 컬러", weight: 18 },
+    { key: "bangs", label: "앞머리 염색", weight: 5 },
+    { key: "splitDye", label: "반반 염색", weight: 5 }
+  ];
+
+  function pickWeightedItem(items = []) {
+    const list = Array.isArray(items) ? items.filter(item => Number(item?.weight || 0) > 0) : [];
+    const total = list.reduce((sum, item) => sum + Number(item.weight || 0), 0) || 1;
+    let roll = Math.random() * total;
+    for (const item of list) {
+      roll -= Number(item.weight || 0);
+      if (roll <= 0) return item;
+    }
+    return list.at(-1) || null;
+  }
+
+  function hexToRgb(hexColor) {
+    const match = String(hexColor || "").trim().match(/^#?([0-9a-f]{6})$/i);
+    if (!match) return null;
+    const value = parseInt(match[1], 16);
+    return {
+      r: (value >> 16) & 255,
+      g: (value >> 8) & 255,
+      b: value & 255
+    };
+  }
+
+  function formatRgbToHex({ r, g, b }) {
+    return `#${[r, g, b].map(value => Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+  }
+
+  function getHexColorDistance(firstColor, secondColor) {
+    const first = hexToRgb(firstColor);
+    const second = hexToRgb(secondColor);
+    if (!first || !second) return Infinity;
+    const r = first.r - second.r;
+    const g = first.g - second.g;
+    const b = first.b - second.b;
+    return Math.sqrt(r * r + g * g + b * b);
+  }
+
+  function getComplementHexColor(hexColor) {
+    const rgb = hexToRgb(hexColor);
+    if (!rgb) return randomHexColor();
+    return formatRgbToHex({ r: 255 - rgb.r, g: 255 - rgb.g, b: 255 - rgb.b });
+  }
+
+  function randomDistinctHexColor(baseColor) {
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      const color = randomHexColor();
+      if (getHexColorDistance(baseColor, color) >= generatorHairColorSimilarityThreshold) return color;
+    }
+    return getComplementHexColor(baseColor);
+  }
+
+  function getTwoToneHairPromptValue(mainColor, subColor, styleKey) {
+    const main = formatHexColorForPrompt(mainColor);
+    const sub = formatHexColorForPrompt(subColor);
+    switch (styleKey) {
+      case "highlight":
+        return `${main} 머리에 ${sub} 하이라이트가 들어간 투톤 헤어`;
+      case "ombre":
+        return `${main} 뿌리에서 ${sub} 머리끝으로 자연스럽게 이어지는 옴브레 투톤 헤어`;
+      case "dipDye":
+        return `${main} 머리에 ${sub} 끝부분 염색이 들어간 투톤 헤어`;
+      case "peekabooInner":
+        return `겉머리는 ${main}, 안쪽 레이어는 ${sub}인 피카부 이너 컬러 투톤 헤어`;
+      case "underlayer":
+        return `${main} 머리에 ${sub} 언더레이어 컬러가 들어간 투톤 헤어`;
+      case "bangs":
+        return `${main} 머리에 ${sub} 앞머리 염색이 들어간 투톤 헤어`;
+      case "splitDye":
+        return `왼쪽은 ${main}, 오른쪽은 ${sub}인 반반 염색 투톤 헤어`;
+      default:
+        return `${main} 머리에 ${sub} 포인트 컬러가 들어간 투톤 헤어`;
+    }
+  }
+
+  function createHairColorEntry() {
+    const mainColor = randomHexColor();
+    if (Math.random() >= generatorHairTwoToneRate) {
+      return {
+        label: "머리",
+        value: mainColor,
+        promptValue: formatHexColorForPrompt(mainColor),
+        swatch: mainColor
+      };
+    }
+    const subColor = randomDistinctHexColor(mainColor);
+    const style = pickWeightedItem(generatorHairTwoToneStyles) || generatorHairTwoToneStyles[0];
+    return {
+      label: "머리",
+      value: `${mainColor} + ${subColor} (${style.label})`,
+      promptValue: getTwoToneHairPromptValue(mainColor, subColor, style.key),
+      swatch: mainColor,
+      mainColor,
+      subColor,
+      twoToneStyle: style.key,
+      twoToneStyleLabel: style.label
+    };
+  }
+
   function normalizeOutfitValue(value) {
     if (typeof value !== "string") return value;
     return value
@@ -4561,11 +4769,43 @@ function renderStoryReader(worldId, storyId) {
   }
 
   function pickFromAllowedGroups(groupMap, allowedGroups = [], allowedItems = []) {
+    return pickRandomFrom(createGeneratorCandidatePool(groupMap, allowedGroups, allowedItems));
+  }
+
+  function createGeneratorCandidatePool(groupMap, allowedGroups = [], allowedItems = []) {
     const groupItems = Array.isArray(allowedGroups)
       ? allowedGroups.flatMap(groupName => groupMap?.[groupName] ?? [])
       : [];
-    const candidates = [...new Set([...groupItems, ...(Array.isArray(allowedItems) ? allowedItems : [])])];
-    return pickRandomFrom(candidates);
+    return [...new Set([...groupItems, ...(Array.isArray(allowedItems) ? allowedItems : [])])].filter(Boolean);
+  }
+
+  function getGeneratorJobGroupKeys(role) {
+    const normalizedRole = String(role || "").trim();
+    if (!normalizedRole) return [];
+    return Object.entries(generatorJobGroups)
+      .filter(([, items]) => Array.isArray(items) && items.includes(normalizedRole))
+      .map(([groupName]) => groupName);
+  }
+
+  function collectGeneratorJobRuleGroups(ruleMap = {}, role = "", groupKey = "") {
+    return getGeneratorJobGroupKeys(role)
+      .flatMap(groupName => {
+        const values = ruleMap?.[groupName]?.[groupKey];
+        return Array.isArray(values) ? values : [];
+      });
+  }
+
+  function createGenreJobCandidatePool(groupMap, genreRule = {}, role = "", options = {}) {
+    const genreGroupItems = createGeneratorCandidatePool(
+      groupMap,
+      genreRule?.[options.genreGroupsKey],
+      genreRule?.[options.genreItemsKey]
+    );
+    const jobGroupItems = createGeneratorCandidatePool(
+      groupMap,
+      collectGeneratorJobRuleGroups(options.jobRuleMap, role, options.jobGroupsKey)
+    );
+    return [...new Set([...genreGroupItems, ...jobGroupItems])].filter(Boolean);
   }
 
   function getGeneratorObjectKeys(map = {}) {
@@ -4657,10 +4897,10 @@ function renderStoryReader(worldId, storyId) {
   function getGeneratorImageHairPromptLine() {
     const hairstyle = String(getGeneratorEntry("hairstyle") || "").trim();
     const hairDetail = String(getGeneratorEntry("hairDetail") || "").trim();
-    const hairColor = getGeneratorListValue("colors", "머리");
-    const eyeColor = getGeneratorListValue("colors", "눈");
-    const skinColor = getGeneratorListValue("colors", "피부");
-    const symbolColor = getGeneratorListValue("colors", "상징");
+    const hairColor = getGeneratorColorPromptValue("머리");
+    const eyeColor = getGeneratorColorPromptValue("눈");
+    const skinColor = getGeneratorColorPromptValue("피부");
+    const symbolColor = getGeneratorColorPromptValue("상징");
     if (!hairstyle) return "";
     return hairDetail
       ? `캐릭터의 헤어스타일은 ${hairstyle} 이며, 헤어디테일은 ${hairDetail} 입니다. 머리색은 ${hairColor}, 눈색은 ${eyeColor}, 피부색은 ${skinColor} 이고 상징 색은 ${symbolColor} 입니다.`
@@ -4669,7 +4909,7 @@ function renderStoryReader(worldId, storyId) {
 
   function createColorSet() {
     return [
-      { label: "머리", value: randomHexColor() },
+      createHairColorEntry(),
       { label: "눈", value: randomHexColor() },
       { label: "피부", value: pickRandomFrom(generatorCommonOptions.skinColorPool ?? ["#F0C7B0"]) },
       { label: "상징", value: randomHexColor() }
@@ -4696,6 +4936,19 @@ function renderStoryReader(worldId, storyId) {
   function createGeneratorResult(overrides = {}) {
     const genre = overrides.genre ?? pickRandomFrom(generatorGenreGroups);
     const rule = generatorGenreRules[genre] ?? {};
+    const role = overrides.role ?? pickFromAllowedGroups(generatorJobGroups, rule.allowedJobGroups, rule.allowedJobItems);
+    const speciesCandidates = createGenreJobCandidatePool(generatorSpeciesGroups, rule, role, {
+      genreGroupsKey: "allowedSpeciesGroups",
+      genreItemsKey: "allowedSpeciesItems",
+      jobRuleMap: generatorJobSpeciesRules,
+      jobGroupsKey: "allowedSpeciesGroups"
+    });
+    const weaponCandidates = createGenreJobCandidatePool(generatorWeaponGroups, rule, role, {
+      genreGroupsKey: "allowedWeaponGroups",
+      genreItemsKey: "allowedWeaponItems",
+      jobRuleMap: generatorJobWeaponRules,
+      jobGroupsKey: "allowedWeaponGroups"
+    });
     const featureCount = pickWeightedCount(generatorCountWeights.features);
     const powerCount = pickWeightedCount(generatorCountWeights.power);
     const fashionPointCount = pickWeightedCount(generatorCountWeights.fashionPoints);
@@ -4705,12 +4958,12 @@ function renderStoryReader(worldId, storyId) {
 
     return {
       genre,
-      race: overrides.race ?? pickFromAllowedGroups(generatorSpeciesGroups, rule.allowedSpeciesGroups, rule.allowedSpeciesItems),
-      role: overrides.role ?? pickFromAllowedGroups(generatorJobGroups, rule.allowedJobGroups, rule.allowedJobItems),
+      role,
+      race: overrides.race ?? pickRandomFrom(speciesCandidates),
       ...personalityResult,
       visualAge: overrides.visualAge ?? visualAgeGroup,
       features: overrides.features ?? (pickUnique(generatorCommonOptions.features ?? [], featureCount).join(", ") || "없음"),
-      weapon: overrides.weapon ?? pickFromAllowedGroups(generatorWeaponGroups, rule.allowedWeaponGroups, rule.allowedWeaponItems),
+      weapon: overrides.weapon ?? pickRandomFrom(weaponCandidates),
       power: overrides.power ?? (pickUnique(generatorCommonOptions.powers ?? [], powerCount).join(", ") || "없음"),
       ...hairResult,
       outfit: overrides.outfit ?? createOutfitResult(),
@@ -4732,6 +4985,14 @@ function renderStoryReader(worldId, storyId) {
     if (!Array.isArray(entries)) return "";
     const value = entries.find(entry => entry?.label === label)?.value ?? "";
     return key === "outfit" ? normalizeOutfitValue(value) : value;
+  }
+
+  function getGeneratorColorPromptValue(label) {
+    const entries = getGeneratorEntry("colors");
+    if (!Array.isArray(entries)) return "";
+    const entry = entries.find(item => item?.label === label);
+    if (!entry) return "";
+    return entry.promptValue || formatHexColorForPrompt(entry.value) || entry.value || "";
   }
 
   function getGeneratorFieldLabel(key) {
@@ -4779,7 +5040,22 @@ function renderStoryReader(worldId, storyId) {
   }
 
   function canLockGeneratorKey(key) {
-    return key === "genre" || lockedGeneratorKeys.has("genre") || !generatorGenreDependentLockKeys.has(key);
+    if (key === "genre") return true;
+    if (generatorRoleDependentLockKeys.has(key)) {
+      return lockedGeneratorKeys.has("genre") && lockedGeneratorKeys.has("role");
+    }
+    if (generatorGenreDependentLockKeys.has(key)) {
+      return lockedGeneratorKeys.has("genre");
+    }
+    return true;
+  }
+
+  function clearRoleDependentGeneratorLocks() {
+    let didClear = false;
+    generatorRoleDependentLockKeys.forEach(key => {
+      if (lockedGeneratorKeys.delete(key)) didClear = true;
+    });
+    return didClear;
   }
 
   function clearGenreDependentGeneratorLocks() {
@@ -4793,15 +5069,18 @@ function renderStoryReader(worldId, storyId) {
   function enforceGeneratorLockDependencies() {
     if (!lockedGeneratorKeys.has("genre")) {
       clearGenreDependentGeneratorLocks();
+      return;
+    }
+    if (!lockedGeneratorKeys.has("role")) {
+      clearRoleDependentGeneratorLocks();
     }
   }
 
   function getLockedGeneratorOverrides() {
     enforceGeneratorLockDependencies();
     const overrides = {};
-    const isGenreLocked = lockedGeneratorKeys.has("genre");
     lockedGeneratorKeys.forEach(key => {
-      if (!isGenreLocked && generatorGenreDependentLockKeys.has(key)) return;
+      if (!canLockGeneratorKey(key)) return;
       if (Object.prototype.hasOwnProperty.call(generatorResult, key)) {
         overrides[key] = structuredCloneSafe(generatorResult[key]);
       }
@@ -4937,46 +5216,69 @@ function renderStoryReader(worldId, storyId) {
 
   function parseGeneratorPasteSection(line, labelMap) {
     const cleaned = stripGeneratorPasteLineDecorators(line);
-    const match = cleaned.match(/^([^:：]+)\s*[:：]\s*(.*)$/);
+    const match = cleaned.match(/^([^:：-]+)\s*[:：-]\s*(.*)$/);
     if (!match) return null;
     const label = normalizeGeneratorPasteLabel(match[1]);
     const key = labelMap.get(label);
     return key ? { key, value: String(match[2] || "").trim() } : null;
   }
 
+  function createEmptyGeneratorSetPasteBuckets() {
+    return { scene: [], composition: [], direction: [] };
+  }
+
+  function normalizeGeneratorSetPasteBuckets(buckets = createEmptyGeneratorSetPasteBuckets()) {
+    return {
+      scene: (buckets.scene || []).map(value => String(value || "").trim()).filter(Boolean).join("\n").trim(),
+      composition: (buckets.composition || []).map(value => String(value || "").trim()).filter(Boolean).join("\n").trim(),
+      direction: (buckets.direction || []).map(value => String(value || "").trim()).filter(Boolean).join("\n").trim()
+    };
+  }
+
+  function hasGeneratorSetPasteValues(values = {}) {
+    return Boolean(values.scene || values.composition || values.direction);
+  }
+
+  function hasCompleteGeneratorSetPasteValues(values = {}) {
+    return Boolean(values.scene && values.composition && values.direction);
+  }
+
   function parseGeneratorSetPasteText(source) {
-    const values = { scene: "", composition: "", direction: "" };
     const labelMap = new Map([
       ["장면", "scene"],
       ["구도", "composition"],
       ["연출", "direction"]
     ]);
-    const buckets = { scene: [], composition: [], direction: [] };
+    const buckets = createEmptyGeneratorSetPasteBuckets();
     let currentKey = "";
+    let foundAnyLabel = false;
 
-    sanitizeGeneratorPasteText(source).split(/\r?\n/).forEach(rawLine => {
+    for (const rawLine of sanitizeGeneratorPasteText(source).split(/\r?\n/)) {
       const line = String(rawLine || "").trim();
-      if (!line) return;
+      if (!line) continue;
+
       if (isGeneratorSetHeading(line)) {
+        if (foundAnyLabel && hasCompleteGeneratorSetPasteValues(normalizeGeneratorSetPasteBuckets(buckets))) break;
         currentKey = "";
-        return;
+        continue;
       }
+
       const section = parseGeneratorPasteSection(line, labelMap);
       if (section) {
+        if (foundAnyLabel && buckets[section.key]?.length && hasCompleteGeneratorSetPasteValues(normalizeGeneratorSetPasteBuckets(buckets))) break;
+        foundAnyLabel = true;
         currentKey = section.key;
         if (section.value) buckets[currentKey].push(section.value);
-        return;
+        continue;
       }
-      if (!currentKey) return;
-      const continuation = stripGeneratorPasteLineDecorators(line);
-      if (!continuation || isGeneratorSetHeading(continuation)) return;
-      buckets[currentKey].push(continuation);
-    });
 
-    Object.keys(values).forEach(key => {
-      values[key] = buckets[key].map(value => String(value || "").trim()).filter(Boolean).join("\n").trim();
-    });
-    return values;
+      if (!currentKey) continue;
+      const continuation = stripGeneratorPasteLineDecorators(line);
+      if (!continuation || isGeneratorSetHeading(continuation)) continue;
+      buckets[currentKey].push(continuation);
+    }
+
+    return normalizeGeneratorSetPasteBuckets(buckets);
   }
 
   function applyGeneratorSetPasteFromModal() {
@@ -5007,7 +5309,7 @@ function renderStoryReader(worldId, storyId) {
     const fashionPoints = getGeneratorEntry("fashionPoints");
     return [
       `캐릭터는 ${getGeneratorEntry("genre")} 장르에 나오는 여성 캐릭터입니다.`,
-      `캐릭터의 외형 나이대는 ${getGeneratorEntry("visualAge")}세 이며, 종족은 ${getGeneratorEntry("race")} 입니다.`,
+      `캐릭터의 외형 나이대는 ${formatGeneratorVisualAgeForPrompt()} 이며, 종족은 ${getGeneratorEntry("race")} 입니다.`,
       `캐릭터의 직업은 ${getGeneratorEntry("role")} 이며, 무기는 ${getGeneratorEntry("weapon")} 를 사용합니다`,
       hasGeneratorOptionalValue(power) ? `캐릭터의 능력은 ${power} 입니다.` : null,
       getGeneratorPersonalityPromptLine(),
@@ -5022,29 +5324,57 @@ function renderStoryReader(worldId, storyId) {
 
       "",
 
-      "이 캐릭터의 일러스트를 생성하려하는데 어떤 장면을 생성하면 좋을까요?",
-      "3개의 장면으로 추천해주세요.",
-      "각각 장면,구도,연출 을 기본적으로 알려주시고 종족/직업/능력/무기에 따라 해당 표현이 필요한경우 알려주세요.(아니면 연출에 포함시켜 주셔도 됩니다)",
-      "기본적으로 전신이 다 나와야합니다.",
-      "화면 비율은 9:16 입니다.",
-      "답변은 아래 형식으로 작성해주세요.",
+      "이 캐릭터의 일러스트를 생성하려고 합니다.",
+      "주어진 캐릭터 설정은 변경하지 말고, 이 설정에 어울리는 장면 후보를 3개 추천해주세요.",
+
+      "각 안은 이미지 생성 프롬프트에 바로 넣을 수 있는 문장으로 작성해주세요.",
+      "A안, B안, C안은 서로 다른 장소와 분위기가 되도록 구성해주세요. 포즈는 장면에 어울리게 구성하되, 모든 후보가 정적인 선 자세로만 반복되지 않도록 앉기, 걷기, 기대기, 몸을 숙이기, 무기를 사용하는 동작 등 다양한 전신 포즈도 자연스럽게 고려해주세요.",
+
+      "각 안에는 반드시 아래 4개 항목을 포함해주세요.",
+
+      "* 장면: 캐릭터가 있는 장소와 배경 상황을 설명해주세요.",
+      "* 구도: 9:16 세로 비율에 맞는 전신 구도로 설명해주세요. 머리부터 발끝까지 캐릭터 전체가 프레임 안에 들어와야 합니다.",
+      "* 연출: 캐릭터의 성격, 분위기, 직업, 능력, 무기, 의상 특징이 자연스럽게 드러나는 행동과 분위기를 설명해주세요.",
+      "* 종족표현: 해당 종족으로 인식될 수 있는 외형적 특징을 설명해주세요.",
+
+      "종족표현은 뿔, 귀, 꼬리, 눈동자, 피부 질감, 신체 실루엣, 장식 요소 등 시각적으로 드러나는 특징 위주로 작성해주세요.",
+      "직업, 능력, 무기 표현은 별도 항목으로 분리하지 말고 연출 안에 자연스럽게 포함해주세요.",
+      "설정에 없는 직업, 무기, 종족, 능력, 의상, 외형 특징을 새로 추가하지 말아주세요.",
+      "장면과 구도는 간결하고 명확하게, 연출은 캐릭터 설정이 잘 드러나도록 구체적으로 작성해주세요.",
+      "별도의 해설이나 설명은 쓰지 말고, 아래 형식만 출력해주세요.",
+
       "A안",
-      "- 장면:",
-      "- 구도:",
-      "- 연출:",
+
+      "* 장면:",
+      "* 구도:",
+      "* 연출:",
+      "* 종족표현:",
+
       "B안",
-      "- 장면:",
-      "- 구도:",
-      "- 연출:",
+
+      "* 장면:",
+      "* 구도:",
+      "* 연출:",
+      "* 종족표현:",
+
       "C안",
-      "- 장면:",
-      "- 구도:",
-      "- 연출:"
+
+      "* 장면:",
+      "* 구도:",
+      "* 연출:",
+      "* 종족표현:"
     ].filter(line => line !== null && line !== undefined).join("\n");
   }
   function hasGeneratorOptionalValue(value) {
     const normalized = String(value || "").trim();
     return normalized !== "" && normalized !== "없음";
+  }
+
+
+  function formatGeneratorVisualAgeForPrompt() {
+    const visualAge = String(getGeneratorEntry("visualAge") || "").trim();
+    if (!visualAge) return "";
+    return /세\s*$/.test(visualAge) ? visualAge : `${visualAge}세`;
   }
 
   function buildGeneratorImagePrompt() {
@@ -5065,7 +5395,7 @@ function renderStoryReader(worldId, storyId) {
     return [
       "캐릭터의 일러스트를 생성해주세요.",
       `캐릭터는 ${getGeneratorEntry("genre")} 장르에 나오는 여성 캐릭터입니다.`,
-      `캐릭터의 외형 나이대는 ${getGeneratorEntry("visualAge")}세 이며, 종족은 ${getGeneratorEntry("race")} 입니다.`,
+      `캐릭터의 외형 나이대는 ${formatGeneratorVisualAgeForPrompt()} 이며, 종족은 ${getGeneratorEntry("race")} 입니다.`,
       `캐릭터의 직업은 ${getGeneratorEntry("role")} 이며, 무기는 ${getGeneratorEntry("weapon")} 를 사용합니다`,
       hasGeneratorOptionalValue(power) ? `캐릭터의 능력은 ${power} 입니다.` : null,
       getGeneratorPersonalityPromptLine(),
@@ -5086,14 +5416,20 @@ function renderStoryReader(worldId, storyId) {
 
       "",
 
-      "전신이 모두 보이는 풀 숏(full shot) 구도로 표현해주세요.",
-      "머리부터 발끝까지 캐릭터 전체가 프레임 안에 완전히 들어오게 해주세요.",
-      "이미지 스타일은 고퀄리티 애니메이션풍의 게임 일러스트이고 반실사 렌더링 입니다.",
+      "캐릭터의 종족, 직업, 무기, 능력, 의상, 외형 특징, 헤어스타일, 색상이 한눈에 드러나도록 표현해주세요.",
       "주 피사체인 캐릭터가 가장 돋보이도록 해주세요.",
-      "배경은 단순하고 절제되게, 낮은 채도와 낮은 대비로 표현해주세요.",
-      "배경 디테일과 조명 효과는 최소화해주세요",
-      "설명문은 만들지 말아주세요.",
-      "가로세로 비율은 9:16 입니다."
+
+      "전신이 모두 보이는 풀 숏 구도로 표현해주세요.",
+      "머리부터 발끝까지 캐릭터 전체가 프레임 안에 완전히 들어오게 해주세요.",
+      "가로세로 비율은 9:16입니다.",
+
+      "이미지 스타일은 고퀄리티 애니메이션풍의 게임 일러스트이며, 반실사 렌더링 느낌입니다.",
+      "배경은 장면을 기반으로 하되 단순하고 절제되게 표현해주세요.",
+      "배경은 낮은 채도와 낮은 대비로 표현해주세요.",
+      "배경 디테일과 배경 조명 효과는 최소화해주세요.",
+      "캐릭터 주변의 핵심 연출 효과는 배경보다 선명하게 표현해주세요.",
+
+      "이미지 안에 설명문, 글자, 캡션, 로고, 워터마크를 넣지 말아주세요."
     ].filter(line => line !== null && line !== undefined).join("\n");
   }
   function getGeneratorFollowupCharacterName() {
@@ -5166,6 +5502,49 @@ function renderStoryReader(worldId, storyId) {
     if (elements.generatorSketchbookRoleInput) elements.generatorSketchbookRoleInput.value = getGeneratorEntry("role") || "";
     if (elements.generatorSketchbookPersonalityInput) elements.generatorSketchbookPersonalityInput.value = getGeneratorEntry("personality") || "";
     if (elements.generatorSketchbookGenreInput) elements.generatorSketchbookGenreInput.value = getGeneratorEntry("genre") || "";
+  }
+
+  function sanitizeGeneratorExcelCell(value) {
+    return String(value ?? "").replace(/[\t\r\n]+/g, " ").trim();
+  }
+
+  function getGeneratorExcelOptionalValue(key) {
+    const value = String(getGeneratorEntry(key) || "").trim();
+    return hasGeneratorOptionalValue(value) ? value : "";
+  }
+
+  function buildGeneratorExcelPersonalityCell() {
+    const trait = String(getGeneratorEntry("personalityTrait") || "").trim();
+    const aura = String(getGeneratorEntry("aura") || "").trim();
+    if (trait && aura) return `${trait}, ${aura}`;
+    return String(getGeneratorEntry("personality") || "").replace(/\s*성격\s*\/\s*/g, ", ").replace(/\s*분위기\s*/g, "").trim();
+  }
+
+  function buildGeneratorExcelRowText() {
+    if (!hasGeneratorResult()) return "";
+    const cells = [
+      getGeneratorEntry("genre"),
+      getGeneratorEntry("race"),
+      getGeneratorEntry("role"),
+      getGeneratorEntry("visualAge"),
+      buildGeneratorExcelPersonalityCell(),
+      getGeneratorExcelOptionalValue("power"),
+      getGeneratorEntry("weapon"),
+      getGeneratorListValue("colors", "상징")
+    ];
+    return cells.map(sanitizeGeneratorExcelCell).join("\t");
+  }
+
+  async function copyGeneratorExcelRow() {
+    if (!hasGeneratorResult()) {
+      openGeneratorPromptNotice("랜덤 생성 결과가 없습니다", "엑셀로 복사할 랜덤 생성 결과를 먼저 만들어 주세요.");
+      return;
+    }
+    await writeClipboardText(
+      buildGeneratorExcelRowText(),
+      elements.copyGeneratorExcelRowButton,
+      "엑셀용 복사"
+    );
   }
 
   function openGeneratorPromptModal({ kicker, title, copy, text: promptText, copyLabel = "복사", source = "" }) {
@@ -5315,21 +5694,55 @@ function renderStoryReader(worldId, storyId) {
     }, delay);
   }
 
+  function formatGeneratorSetPasteText(notes = getGeneratorAssistNotes()) {
+    return [
+      notes.scene ? `- 장면: ${notes.scene}` : "",
+      notes.composition ? `- 구도: ${notes.composition}` : "",
+      notes.direction ? `- 연출: ${notes.direction}` : ""
+    ].filter(Boolean).join("\n");
+  }
+
   function openGeneratorSetPasteModal() {
     if (!elements.generatorSetPasteModal || !elements.generatorSetPasteText) return;
-    const notes = getGeneratorAssistNotes();
-    elements.generatorSetPasteText.value = [
-      "A안",
-      notes.scene ? `- 장면: ${notes.scene}` : "- 장면:",
-      notes.composition ? `- 구도: ${notes.composition}` : "- 구도:",
-      notes.direction ? `- 연출: ${notes.direction}` : "- 연출:"
-    ].join("\n");
+    elements.generatorSetPasteText.value = formatGeneratorSetPasteText();
     elements.generatorSetPasteModal.hidden = false;
     elements.generatorSetPasteText.focus();
   }
 
   function closeGeneratorSetPasteModal() {
     if (elements.generatorSetPasteModal) elements.generatorSetPasteModal.hidden = true;
+  }
+
+  function getGeneratorLockRequirementText(key) {
+    if (generatorRoleDependentLockKeys.has(key)) {
+      return lockedGeneratorKeys.has("genre")
+        ? "직업을 먼저 고정해야 사용할 수 있습니다."
+        : "장르와 직업을 먼저 고정해야 사용할 수 있습니다.";
+    }
+    if (generatorGenreDependentLockKeys.has(key)) {
+      return "장르를 먼저 고정해야 사용할 수 있습니다.";
+    }
+    return "";
+  }
+
+  function getGeneratorLockRequirementNotice(key) {
+    if (generatorRoleDependentLockKeys.has(key)) {
+      return lockedGeneratorKeys.has("genre")
+        ? ["직업 고정이 필요합니다.", "종족과 무기는 직업을 먼저 고정해야 고정할 수 있습니다."]
+        : ["장르와 직업 고정이 필요합니다.", "종족과 무기는 장르와 직업을 먼저 고정해야 고정할 수 있습니다."];
+    }
+    if (generatorGenreDependentLockKeys.has(key)) {
+      return ["장르 고정이 필요합니다.", "직업은 장르를 먼저 고정해야 고정할 수 있습니다."];
+    }
+    return ["고정할 수 없습니다.", "현재 상태에서는 이 항목을 고정할 수 없습니다."];
+  }
+
+  function getGeneratorLockButtonLabel(key, locked, canLock) {
+    if (locked) return "고정됨";
+    if (canLock) return "고정";
+    if (generatorRoleDependentLockKeys.has(key)) return lockedGeneratorKeys.has("genre") ? "직업 필요" : "장르·직업 필요";
+    if (generatorGenreDependentLockKeys.has(key)) return "장르 필요";
+    return "고정 불가";
   }
 
   function renderGeneratorValue(container, key) {
@@ -5347,8 +5760,15 @@ function renderStoryReader(worldId, storyId) {
           if (key === "colors") {
             const swatch = document.createElement("i");
             swatch.className = "generator-color-swatch";
-            swatch.style.backgroundColor = entry.value;
-            strong.append(swatch, document.createTextNode(entry.value));
+            swatch.style.backgroundColor = entry.swatch || entry.value;
+            strong.append(swatch);
+            if (entry.subColor) {
+              const subSwatch = document.createElement("i");
+              subSwatch.className = "generator-color-swatch";
+              subSwatch.style.backgroundColor = entry.subColor;
+              strong.append(subSwatch);
+            }
+            strong.append(document.createTextNode(entry.value));
           } else {
             strong.textContent = key === "outfit" ? normalizeOutfitValue(entry.value) : entry.value;
           }
@@ -5384,8 +5804,8 @@ function renderStoryReader(worldId, storyId) {
     lockButton.classList.toggle("is-active", locked);
     lockButton.dataset.generatorLock = key;
     lockButton.disabled = !canLock;
-    lockButton.title = canLock ? "" : "장르를 먼저 고정해야 사용할 수 있습니다.";
-    lockButton.textContent = locked ? "고정됨" : (canLock ? "고정" : "장르 필요");
+    lockButton.title = canLock ? "" : getGeneratorLockRequirementText(key);
+    lockButton.textContent = getGeneratorLockButtonLabel(key, locked, canLock);
 
     item.append(label, value, lockButton);
     return item;
@@ -5848,6 +6268,7 @@ function renderStoryReader(worldId, storyId) {
     elements.copyFollowupSketchbookPromptButton?.addEventListener("click", () => openFollowupPromptModal("sketchbook", "스케치북 프롬프트 확인", buildFollowupSketchbookPrompt, false));
     elements.copyFollowupBodyInfoPromptButton?.addEventListener("click", () => openFollowupPromptModal("body-info", "신체정보 프롬프트 확인", buildFollowupBodyInfoPrompt, false));
     elements.copyFollowupCookingMagazinePromptButton?.addEventListener("click", () => openFollowupPromptModal("cooking-magazine", "요리잡지 프롬프트 확인", buildFollowupCookingMagazinePrompt));
+    elements.copyGeneratorExcelRowButton?.addEventListener("click", copyGeneratorExcelRow);
 
     [elements.privateCharacterXlsxInput, elements.privateCharacterZipInput].forEach(input => {
       input?.addEventListener("change", () => {
@@ -5939,13 +6360,15 @@ function renderStoryReader(worldId, storyId) {
       if (generatorLockButton) {
         const key = generatorLockButton.dataset.generatorLock;
         if (generatorLockButton.disabled || !canLockGeneratorKey(key)) {
-          openGeneratorPromptNotice("장르 고정이 필요합니다.", "종족, 직업, 무기는 장르를 먼저 고정해야 고정할 수 있습니다.");
+          openGeneratorPromptNotice(...getGeneratorLockRequirementNotice(key));
           return;
         }
         if (lockedGeneratorKeys.has(key)) {
           lockedGeneratorKeys.delete(key);
           if (key === "genre" && clearGenreDependentGeneratorLocks()) {
-            openGeneratorPromptNotice("하위 고정 해제", "장르 고정이 해제되어 종족, 직업, 무기 고정도 함께 해제되었습니다.");
+            openGeneratorPromptNotice("하위 고정 해제", "장르 고정이 해제되어 직업, 종족, 무기 고정도 함께 해제되었습니다.");
+          } else if (key === "role" && clearRoleDependentGeneratorLocks()) {
+            openGeneratorPromptNotice("하위 고정 해제", "직업 고정이 해제되어 종족, 무기 고정도 함께 해제되었습니다.");
           }
         } else {
           lockedGeneratorKeys.add(key);
@@ -6181,7 +6604,8 @@ function renderStoryReader(worldId, storyId) {
       "copyFollowupMagazinePromptButton",
       "copyFollowupSketchbookPromptButton",
       "copyFollowupBodyInfoPromptButton",
-      "copyFollowupCookingMagazinePromptButton"
+      "copyFollowupCookingMagazinePromptButton",
+      "copyGeneratorExcelRowButton"
     ].forEach(id => {
       elements[id] = $(id);
     });

@@ -10,7 +10,7 @@ window.STORY_TAXONOMY = {
       "code": "noct",
       "name": "노크트",
       "coreGenre": "전쟁 판타지 / 궁정 판타지",
-      "description": "흑관 장례법과 변경 왕국의 맹세가 산 자와 죽은 자의 질서를 묶는 왕국권.",
+      "description": "전쟁과 궁정의 명예, 음모, 충성이 검 끝에서 시험받는 중세 판타지 세계.",
       "characters": [
         "lena",
         "scarlett",
@@ -24,14 +24,16 @@ window.STORY_TAXONOMY = {
         "moira",
         "elysia",
         "yslra",
-        "amelys"
+        "amelys",
+        "edeline",
+        "melia"
       ]
     },
     {
       "code": "corebelt",
       "name": "코어벨트",
       "coreGenre": "사이버펑크 / 디스토피아 SF",
-      "description": "기업도시의 폐허, 신체개조, 재난산업, 군수권력이 인간의 쓸모를 평가하는 산업권.",
+      "description": "기업과 기술이 인간의 몸과 삶을 갈아 넣은 네온 폐허의 디스토피아 세계.",
       "characters": [
         "lunaFerrano",
         "raina",
@@ -49,14 +51,18 @@ window.STORY_TAXONOMY = {
         "barretha",
         "nouvel",
         "velour",
-        "loen"
+        "loen",
+        "mona",
+        "mikazi",
+        "daphne",
+        "xella"
       ]
     },
     {
       "code": "midrain",
       "name": "미드레인",
       "coreGenre": "어반 판타지 / 괴담 수사물",
-      "description": "비가 멈추지 않는 야간도시에서 괴담, 범죄, 수사, 언론, 법정이 서로를 증거로 삼는 도시권.",
+      "description": "비 오는 도시의 골목마다 괴담과 사건의 진실이 숨어 있는 어두운 수사 세계.",
       "characters": [
         "eliana",
         "shirayeAilmaris",
@@ -74,14 +80,15 @@ window.STORY_TAXONOMY = {
         "umbra",
         "zenith",
         "mirabel",
-        "vesper"
+        "vesper",
+        "karma"
       ]
     },
     {
       "code": "ashrun",
       "name": "애쉬런",
       "coreGenre": "아포칼립스 / 생존물",
-      "description": "감염, 낙진, 격리문, 황사 폐허 속에서 생존자들이 서로의 인간성을 확인하는 적막지대.",
+      "description": "잿비와 폐허 속에서 생존, 감염, 인간성이 매일 시험받는 멸망 이후의 세계.",
       "characters": [
         "erissaBlackmoon",
         "searra",
@@ -102,7 +109,7 @@ window.STORY_TAXONOMY = {
       "code": "yeonmuk",
       "name": "연묵",
       "coreGenre": "동양 판타지 / 무협",
-      "description": "묵법, 주술, 검, 표국, 문파의 명예가 길 위에서 시험받는 동방 무림권.",
+      "description": "주술, 무공, 문파와 금기가 먹빛 강호 위에서 부딪히는 동방 판타지 세계.",
       "characters": [
         "chihwaseon",
         "garnet",
@@ -115,14 +122,17 @@ window.STORY_TAXONOMY = {
         "siyo",
         "yul",
         "lia",
-        "torqa"
+        "torqa",
+        "garam",
+        "vryza",
+        "ciaran"
       ]
     },
     {
       "code": "lumia",
       "name": "루미아",
       "coreGenre": "일상 판타지 / 학원·생활물",
-      "description": "평범한 거리와 가족적 공동체 안에서 작고 기묘한 사건들이 마음의 균열을 비추는 일상권.",
+      "description": "학교, 카페, 공연장, 골목에 밝고 기묘한 판타지가 자연스럽게 섞인 생활 세계.",
       "characters": [
         "luciel",
         "vanPalaeon",
@@ -142,7 +152,7 @@ window.STORY_TAXONOMY = {
       "code": "gatefall",
       "name": "게이트폴",
       "coreGenre": "헌터물 / 이세계·히어로 판타지",
-      "description": "무너지는 게이트와 다중 전장 사이에서 영웅, 헌터, 방송, 임무가 전쟁을 소비하는 세계.",
+      "description": "균열, 랭크, 영웅과 빌런이 뒤섞인 차원전장형 액션 판타지 세계.",
       "characters": [
         "rowina",
         "luciaNox",
@@ -156,27 +166,33 @@ window.STORY_TAXONOMY = {
         "zella",
         "officina",
         "ursola",
-        "lixia"
+        "lixia",
+        "marine",
+        "lavinia",
+        "celeste",
+        "kyraxa"
       ]
     },
     {
       "code": "astra",
       "name": "아스트라",
       "coreGenre": "스페이스 오페라 / 우주 SF",
-      "description": "별먼지 항로와 개척 성역에서 신앙, 과학, 생존, 식민 개척의 윤리가 충돌하는 세계.",
+      "description": "별과 항로, 함선과 개척지가 기억과 귀환을 시험하는 우주 개척 세계.",
       "characters": [
         "nagir",
         "tanilaEllamin",
         "rust",
         "garka",
-        "tiska"
+        "tiska",
+        "mantis",
+        "esme"
       ]
     },
     {
       "code": "saffron-sea",
       "name": "사프란해",
       "coreGenre": "해양 판타지 / 모험·교역물",
-      "description": "비단항로, 항구도시, 대상선단, 해적 총독, 저주받은 화물이 운명을 사고파는 해양상권.",
+      "description": "항구, 선단, 해적, 상인과 사신이 바다 위 계약과 모험을 벌이는 해양 판타지 세계.",
       "characters": [
         "celina",
         "piffGabriel",
@@ -187,14 +203,16 @@ window.STORY_TAXONOMY = {
         "castiella",
         "zahyra",
         "yvris",
-        "nerissa"
+        "nerissa",
+        "sabia",
+        "enid"
       ]
     },
     {
       "code": "erebos",
       "name": "에레보스",
       "coreGenre": "코즈믹 호러 / 신화 판타지",
-      "description": "신의 그늘, 심연 묘역, 이름을 지우는 성소에서 인간성이 신화적 고통과 맞서는 세계.",
+      "description": "신의 잔해와 심연의 법칙이 이름과 운명을 침식하는 신화적 공포 세계.",
       "characters": [
         "serothan",
         "essy",
@@ -203,7 +221,9 @@ window.STORY_TAXONOMY = {
         "athenia",
         "anachris",
         "ryx",
-        "nyrva"
+        "nyrva",
+        "lethar",
+        "morwenna"
       ]
     }
   ],
@@ -1407,6 +1427,206 @@ window.STORY_TAXONOMY = {
       "genreName": "루미아",
       "characterName": "신시아",
       "characterEn": "Cynthia"
+    },
+    "karma": {
+      "worldCode": "midrain",
+      "worldName": "미드레인",
+      "genreGroupCode": "midrain",
+      "genreGroupName": "미드레인",
+      "genreCode": "midrain",
+      "genreName": "미드레인",
+      "characterName": "카르마",
+      "characterEn": "Karma"
+    },
+    "mona": {
+      "worldCode": "corebelt",
+      "worldName": "코어벨트",
+      "genreGroupCode": "corebelt",
+      "genreGroupName": "코어벨트",
+      "genreCode": "corebelt",
+      "genreName": "코어벨트",
+      "characterName": "모나",
+      "characterEn": "Mona"
+    },
+    "lethar": {
+      "worldCode": "erebos",
+      "worldName": "에레보스",
+      "genreGroupCode": "erebos",
+      "genreGroupName": "에레보스",
+      "genreCode": "erebos",
+      "genreName": "에레보스",
+      "characterName": "리터",
+      "characterEn": "Lethar"
+    },
+    "mantis": {
+      "worldCode": "astra",
+      "worldName": "아스트라",
+      "genreGroupCode": "astra",
+      "genreGroupName": "아스트라",
+      "genreCode": "astra",
+      "genreName": "아스트라",
+      "characterName": "만티스",
+      "characterEn": "Mantis"
+    },
+    "mikazi": {
+      "worldCode": "corebelt",
+      "worldName": "코어벨트",
+      "genreGroupCode": "corebelt",
+      "genreGroupName": "코어벨트",
+      "genreCode": "corebelt",
+      "genreName": "코어벨트",
+      "characterName": "미카지",
+      "characterEn": "Mikazi"
+    },
+    "marine": {
+      "worldCode": "gatefall",
+      "worldName": "게이트폴",
+      "genreGroupCode": "gatefall",
+      "genreGroupName": "게이트폴",
+      "genreCode": "gatefall",
+      "genreName": "게이트폴",
+      "characterName": "마린",
+      "characterEn": "Marine"
+    },
+    "esme": {
+      "worldCode": "astra",
+      "worldName": "아스트라",
+      "genreGroupCode": "astra",
+      "genreGroupName": "아스트라",
+      "genreCode": "astra",
+      "genreName": "아스트라",
+      "characterName": "에스메",
+      "characterEn": "Esme"
+    },
+    "lavinia": {
+      "worldCode": "gatefall",
+      "worldName": "게이트폴",
+      "genreGroupCode": "gatefall",
+      "genreGroupName": "게이트폴",
+      "genreCode": "gatefall",
+      "genreName": "게이트폴",
+      "characterName": "라비니아",
+      "characterEn": "Lavinia"
+    },
+    "garam": {
+      "worldCode": "yeonmuk",
+      "worldName": "연묵",
+      "genreGroupCode": "yeonmuk",
+      "genreGroupName": "연묵",
+      "genreCode": "yeonmuk",
+      "genreName": "연묵",
+      "characterName": "가람",
+      "characterEn": "Garam"
+    },
+    "daphne": {
+      "worldCode": "corebelt",
+      "worldName": "코어벨트",
+      "genreGroupCode": "corebelt",
+      "genreGroupName": "코어벨트",
+      "genreCode": "corebelt",
+      "genreName": "코어벨트",
+      "characterName": "다프네",
+      "characterEn": "Daphne"
+    },
+    "sabia": {
+      "worldCode": "saffron-sea",
+      "worldName": "사프란해",
+      "genreGroupCode": "saffron-sea",
+      "genreGroupName": "사프란해",
+      "genreCode": "saffron-sea",
+      "genreName": "사프란해",
+      "characterName": "사비아",
+      "characterEn": "Sabia"
+    },
+    "celeste": {
+      "worldCode": "gatefall",
+      "worldName": "게이트폴",
+      "genreGroupCode": "gatefall",
+      "genreGroupName": "게이트폴",
+      "genreCode": "gatefall",
+      "genreName": "게이트폴",
+      "characterName": "셀레스트",
+      "characterEn": "Celeste"
+    },
+    "edeline": {
+      "worldCode": "noct",
+      "worldName": "노크트",
+      "genreGroupCode": "noct",
+      "genreGroupName": "노크트",
+      "genreCode": "noct",
+      "genreName": "노크트",
+      "characterName": "에델린",
+      "characterEn": "Edeline"
+    },
+    "vryza": {
+      "worldCode": "yeonmuk",
+      "worldName": "연묵",
+      "genreGroupCode": "yeonmuk",
+      "genreGroupName": "연묵",
+      "genreCode": "yeonmuk",
+      "genreName": "연묵",
+      "characterName": "브리자",
+      "characterEn": "Vryza"
+    },
+    "kyraxa": {
+      "worldCode": "gatefall",
+      "worldName": "게이트폴",
+      "genreGroupCode": "gatefall",
+      "genreGroupName": "게이트폴",
+      "genreCode": "gatefall",
+      "genreName": "게이트폴",
+      "characterName": "키락사",
+      "characterEn": "Kyraxa"
+    },
+    "ciaran": {
+      "worldCode": "yeonmuk",
+      "worldName": "연묵",
+      "genreGroupCode": "yeonmuk",
+      "genreGroupName": "연묵",
+      "genreCode": "yeonmuk",
+      "genreName": "연묵",
+      "characterName": "시아란",
+      "characterEn": "Ciaran"
+    },
+    "xella": {
+      "worldCode": "corebelt",
+      "worldName": "코어벨트",
+      "genreGroupCode": "corebelt",
+      "genreGroupName": "코어벨트",
+      "genreCode": "corebelt",
+      "genreName": "코어벨트",
+      "characterName": "크셀라",
+      "characterEn": "Xella"
+    },
+    "melia": {
+      "worldCode": "noct",
+      "worldName": "노크트",
+      "genreGroupCode": "noct",
+      "genreGroupName": "노크트",
+      "genreCode": "noct",
+      "genreName": "노크트",
+      "characterName": "멜리아",
+      "characterEn": "Melia"
+    },
+    "morwenna": {
+      "worldCode": "erebos",
+      "worldName": "에레보스",
+      "genreGroupCode": "erebos",
+      "genreGroupName": "에레보스",
+      "genreCode": "erebos",
+      "genreName": "에레보스",
+      "characterName": "모웬나",
+      "characterEn": "Morwenna"
+    },
+    "enid": {
+      "worldCode": "saffron-sea",
+      "worldName": "사프란해",
+      "genreGroupCode": "saffron-sea",
+      "genreGroupName": "사프란해",
+      "genreCode": "saffron-sea",
+      "genreName": "사프란해",
+      "characterName": "에니드",
+      "characterEn": "Enid"
     }
   }
 };
